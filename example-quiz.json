@@ -1,0 +1,37 @@
+{
+  "title": "상식 퀴즈 예시",
+  "subject": "상식",
+  "description": "이 파일은 퀴즈 데이터 형식 예시입니다. 이 형식에 맞춰 나만의 퀴즈 파일을 만들어 업로드하세요. subject(과목)를 지정하면 과목별로 저장·정리됩니다.",
+  "questions": [
+    {
+      "question": "대한민국의 수도는 어디인가요?",
+      "options": ["부산", "서울", "인천", "대구"],
+      "answer": 1,
+      "explanation": "대한민국의 수도는 서울입니다."
+    },
+    {
+      "question": "1 + 1 은 무엇인가요?",
+      "options": ["1", "2", "3", "11"],
+      "answer": 1,
+      "explanation": "1 더하기 1은 2입니다."
+    },
+    {
+      "question": "태양계에서 가장 큰 행성은 무엇인가요?",
+      "options": ["지구", "화성", "목성", "토성"],
+      "answer": 2,
+      "explanation": "목성은 태양계에서 가장 큰 행성입니다."
+    },
+    {
+      "question": "물의 화학식은 무엇인가요?",
+      "options": ["CO2", "O2", "H2O", "NaCl"],
+      "answer": 2,
+      "explanation": "물은 수소 2개와 산소 1개로 이루어져 H2O 입니다."
+    },
+    {
+      "question": "다음 중 프로그래밍 언어가 아닌 것은?",
+      "options": ["Python", "Java", "HTML", "C++"],
+      "answer": 2,
+      "explanation": "HTML은 마크업 언어로, 일반적으로 프로그래밍 언어로 분류되지 않습니다."
+    }
+  ]
+}

@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Study Deck</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+<button class="stats-toggle" id="statsToggle" title="학습 통계"><i class="fa-solid fa-chart-column"></i></button>
+<button class="theme-toggle" id="themeToggle" title="테마 전환"><i class="fa-solid fa-sun"></i></button>
+
+<div class="container">
+  <header>
+    <h1 id="homeTitle" title="메인으로 이동">Study Deck</h1>
+    <p>쌓고, 반복하고, 완성하다</p>
+  </header>
+
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="subjects"><i class="fa-solid fa-folder-open"></i> 과목별 풀기<span class="count" id="cntLib">0</span></button>
+    <button class="tab-btn" data-tab="all"><i class="fa-solid fa-font"></i> 전체 풀기</button>
+    <button class="tab-btn" data-tab="bookmark"><i class="fa-solid fa-star"></i> 북마크<span class="count" id="cntBm">0</span></button>
+    <button class="tab-btn" data-tab="wrong"><i class="fa-solid fa-clipboard-list"></i> 오답 노트<span class="count" id="cntWrong">0</span></button>
+  </div>
+
+  <div class="tab-panel active" id="tab-subjects"></div>
+  <div class="tab-panel" id="tab-all"></div>
+  <div class="tab-panel" id="tab-bookmark"></div>
+  <div class="tab-panel" id="tab-wrong"></div>
+</div>
+
+<input type="file" id="fileInput" accept=".json,application/json" multiple />
+
+<script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,6 @@
+# OS / 편집기 부산물
+Thumbs.db
+Desktop.ini
+.DS_Store
+*.log
+.vscode/
