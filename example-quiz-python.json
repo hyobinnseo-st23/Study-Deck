@@ -1,37 +1,37 @@
 {
-  "title": "Python 예시 (5문제)",
+  "title": "Python_DAY2",
   "subject": "Python",
-  "description": "python-day1.json을 5문제로 간략화한 예시 파일입니다. 이 형식에 맞춰 나만의 퀴즈를 만들어 업로드해 보세요.",
+  "description": "SK Shieldus Rookies: Python 2일차 수업. 변수와 객체(참조), 자료형, 리스트/튜플/집합/딕셔너리, 문자열, 타입 힌트를 다룹니다.",
   "questions": [
     {
-      "question": "파이썬의 실행 방식에 대한 설명으로 옳은 것은?",
-      "options": ["전체 코드를 먼저 기계어로 번역한 뒤 실행한다", "코드를 한 줄씩 해석하며 실행하는 인터프리터 언어이다", "실행 전 반드시 빌드 단계를 거쳐야 한다", "여러 줄을 동시에 병렬로 실행한다"],
+      "question": "파이썬에서 변수가 실제로 저장하는 것은 무엇인가요?",
+      "options": ["데이터의 복사본", "객체의 메모리 주소(참조)", "자료형의 이름", "데이터 값 자체"],
       "answer": 1,
-      "explanation": "파이썬은 인터프리터 언어로, 코드를 위에서 아래로 한 줄(라인)씩 해석하며 실행합니다."
+      "explanation": "파이썬 변수는 값을 직접 담지 않고, 메모리에 만들어진 객체의 주소(reference)를 가리키는 이름표입니다."
     },
     {
-      "question": "파이썬을 개발한 사람은 누구인가요?",
-      "options": ["제임스 고슬링", "귀도 반 로섬", "데니스 리치", "브렌던 아이크"],
-      "answer": 1,
-      "explanation": "파이썬은 귀도 반 로섬(Guido van Rossum)이 개발했습니다."
-    },
-    {
-      "question": "파이썬에서 코드 블록을 구분하는 방식은?",
-      "options": ["중괄호 { }", "들여쓰기(indent)", "세미콜론 ;", "begin/end 키워드"],
-      "answer": 1,
-      "explanation": "파이썬은 중괄호 대신 들여쓰기(indent)로 코드 블록을 구분하며, 들여쓰기가 틀리면 오류가 발생합니다."
-    },
-    {
-      "question": "다음 중 파이썬 기반 웹 백엔드 프레임워크가 아닌 것은?",
-      "options": ["Flask", "Django", "FastAPI", "Spring"],
-      "answer": 3,
-      "explanation": "Spring은 자바(Java) 기반 프레임워크입니다. Flask, Django, FastAPI는 파이썬 기반입니다."
-    },
-    {
-      "question": "머신러닝(회귀, 분류, 군집화)에 사용하는 대표적인 파이썬 라이브러리는?",
-      "options": ["scikit-learn", "matplotlib", "requests", "beautifulsoup"],
+      "question": "is 연산자와 == 연산자의 차이로 옳은 것은?",
+      "options": ["is는 주소(정체성) 비교, ==는 값 비교", "둘 다 값 비교", "둘 다 주소 비교", "is는 값 비교, ==는 주소 비교"],
       "answer": 0,
-      "explanation": "scikit-learn(사이킷런)은 머신러닝 알고리즘을 제공하는 대표 라이브러리입니다."
+      "explanation": "is는 같은 객체(주소/정체성)인지, ==는 값이 같은지를 비교합니다."
+    },
+    {
+      "question": "딕셔너리에서 없는 키에도 에러 없이 안전하게 접근하는 메서드는?",
+      "options": ["index()", "get()", "pop()", "keys()"],
+      "answer": 1,
+      "explanation": "get()은 키가 없어도 KeyError 대신 None(또는 지정한 기본값)을 반환합니다."
+    },
+    {
+      "question": "빈 집합(set)을 만드는 올바른 방법은?",
+      "options": ["set()", "()", "[]", "{}"],
+      "answer": 0,
+      "explanation": "{}는 빈 딕셔너리이므로, 빈 집합은 반드시 set()으로 만들어야 합니다."
+    },
+    {
+      "question": "리스트를 진짜로 복사(별도 객체 생성)하려면 어떻게 해야 하나요?",
+      "options": ["b = a.copy()", "b = a.sort()", "b = a", "b = a.append()"],
+      "answer": 0,
+      "explanation": "b = a는 같은 객체를 공유합니다. copy()나 a[:]로 얕은 복사본을 만들어야 별개가 됩니다."
     }
   ]
 }
