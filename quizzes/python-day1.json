@@ -28,22 +28,10 @@
       "explanation": "Spring은 자바(Java) 기반 프레임워크입니다. Flask, Django, FastAPI는 파이썬 기반입니다."
     },
     {
-      "question": "AI 서빙(serving) 환경 구성과 API 제작에 가장 많이 사용된다고 소개된 파이썬 프레임워크는?",
-      "options": ["Flask", "Django", "FastAPI", "Tornado"],
-      "answer": 2,
-      "explanation": "FastAPI는 고성능이며 API 구성과 AI 서빙에 가장 많이 사용됩니다."
-    },
-    {
       "question": "머신러닝(회귀, 분류, 군집화)에 사용하는 대표적인 파이썬 라이브러리는?",
       "options": ["scikit-learn", "matplotlib", "requests", "beautifulsoup"],
       "answer": 0,
       "explanation": "scikit-learn(사이킷런)은 머신러닝 알고리즘을 제공하는 대표 라이브러리입니다."
-    },
-    {
-      "question": "표(DataFrame) 형태의 데이터 처리와 전처리에 핵심적으로 쓰이며, 강사가 가장 강조한 라이브러리는?",
-      "options": ["NumPy", "Pandas", "TensorFlow", "PyTorch"],
-      "answer": 1,
-      "explanation": "Pandas는 데이터 전처리와 분석의 핵심 라이브러리로, 머신러닝 전 단계에서 가장 많이 사용됩니다."
     },
     {
       "question": "데이터 시각화(차트, 그래프)에 사용하는 라이브러리는?",
@@ -62,18 +50,6 @@
       "options": ["메모리 누수", "임의 코드 실행(RCE)", "화면 깨짐", "네트워크 지연"],
       "answer": 1,
       "explanation": "신뢰할 수 없는 .pkl 파일을 pickle.load()하면 임의 코드 실행(RCE)이 가능한 역직렬화 취약점(CWE-502)이 있습니다."
-    },
-    {
-      "question": "이번 과정에서 설치하기로 한 파이썬 버전은?",
-      "options": ["3.9", "3.11", "3.12", "3.14"],
-      "answer": 2,
-      "explanation": "TensorFlow 등 라이브러리 호환성을 고려해 3.12(3.12.10) 버전을 설치했습니다."
-    },
-    {
-      "question": "3.14가 최신 버전인데도 3.12를 설치한 주된 이유는?",
-      "options": ["3.14는 유료라서", "TensorFlow 등 일부 라이브러리가 최신 버전에서 아직 완벽히 호환되지 않아서", "3.14는 한글을 지원하지 않아서", "3.12가 더 빨라서"],
-      "answer": 1,
-      "explanation": "TensorFlow 등 일부 라이브러리가 3.13/3.14에서 아직 완벽하게 지원되지 않아 안정적인 3.12를 선택했습니다."
     },
     {
       "question": "윈도우에서 파이썬 설치 시 반드시 체크해야 하는 항목은?",
