@@ -1,5 +1,5 @@
 {
-    "_comment":  "???뚯씪? update-manifest.ps1 (?먮뒗 GitHub Actions)媛 quizzes/ ?대뜑瑜??ㅼ틪???먮룞 ?앹꽦?⑸땲?? 吏곸젒 ?섏젙?섏? 留먭퀬 ?ㅽ겕由쏀듃瑜??ㅼ떆 ?ㅽ뻾?섏꽭??",
+    "_comment":  "이 파일은 update-manifest.ps1 (또는 GitHub Actions)가 quizzes/ 폴더를 스캔해 자동 생성합니다. 직접 수정하지 말고 스크립트를 다시 실행하세요.",
     "quizzes":  [
                     "python-day1.json",
                     "python-day2.json"

@@ -1,4 +1,4 @@
-# quizzes/ 폴더의 .json 파일들을 스캔해 quizzes/manifest.json 을 자동으로 다시 만듭니다.
+﻿# quizzes/ 폴더의 .json 파일들을 스캔해 quizzes/manifest.json 을 자동으로 다시 만듭니다.
 # 사용법: 이 파일이 있는 폴더에서 PowerShell로  ./update-manifest.ps1  실행
 # (실행이 막히면 한 번만:  powershell -ExecutionPolicy Bypass -File .\update-manifest.ps1 )
 
