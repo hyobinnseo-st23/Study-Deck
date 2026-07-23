@@ -1,0 +1,601 @@
+{
+  "title": "Python_DAY3",
+  "subject": "Python",
+  "description": "SK Shieldus Rookies: Python 3일차 수업. 자료형 복습과 JSON, 형변환, 논리값(Truthy/Falsy), 표준 입출력, 조건문(if/elif/else), 반복문(while/for), continue/break, range(), 중첩 반복, 2차원 리스트, 리스트 컴프리헨션, 함수 정의와 타입 힌트, 인자 전달과 가변 매개변수를 다룹니다.",
+  "questions": [
+    {
+      "question": "input() 함수가 반환하는 자료형은 무엇인가요?",
+      "options": [
+        "입력한 내용에 따라 자동으로 결정된다",
+        "항상 str",
+        "항상 int",
+        "항상 bool"
+      ],
+      "answer": 1,
+      "explanation": "input()은 사용자가 무엇을 입력하든 항상 문자열(str)을 반환합니다. 숫자 연산이 필요하면 int()나 float()로 형변환해야 합니다."
+    },
+    {
+      "question": "print(\"점수: \" + 90) 을 실행하면 어떻게 되나요?",
+      "options": [
+        "점수: 90 이 출력된다",
+        "TypeError가 발생한다",
+        "점수: 90.0 이 출력된다",
+        "점수: 이 출력된다"
+      ],
+      "answer": 1,
+      "explanation": "+ 연산자는 같은 타입끼리만 결합됩니다. 문자열과 정수를 더하면 TypeError가 발생하므로 str(90)으로 형변환해야 합니다."
+    },
+    {
+      "question": "다음 중 파이썬에서 False(거짓)로 평가되지 '않는' 것은?",
+      "options": [
+        "0",
+        "[]",
+        "\"False\"",
+        "\"\""
+      ],
+      "answer": 2,
+      "explanation": "\"False\"는 비어 있지 않은 문자열이므로 True로 평가됩니다. 0, 빈 리스트 [], 빈 문자열 \"\" 은 모두 Falsy입니다."
+    },
+    {
+      "question": "arr이 리스트일 때, 'arr에 요소가 있으면 실행'을 파이썬답게 표현한 것은?",
+      "options": [
+        "if arr:",
+        "if arr == True:",
+        "if arr is not None:",
+        "if arr != []:"
+      ],
+      "answer": 0,
+      "explanation": "파이썬은 컬렉션을 논리값으로 자동 변환하며, 요소가 있으면 True, 비어 있으면 False가 됩니다. if arr: 가 관용적 표현입니다."
+    },
+    {
+      "question": "7 // 2 의 결과는?",
+      "options": [
+        "3.5",
+        "3",
+        "4",
+        "1"
+      ],
+      "answer": 1,
+      "explanation": "// 는 몫(정수 나눗셈)을 구하는 연산자로 소수점 이하를 버립니다. 7 / 2 는 3.5, 7 % 2 는 나머지 1입니다."
+    },
+    {
+      "question": "파이썬 딕셔너리를 JSON 형식의 문자열로 변환하는 함수는?",
+      "options": [
+        "json.loads()",
+        "json.dumps()",
+        "json.read()",
+        "json.parse()"
+      ],
+      "answer": 1,
+      "explanation": "dumps는 dict를 string으로 덤프(직렬화)하고, loads는 string을 로드(역직렬화)합니다. s가 붙으면 문자열 대상, 없으면 파일 대상입니다."
+    },
+    {
+      "question": "JSON의 null 에 해당하는 파이썬 값은?",
+      "options": [
+        "0",
+        "None",
+        "False",
+        "\"\""
+      ],
+      "answer": 1,
+      "explanation": "JSON의 null은 파이썬의 None에 대응합니다. 또한 JSON의 true/false는 파이썬의 True/False에 대응합니다."
+    },
+    {
+      "question": "리스트는 딕셔너리의 키로 쓸 수 없지만 튜플은 쓸 수 있습니다. 그 이유는?",
+      "options": [
+        "튜플이 리스트보다 메모리를 적게 쓰기 때문에",
+        "튜플은 변경 불가(불변)라서 해시가 가능하기 때문에",
+        "튜플은 순서가 없기 때문에",
+        "튜플은 중복을 허용하지 않기 때문에"
+      ],
+      "answer": 1,
+      "explanation": "딕셔너리 키와 집합 원소는 해시 가능(hashable)해야 합니다. 튜플은 변경 불가이므로 해시할 수 있고, 리스트는 변경 가능하여 unhashable입니다."
+    },
+    {
+      "question": "실제 접속 IP 집합에서 방화벽 허용 IP 집합에 없는 것만 골라내려면 어떤 집합 연산을 쓰나요?",
+      "options": [
+        "합집합 (|)",
+        "교집합 (&)",
+        "차집합 (-)",
+        "대칭차집합 (^)"
+      ],
+      "answer": 2,
+      "explanation": "actual_ips - allowed_ips 는 실제 접속 IP 중 허용 목록에 없는 것만 남기므로 미승인 접속 탐지에 사용할 수 있습니다."
+    },
+    {
+      "question": "avg 값을 소수점 둘째 자리까지 출력하는 f-string 표현은?",
+      "options": [
+        "f\"{avg:2f}\"",
+        "f\"{avg:.2f}\"",
+        "f\"{avg:%2}\"",
+        "f\"{avg:2.f}\""
+      ],
+      "answer": 1,
+      "explanation": "f-string에서 콜론 뒤에 .2f를 쓰면 소수점 이하 2자리로 고정됩니다. 정렬은 :>10, :<10, :^10 형식을 사용합니다."
+    },
+    {
+      "question": "int(\"abc\") 를 실행하면 어떤 예외가 발생하나요?",
+      "options": [
+        "TypeError",
+        "ValueError",
+        "KeyError",
+        "NameError"
+      ],
+      "answer": 1,
+      "explanation": "타입은 맞지만 값의 형식이 잘못된 경우 ValueError가 발생합니다. 사용자 입력을 int()로 변환할 때 항상 대비해야 하는 예외입니다."
+    },
+    {
+      "question": "딕셔너리 d의 키들을 인덱싱 가능한 형태로 가공하려면?",
+      "options": [
+        "list(d.keys())",
+        "str(d.keys())",
+        "int(d.keys())",
+        "d.keys()[0]"
+      ],
+      "answer": 0,
+      "explanation": "d.keys()는 뷰 객체를 반환하므로 인덱싱이 되지 않습니다. list()로 형변환해야 인덱스로 접근할 수 있습니다."
+    },
+    {
+      "question": "if 문의 조건식 자리에 최종적으로 평가되어야 하는 것은?",
+      "options": [
+        "정수",
+        "문자열",
+        "논리값(True/False)",
+        "리스트"
+      ],
+      "answer": 2,
+      "explanation": "if 다음에는 논리값이 와야 합니다. 다른 타입이 오면 파이썬이 자동으로 bool()을 적용해 논리값으로 변환합니다."
+    },
+    {
+      "question": "다음 코드에서 grade에 저장되는 값은?\n\nscore = 95\nif score >= 60:\n    grade = \"D\"\nelif score >= 90:\n    grade = \"A\"\nelse:\n    grade = \"F\"",
+      "options": [
+        "\"A\"",
+        "\"D\"",
+        "\"F\"",
+        "에러 발생"
+      ],
+      "answer": 1,
+      "explanation": "elif는 위에서부터 검사해 처음 참인 분기만 실행합니다. 95는 첫 조건에서 이미 걸리므로 \"D\"가 되고, 아래 elif는 영원히 실행되지 않는 죽은 코드가 됩니다."
+    },
+    {
+      "question": "if 문에서 else 블록에 대한 설명으로 옳은 것은?",
+      "options": [
+        "항상 반드시 작성해야 한다",
+        "생략할 수 있다",
+        "elif가 있으면 반드시 있어야 한다",
+        "else 없이 elif만 쓸 수 없다"
+      ],
+      "answer": 1,
+      "explanation": "else는 선택적입니다. 특정 조건일 때만 처리하고 나머지는 아무것도 하지 않아도 되는 경우 else를 생략합니다."
+    },
+    {
+      "question": "pass 키워드의 역할은?",
+      "options": [
+        "반복문의 다음 회차로 넘어간다",
+        "함수를 종료하고 값을 반환한다",
+        "아무 동작도 하지 않고 빈 블록을 채운다",
+        "반복문을 완전히 종료한다"
+      ],
+      "answer": 2,
+      "explanation": "파이썬은 콜론 뒤 블록이 비어 있으면 문법 오류입니다. pass는 아무 동작 없이 그 자리를 채워 구조만 먼저 잡을 때 사용합니다."
+    },
+    {
+      "question": "score가 60 이상이면 \"PASS\", 아니면 \"FAIL\"을 msg에 담는 조건부 표현식(삼항 연산자)으로 올바른 것은?",
+      "options": [
+        "msg = if score >= 60 \"PASS\" else \"FAIL\"",
+        "msg = \"PASS\" if score >= 60 else \"FAIL\"",
+        "msg = score >= 60 ? \"PASS\" : \"FAIL\"",
+        "msg = \"PASS\" else \"FAIL\" if score >= 60"
+      ],
+      "answer": 1,
+      "explanation": "파이썬의 조건부 표현식은 [참일 때 값] if [조건] else [거짓일 때 값] 순서입니다. C 계열의 ? : 문법은 지원하지 않습니다."
+    },
+    {
+      "question": "조건부 표현식(삼항 연산자)에서 else 부분을 생략하면 어떻게 되나요?",
+      "options": [
+        "None이 저장된다",
+        "SyntaxError가 발생한다",
+        "조건이 거짓이면 아무 일도 일어나지 않는다",
+        "이전 값이 유지된다"
+      ],
+      "answer": 1,
+      "explanation": "일반 if문에서는 else가 선택적이지만, 조건부 표현식은 반드시 하나의 값을 만들어내야 하므로 else가 필수입니다."
+    },
+    {
+      "question": "if score = 100: 을 실행하면 어떻게 되나요?",
+      "options": [
+        "score에 100이 대입되고 조건은 참이 된다",
+        "SyntaxError가 발생한다",
+        "조건이 항상 거짓이 된다",
+        "경고만 나오고 정상 동작한다"
+      ],
+      "answer": 1,
+      "explanation": "=는 대입, ==는 비교입니다. 파이썬은 조건식 자리의 대입을 문법 오류로 막아주므로 == 로 고쳐야 합니다."
+    },
+    {
+      "question": "not (A and B) 와 논리적으로 같은 표현은?",
+      "options": [
+        "(not A) and (not B)",
+        "(not A) or (not B)",
+        "A or B",
+        "not A and B"
+      ],
+      "answer": 1,
+      "explanation": "드모르간의 법칙에 따라 and를 부정하면 or이 됩니다. 반대로 not (A or B)는 (not A) and (not B)와 같습니다."
+    },
+    {
+      "question": "match 문에서 미리 정의해 둔 상수와 값을 비교하려면 어떻게 작성해야 하나요?",
+      "options": [
+        "case OK: 처럼 점이 없는 단독 이름을 쓴다",
+        "case Status.OK: 처럼 점이 붙은 이름이나 case 200: 같은 리터럴을 쓴다",
+        "case == OK: 처럼 비교 연산자를 함께 쓴다",
+        "case (OK): 처럼 괄호로 감싼다"
+      ],
+      "answer": 1,
+      "explanation": "match에서 점이 없는 단독 이름은 값 비교가 아니라 변수 캡처 패턴으로 해석됩니다. 상수와 비교하려면 점이 붙은 이름(dotted name)이나 리터럴을 사용해야 합니다."
+    },
+    {
+      "question": "while 문을 안전하게 쓰기 위해 반드시 갖춰야 할 세 가지는?",
+      "options": [
+        "초기화, 조건, 갱신",
+        "선언, 호출, 반환",
+        "입력, 처리, 출력",
+        "정의, 비교, 종료"
+      ],
+      "answer": 0,
+      "explanation": "조건식에 쓰이는 변수를 루프 밖에서 초기화하고, 조건에서 검사하고, 루프 안에서 갱신해야 합니다. 갱신이 빠지면 무한루프가 됩니다."
+    },
+    {
+      "question": "다음 코드를 실행하면 어떻게 되나요?\n\ncnt = 0\nwhile cnt < 5:\n    if cnt % 2 == 0:\n        continue\n    print(cnt)\n    cnt += 1",
+      "options": [
+        "1, 3 이 출력된다",
+        "0, 1, 2, 3, 4 가 출력된다",
+        "무한루프에 빠진다",
+        "아무것도 출력되지 않고 정상 종료된다"
+      ],
+      "answer": 2,
+      "explanation": "cnt가 0일 때 continue를 만나 아래의 cnt += 1을 건너뛰므로 cnt가 영원히 0에 머뭅니다. while에서 continue를 쓸 때는 갱신문을 continue보다 위에 두어야 합니다."
+    },
+    {
+      "question": "continue와 break의 차이로 옳은 것은?",
+      "options": [
+        "continue는 반복문 전체를 종료하고, break는 이번 회차만 건너뛴다",
+        "continue는 이번 회차만 건너뛰고, break는 반복문 전체를 종료한다",
+        "둘 다 반복문 전체를 종료한다",
+        "둘 다 이번 회차만 건너뛴다"
+      ],
+      "answer": 1,
+      "explanation": "continue는 아래 코드를 건너뛰고 조건식으로 돌아가 반복을 계속하지만, break는 반복문 자체를 빠져나옵니다."
+    },
+    {
+      "question": "for 문이 while 문과 달리 무한루프에 빠지지 않는 이유는?",
+      "options": [
+        "파이썬이 반복 횟수를 100회로 제한하기 때문",
+        "시퀀스의 요소를 모두 꺼내면 자동으로 종료되기 때문",
+        "for는 조건식을 쓸 수 없기 때문",
+        "for는 break가 자동으로 실행되기 때문"
+      ],
+      "answer": 1,
+      "explanation": "for는 시퀀스의 요소 개수만큼만 반복하고 요소가 소진되면 자동 탈출합니다. 초기화, 조건, 갱신을 직접 관리할 필요가 없습니다."
+    },
+    {
+      "question": "파이썬에서 변수 cnt의 값을 1 증가시키는 올바른 표현은?",
+      "options": [
+        "cnt++",
+        "++cnt",
+        "cnt += 1",
+        "cnt =+ 1"
+      ],
+      "answer": 2,
+      "explanation": "파이썬에는 ++ 증가 연산자가 없습니다. cnt++는 SyntaxError이고, ++cnt는 부호 연산 두 번으로 해석되어 값이 변하지 않으며, cnt =+ 1은 cnt에 1을 대입합니다."
+    },
+    {
+      "question": "다음 코드를 실행하면 어떻게 되나요?\n\nfor a, b in [(1, 2), (3, 4, 5)]:\n    print(a, b)",
+      "options": [
+        "1 2 와 3 4 가 출력된다",
+        "첫 줄만 출력되고 ValueError가 발생한다",
+        "모두 정상 출력된다",
+        "SyntaxError가 발생한다"
+      ],
+      "answer": 1,
+      "explanation": "(1, 2)는 정상 언패킹되지만 (3, 4, 5)는 변수 2개에 값 3개라 ValueError가 발생합니다. 로그 파싱 시 필드 개수가 다른 줄에서 자주 겪는 문제입니다."
+    },
+    {
+      "question": "list(range(1, 10)) 의 마지막 값은?",
+      "options": [
+        "8",
+        "9",
+        "10",
+        "11"
+      ],
+      "answer": 1,
+      "explanation": "range의 stop 값은 포함되지 않습니다. '1부터 10까지'를 원하면 range(1, 11)로 써야 합니다."
+    },
+    {
+      "question": "range(5) 가 생성하는 첫 번째 값은?",
+      "options": [
+        "0",
+        "1",
+        "4",
+        "5"
+      ],
+      "answer": 0,
+      "explanation": "인자가 하나면 그것이 stop이고 start의 기본값은 0, step의 기본값은 1입니다. 따라서 0, 1, 2, 3, 4를 생성합니다."
+    },
+    {
+      "question": "range() 함수가 반환하는 것은?",
+      "options": [
+        "리스트",
+        "튜플",
+        "필요할 때 값을 하나씩 만들어내는 range 객체",
+        "문자열"
+      ],
+      "answer": 2,
+      "explanation": "range는 리스트가 아니라 지연 평가되는 객체입니다. 그래서 range(10000000)을 써도 메모리를 거의 쓰지 않으며, 내용을 보려면 list()로 형변환해야 합니다."
+    },
+    {
+      "question": "다음 중첩 반복문에서 print는 총 몇 번 실행되나요?\n\nfor i in range(2, 10):\n    for j in range(1, 10):\n        print(i * j)",
+      "options": [
+        "17번",
+        "72번",
+        "81번",
+        "90번"
+      ],
+      "answer": 1,
+      "explanation": "바깥은 2부터 9까지 8회, 안쪽은 1부터 9까지 9회이므로 8 × 9 = 72번 실행됩니다."
+    },
+    {
+      "question": "중첩된 반복문 안에서 break를 실행하면?",
+      "options": [
+        "모든 반복문이 한 번에 종료된다",
+        "가장 안쪽 반복문만 종료된다",
+        "가장 바깥쪽 반복문만 종료된다",
+        "프로그램이 종료된다"
+      ],
+      "answer": 1,
+      "explanation": "break는 자신을 감싼 가장 안쪽 반복문 하나만 빠져나옵니다. 여러 겹을 한 번에 탈출하려면 플래그 변수를 쓰거나 함수로 분리해 return을 사용합니다."
+    },
+    {
+      "question": "다음 코드의 실행 결과는?\n\ngrid = [[0] * 3] * 3\ngrid[0][0] = 1\nprint(grid)",
+      "options": [
+        "[[1, 0, 0], [0, 0, 0], [0, 0, 0]]",
+        "[[1, 0, 0], [1, 0, 0], [1, 0, 0]]",
+        "[[1, 1, 1], [0, 0, 0], [0, 0, 0]]",
+        "TypeError가 발생한다"
+      ],
+      "answer": 1,
+      "explanation": "* 3 은 리스트를 복사하는 것이 아니라 같은 리스트를 가리키는 참조 3개를 만듭니다. 한 칸만 바꿔도 모든 행이 함께 바뀝니다."
+    },
+    {
+      "question": "3행 3열의 2차원 리스트를 안전하게 만드는 방법은?",
+      "options": [
+        "[[0] * 3] * 3",
+        "[[0] * 3 for _ in range(3)]",
+        "[0] * 3 * 3",
+        "[[0, 0, 0]] * 3"
+      ],
+      "answer": 1,
+      "explanation": "컴프리헨션을 쓰면 반복할 때마다 새로운 리스트가 생성되므로 참조가 공유되지 않습니다."
+    },
+    {
+      "question": "[n * 2 for n in [1, 2, 3, 4] if n % 2 == 0] 의 결과는?",
+      "options": [
+        "[2, 4, 6, 8]",
+        "[4, 8]",
+        "[2, 6]",
+        "[1, 3]"
+      ],
+      "answer": 1,
+      "explanation": "먼저 if 조건으로 짝수 2와 4만 걸러낸 뒤 각각 2를 곱하므로 [4, 8]이 됩니다."
+    },
+    {
+      "question": "반복하면서 인덱스와 값을 동시에 얻고 싶을 때 사용하는 내장 함수는?",
+      "options": [
+        "range()",
+        "zip()",
+        "enumerate()",
+        "len()"
+      ],
+      "answer": 2,
+      "explanation": "for i, item in enumerate(items): 형태로 사용합니다. for i in range(len(items)) 는 파이썬에서 권장되지 않는 안티패턴입니다."
+    },
+    {
+      "question": "반복문으로 합계를 구할 때 누적 변수(total = 0)를 선언해야 하는 위치는?",
+      "options": [
+        "반복문 안쪽 맨 위",
+        "반복문 밖(반복문 시작 전)",
+        "반복문 안쪽 맨 아래",
+        "어디에 두어도 결과가 같다"
+      ],
+      "answer": 1,
+      "explanation": "반복문 안에서 초기화하면 매 회차마다 0으로 리셋되어 마지막 값만 남습니다. 누적 변수는 반드시 반복문 밖에서 초기화합니다."
+    },
+    {
+      "question": "print() 함수의 end 매개변수 기본값은?",
+      "options": [
+        "\" \" (공백)",
+        "\"\\n\" (개행)",
+        "\"\" (빈 문자열)",
+        "\",\" (콤마)"
+      ],
+      "answer": 1,
+      "explanation": "end의 기본값이 개행이라 print가 자동으로 줄을 바꿉니다. end=\"\" 로 바꾸면 줄바꿈 없이 이어서 출력됩니다."
+    },
+    {
+      "question": "매개변수가 없는 함수를 정의할 때 소괄호 ( ) 는 어떻게 해야 하나요?",
+      "options": [
+        "생략해도 된다",
+        "반드시 써야 한다",
+        "매개변수가 없으면 대괄호를 쓴다",
+        "콜론으로 대체한다"
+      ],
+      "answer": 1,
+      "explanation": "매개변수와 return은 선택적이지만 소괄호는 문법상 필수입니다. def say_hello(): 처럼 빈 괄호를 반드시 붙여야 합니다."
+    },
+    {
+      "question": "return 문이 없는 함수를 호출해 그 결과를 변수에 담으면 무엇이 저장되나요?",
+      "options": [
+        "0",
+        "빈 문자열",
+        "None",
+        "에러가 발생한다"
+      ],
+      "answer": 2,
+      "explanation": "함수는 항상 무언가를 반환하며, return을 명시하지 않으면 None을 반환합니다. print만 하는 함수를 값으로 쓰려다 자주 겪는 문제입니다."
+    },
+    {
+      "question": "return 키워드의 기능을 모두 올바르게 설명한 것은?",
+      "options": [
+        "값을 반환하기만 한다",
+        "함수를 종료하기만 한다",
+        "값을 반환하고 함수를 즉시 종료한다",
+        "값을 반환하고 다음 줄부터 계속 실행한다"
+      ],
+      "answer": 2,
+      "explanation": "return은 값을 돌려주는 동시에 함수를 즉시 끝냅니다. 이 성질 덕분에 else 없이 조건마다 return하는 가드 절 패턴을 쓸 수 있습니다."
+    },
+    {
+      "question": "다음 코드의 두 번째 출력은?\n\ndef add_item(item, items=[]):\n    items.append(item)\n    return items\n\nprint(add_item(\"a\"))\nprint(add_item(\"b\"))",
+      "options": [
+        "['b']",
+        "['a', 'b']",
+        "['a']",
+        "[]"
+      ],
+      "answer": 1,
+      "explanation": "기본값은 함수 정의 시점에 한 번만 만들어지고 호출할 때마다 같은 객체가 재사용됩니다. 그래서 이전 값이 남아 ['a', 'b']가 됩니다."
+    },
+    {
+      "question": "가변 기본 인자 함정을 피하는 올바른 방법은?",
+      "options": [
+        "기본값을 None으로 두고 함수 안에서 새 리스트를 만든다",
+        "기본값을 빈 튜플 ()로 바꾼다",
+        "매개변수 이름을 바꾼다",
+        "return을 두 번 쓴다"
+      ],
+      "answer": 0,
+      "explanation": "def f(items=None): 으로 정의하고 함수 안에서 if items is None: items = [] 로 매번 새로 만들어야 합니다. 기본값에는 불변 객체만 사용합니다."
+    },
+    {
+      "question": "타입 힌트에 대한 설명으로 옳은 것은?",
+      "options": [
+        "타입이 다르면 실행 시 자동으로 TypeError가 발생한다",
+        "실행 시 강제되지 않으며 편집기와 정적 검사 도구를 위한 정보다",
+        "타입 힌트를 쓰면 실행 속도가 빨라진다",
+        "타입 힌트가 없으면 함수를 정의할 수 없다"
+      ],
+      "answer": 1,
+      "explanation": "파이썬은 런타임에 타입 힌트를 검사하지 않습니다. 신뢰할 수 없는 입력은 isinstance() 등으로 별도 검증해야 합니다."
+    },
+    {
+      "question": "def f(*args): 로 정의된 함수 안에서 args의 자료형은?",
+      "options": [
+        "리스트",
+        "튜플",
+        "딕셔너리",
+        "집합"
+      ],
+      "answer": 1,
+      "explanation": "*args는 전달된 위치 인자들을 튜플로 묶어줍니다. 튜플은 시퀀스이므로 sum(), len(), 반복문 등을 그대로 쓸 수 있습니다."
+    },
+    {
+      "question": "def f(**kwargs): 로 정의된 함수 안에서 kwargs의 자료형은?",
+      "options": [
+        "리스트",
+        "튜플",
+        "딕셔너리",
+        "문자열"
+      ],
+      "answer": 2,
+      "explanation": "**kwargs는 키워드 인자들을 딕셔너리로 묶어줍니다. kwargs.items()로 키와 값을 순회할 수 있습니다."
+    },
+    {
+      "question": "def process(*args, p_type=\"add\"): 로 정의된 함수에서 p_type에 값을 전달하는 유일한 방법은?",
+      "options": [
+        "위치 인자로 마지막에 전달한다",
+        "위치 인자로 첫 번째에 전달한다",
+        "p_type=\"multiply\" 처럼 키워드로 전달한다",
+        "전달할 수 없다"
+      ],
+      "answer": 2,
+      "explanation": "*args가 몇 개든 다 받아버리므로 어디까지가 args인지 셀 수 없습니다. 그래서 *args 뒤의 매개변수는 키워드 전용이 됩니다."
+    },
+    {
+      "question": "print(1, 2, 3, \"-\") 의 출력 결과는?",
+      "options": [
+        "1-2-3",
+        "1 2 3 -",
+        "1 2 3",
+        "TypeError가 발생한다"
+      ],
+      "answer": 1,
+      "explanation": "\"-\"도 가변 매개변수 *values에 포함되어 출력 대상이 됩니다. 구분자로 쓰려면 반드시 sep=\"-\" 처럼 키워드로 전달해야 합니다."
+    },
+    {
+      "question": "def f(a=1, b): 을 실행하면 어떻게 되나요?",
+      "options": [
+        "정상 동작한다",
+        "SyntaxError가 발생한다",
+        "b에 자동으로 None이 들어간다",
+        "실행할 때만 에러가 난다"
+      ],
+      "answer": 1,
+      "explanation": "기본값이 없는 매개변수가 기본값이 있는 매개변수 뒤에 오면 위치를 결정할 수 없어 SyntaxError가 발생합니다. 기본값 매개변수는 항상 뒤쪽에 둡니다."
+    },
+    {
+      "question": "함수 정의부에 쓰는 변수와 호출 시 전달하는 값의 명칭을 올바르게 짝지은 것은?",
+      "options": [
+        "정의부는 인자(argument), 호출 시는 매개변수(parameter)",
+        "정의부는 매개변수(parameter), 호출 시는 인자(argument)",
+        "둘 다 매개변수라고 한다",
+        "둘 다 인자라고 한다"
+      ],
+      "answer": 1,
+      "explanation": "함수를 정의할 때 선언하는 변수가 매개변수(parameter), 호출할 때 실제로 넘기는 값이 인자(argument)입니다."
+    },
+    {
+      "question": "def greet(): 로 정의된 함수가 있을 때, greet 와 greet() 의 차이는?",
+      "options": [
+        "둘 다 함수를 실행한다",
+        "greet은 함수 객체 자체이고, greet()는 함수를 실행한 결과다",
+        "greet은 실행 결과이고, greet()는 함수 객체다",
+        "greet은 문법 오류다"
+      ],
+      "answer": 1,
+      "explanation": "파이썬에서 함수도 객체이므로 괄호 없이 쓰면 함수 자체를 가리킵니다. 괄호를 붙여야 호출되며, 이 차이는 콜백이나 정렬 key 전달에서 중요합니다."
+    },
+    {
+      "question": "def subtract(n1, n2): return n1 - n2 일 때, subtract(n2=3, n1=10) 의 결과는?",
+      "options": [
+        "-7",
+        "7",
+        "13",
+        "TypeError가 발생한다"
+      ],
+      "answer": 1,
+      "explanation": "키워드 인자로 전달하면 작성 순서와 무관하게 이름에 맞춰 값이 들어갑니다. 따라서 10 - 3 = 7 입니다."
+    },
+    {
+      "question": "Python 3.8 환경에서 list[int] 와 str | int 문법을 사용할 수 없을 때 대신 사용하는 방법은?",
+      "options": [
+        "from typing import List, Union 후 List[int], Union[str, int] 사용",
+        "타입 힌트를 문자열로 감싼다",
+        "collections 모듈을 import 한다",
+        "대체 방법이 없어 타입 힌트를 쓸 수 없다"
+      ],
+      "answer": 0,
+      "explanation": "list[int] 는 3.9부터, str | int 는 3.10부터 지원됩니다. 그 이전 버전에서는 typing 모듈의 List, Union을 사용해야 합니다."
+    },
+    {
+      "question": "함수 안에서 전역 변수 count에 count += 1 을 시도했을 때 발생하는 에러는?",
+      "options": [
+        "NameError",
+        "UnboundLocalError",
+        "TypeError",
+        "IndexError"
+      ],
+      "answer": 1,
+      "explanation": "함수 안에서 대입이 일어나면 파이썬은 그 변수를 지역 변수로 간주하므로, 값이 없는 상태에서 읽으려다 UnboundLocalError가 납니다. 값을 인자로 받아 반환하는 방식이 권장됩니다."
+    }
+  ]
+}
