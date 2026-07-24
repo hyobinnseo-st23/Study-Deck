@@ -1,5 +1,6 @@
 {
-  "title": "Python DAY3 심화 - 조건·반복·컴프리헨션·함수",
+  "title": "Python DAY3 심화",
+  "subtitle": "조건·반복·컴프리헨션·함수",
   "subject": "Python",
   "description": "SK Shieldus Rookies: Python 3일차 심화. 3일차에 다룬 범위(자료형과 참조, JSON, 형변환, 논리값과 연산자, 조건문, 반복문, range, 2차원 리스트, 리스트 컴프리헨션, 함수와 매개변수) 안에서 한 단계 더 깊은 동작 원리와 함정을 다룹니다.",
   "questions": [

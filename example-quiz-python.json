@@ -1,5 +1,6 @@
 {
-  "title": "Python_DAY2",
+  "title": "Python DAY2",
+  "subtitle": "자료형·컬렉션·문자열·타입 힌트",
   "subject": "Python",
   "description": "SK Shieldus Rookies: Python 2일차 수업. 변수와 객체(참조), 자료형, 리스트/튜플/집합/딕셔너리, 문자열, 타입 힌트를 다룹니다.",
   "questions": [

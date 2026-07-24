@@ -433,6 +433,7 @@
           if (err) errors.push(file.name + ": " + err);
           else parsed.push({
             title: (data && data.title) ? data.title : file.name.replace(/\.json$/i, ""),
+            subtitle: (data && data.subtitle) ? String(data.subtitle).trim() : "",
             fileSubject: (data && data.subject) ? String(data.subject).trim() : "",
             description: (data && data.description) || "",
             questions: questions
@@ -453,7 +454,7 @@
           const id = hashId(p.title);
           const existing = getLibrary()[id];
           saveQuiz({
-            id: id, title: p.title, subject: subject,
+            id: id, title: p.title, subtitle: p.subtitle, subject: subject,
             description: p.description, questions: p.questions,
             addedAt: existing ? existing.addedAt : Date.now(), updatedAt: Date.now()
           });
@@ -858,9 +859,15 @@
       h.appendChild(document.createTextNode(" "));
       h.appendChild(badge);
     }
+    info.appendChild(h);
+    if (quiz.subtitle) {
+      const st = document.createElement("p"); st.className = "quiz-item-subtitle";
+      st.textContent = quiz.subtitle;
+      info.appendChild(st);
+    }
     const sub = document.createElement("p"); sub.className = "quiz-item-sub";
     sub.textContent = quiz.questions.length + "문제 · 추가일 " + fmtDate(quiz.addedAt);
-    info.appendChild(h); info.appendChild(sub);
+    info.appendChild(sub);
     top.appendChild(info);
     item.appendChild(top);
 
@@ -1422,6 +1429,7 @@
         if (validate(questions)) return null;
         return {
           title: (data && data.title) ? data.title : file.replace(/\.json$/i, ""),
+          subtitle: (data && data.subtitle) ? String(data.subtitle).trim() : "",
           subject: subjectOverride || (data && data.subject ? String(data.subject).trim() : DEFAULT_SUBJECT),
           description: (data && data.description) || "",
           questions: questions
@@ -1438,6 +1446,7 @@
       saveQuiz({
         id: id,
         title: p.title,
+        subtitle: p.subtitle,
         subject: p.subject,
         description: p.description,
         questions: p.questions,

@@ -1,5 +1,6 @@
 {
-  "title": "Python DAY3 - 조건문·반복문·리스트·함수",
+  "title": "Python DAY3",
+  "subtitle": "조건문·반복문·리스트·함수",
   "subject": "Python",
   "description": "SK Shieldus Rookies: Python 3일차 수업. 자료형 복습과 JSON, 형변환, 논리값(Truthy/Falsy), 표준 입출력, 조건문(if/elif/else), 반복문(while/for), continue/break, range(), 중첩 반복, 2차원 리스트, 리스트 컴프리헨션, 함수 정의와 타입 힌트, 인자 전달과 가변 매개변수를 다룹니다.",
   "questions": [
