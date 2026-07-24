@@ -1,0 +1,337 @@
+{
+  "title": "Python_DAY1 ADVANCED",
+  "subject": "Python",
+  "description": "파이썬 1일차(1~6교시) 범위의 심화 퀴즈 30문항입니다. 변수와 객체 참조, 자료형, 문자열 시퀀스, 연산자의 동작 원리를 코드 실행 결과 중심으로 확인합니다. 모든 정답은 실제 파이썬 실행으로 검증되었습니다.",
+  "questions": [
+    {
+      "question": "다음 코드의 출력 결과는?\n\na = [1, 2, 3]\nb = a.copy()\na[0] = 99\nprint(b)",
+      "options": [
+        "[1, 2, 3]",
+        "[99, 1, 2, 3]",
+        "TypeError 발생",
+        "[99, 2, 3]"
+      ],
+      "answer": 0,
+      "explanation": "copy()는 새로운 리스트 객체를 만들어 반환하므로 b는 a와 다른 객체입니다. 따라서 a를 수정해도 b는 [1, 2, 3] 그대로입니다. 반면 b = a 였다면 주소를 공유해 [99, 2, 3]이 됩니다."
+    },
+    {
+      "question": "다음 코드의 출력 결과는?\n\nn1 = [[1, 2], [3, 4]]\nn2 = n1.copy()\nn1[0][0] = 99\nprint(n2[0][0])",
+      "options": [
+        "IndexError 발생",
+        "99",
+        "1",
+        "[99, 2]"
+      ],
+      "answer": 1,
+      "explanation": "copy()는 얕은 복사라 바깥 리스트만 새로 만들고 내부 리스트는 여전히 주소를 공유합니다. 따라서 n2[0][0]도 99가 됩니다. 중첩 구조까지 완전히 분리하려면 copy.deepcopy()를 써야 합니다."
+    },
+    {
+      "question": "다음 코드의 출력 결과는?\n\nprint(\"python\"[::2])",
+      "options": [
+        "'yhn'",
+        "'pto'",
+        "'python'",
+        "'nohtyp'"
+      ],
+      "answer": 1,
+      "explanation": "[::2]는 처음부터 끝까지 2칸 간격으로 추출합니다. 인덱스 0(p), 2(t), 4(o)가 선택되어 'pto'가 됩니다."
+    },
+    {
+      "question": "다음 코드의 출력 결과는?\n\nprint(\"python\"[-3:])",
+      "options": [
+        "'hon'",
+        "'nohtyp'",
+        "'tho'",
+        "'pyt'"
+      ],
+      "answer": 0,
+      "explanation": "-3은 뒤에서 세 번째 문자(h)를 가리키며, 끝 인덱스를 생략했으므로 거기서부터 끝까지인 'hon'이 추출됩니다."
+    },
+    {
+      "question": "다음 코드의 출력 결과는?\n\nprint(\"python\"[:-1])",
+      "options": [
+        "'python'",
+        "'ython'",
+        "'pytho'",
+        "'n'"
+      ],
+      "answer": 2,
+      "explanation": "끝 인덱스 -1은 마지막 문자(n)를 가리키며, 슬라이싱에서 끝 인덱스는 포함되지 않으므로(탈출점) 마지막 글자를 제외한 'pytho'가 됩니다."
+    },
+    {
+      "question": "다음 코드를 실행하면 어떻게 되나요?\n\ns = \"python\"\ns[0] = \"P\"",
+      "options": [
+        "s가 'Python'으로 바뀐다",
+        "TypeError가 발생한다",
+        "아무 일도 일어나지 않는다",
+        "s가 'P'로 바뀐다"
+      ],
+      "answer": 1,
+      "explanation": "문자열은 불변(immutable) 객체라 인덱스로 특정 문자를 변경할 수 없어 TypeError가 발생합니다. 바꾸려면 replace() 등으로 새 문자열을 만들어 재할당해야 합니다."
+    },
+    {
+      "question": "다음 두 코드의 실행 결과를 바르게 짝지은 것은?\n\n(가) \"hello\"[100]\n(나) \"hello\"[1:100]",
+      "options": [
+        "(가) '' , (나) IndexError",
+        "(가) 'o', (나) 'hello'",
+        "(가) IndexError, (나) 'ello'",
+        "(가) IndexError, (나) IndexError"
+      ],
+      "answer": 2,
+      "explanation": "인덱싱은 범위를 벗어나면 IndexError가 발생하지만, 슬라이싱은 범위를 넘어도 에러 없이 가능한 만큼만 잘라 'ello'를 반환합니다."
+    },
+    {
+      "question": "다음 코드의 출력 결과는?\n\nprint(bool(\"False\"))",
+      "options": [
+        "False",
+        "오류 발생",
+        "True",
+        "'False'"
+      ],
+      "answer": 2,
+      "explanation": "문자열 \"False\"는 내용이 있는 문자열이므로 True로 판정됩니다. bool()은 문자열의 의미가 아니라 '비어 있는지 여부'만 봅니다. 빈 문자열 \"\"만 False입니다."
+    },
+    {
+      "question": "다음 코드의 출력 결과는?\n\nprint([] == False, bool([]) == False)",
+      "options": [
+        "True False",
+        "True True",
+        "False True",
+        "False False"
+      ],
+      "answer": 2,
+      "explanation": "빈 리스트는 bool()로 변환하면 False가 되지만(falsy), False라는 값과 동등하지는 않습니다. 따라서 [] == False는 False, bool([]) == False는 True입니다."
+    },
+    {
+      "question": "다음 코드의 출력 결과는?\n\nprint(True + True)",
+      "options": [
+        "1",
+        "True",
+        "TypeError 발생",
+        "2"
+      ],
+      "answer": 3,
+      "explanation": "파이썬에서 bool은 int의 하위 타입이라 True는 1, False는 0으로 계산됩니다. 따라서 True + True는 2입니다."
+    },
+    {
+      "question": "다음 코드의 출력 결과는?\n\nprint(isinstance(True, int), type(True) == int)",
+      "options": [
+        "False True",
+        "True False",
+        "False False",
+        "True True"
+      ],
+      "answer": 1,
+      "explanation": "isinstance는 상속 관계를 인정하므로 bool이 int의 하위 타입이라 True입니다. 반면 type()은 정확한 타입만 비교하므로 bool != int 이어서 False입니다."
+    },
+    {
+      "question": "다음 코드의 출력 결과는?\n\nprint(True or False and False)",
+      "options": [
+        "None",
+        "오류 발생",
+        "True",
+        "False"
+      ],
+      "answer": 2,
+      "explanation": "논리 연산자 우선순위는 not > and > or 입니다. 따라서 True or (False and False) → True or False → True가 됩니다. 왼쪽부터 순서대로 계산하면 False가 나오므로 주의해야 합니다."
+    },
+    {
+      "question": "다음 코드의 출력 결과는?\n\nprint(-7 // 2)",
+      "options": [
+        "-3",
+        "-3.5",
+        "3",
+        "-4"
+      ],
+      "answer": 3,
+      "explanation": "//는 결과를 버리는 것이 아니라 작은 쪽 정수로 내림(floor)합니다. -3.5를 내림하면 -4가 됩니다."
+    },
+    {
+      "question": "다음 코드의 출력 결과는?\n\nprint(-7 % 2)",
+      "options": [
+        "-1",
+        "1",
+        "오류 발생",
+        "0"
+      ],
+      "answer": 1,
+      "explanation": "파이썬의 % 결과는 나누는 수의 부호를 따라갑니다. -7 // 2가 -4이므로 -7 - (-4 * 2) = 1 이 됩니다."
+    },
+    {
+      "question": "다음 코드의 출력 결과는?\n\nresult = \"a,b,,c\".split(\",\")\nprint(len(result))",
+      "options": [
+        "오류 발생",
+        "3",
+        "4",
+        "5"
+      ],
+      "answer": 2,
+      "explanation": "split은 구분자를 만날 때마다 나누므로 연속된 구분자 사이에는 빈 문자열이 들어갑니다. 결과는 ['a', 'b', '', 'c']로 길이 4입니다."
+    },
+    {
+      "question": "다음 코드의 출력 결과는?\n\nprint(\"  a b  \".strip())",
+      "options": [
+        "'ab'",
+        "'a b'",
+        "'  a b  '",
+        "'a  b'"
+      ],
+      "answer": 1,
+      "explanation": "strip()은 문자열 양쪽 끝의 공백만 제거하며, 문자열 내부의 공백은 그대로 유지합니다."
+    },
+    {
+      "question": "다음 두 코드의 실행 결과를 바르게 짝지은 것은?\n\n(가) \"hello\".find(\"z\")\n(나) \"hello\".index(\"z\")",
+      "options": [
+        "(가) -1, (나) ValueError",
+        "(가) 0, (나) 0",
+        "(가) None, (나) None",
+        "(가) ValueError, (나) -1"
+      ],
+      "answer": 0,
+      "explanation": "둘 다 첫 번째 위치를 반환하지만, 찾는 값이 없을 때 find는 -1을 반환하고 index는 ValueError를 발생시킵니다."
+    },
+    {
+      "question": "다음 코드의 출력 결과는?\n\nprint(\"aaaa\".count(\"aa\"))",
+      "options": [
+        "1",
+        "2",
+        "3",
+        "4"
+      ],
+      "answer": 1,
+      "explanation": "count는 겹치지 않게 세므로 'aaaa'에서 'aa'는 앞 두 글자와 뒤 두 글자, 총 2번으로 계산됩니다."
+    },
+    {
+      "question": "다음 코드의 출력 결과는?\n\nnum = 10\nnum2 = num\nnum = 20\nprint(num2)",
+      "options": [
+        "10",
+        "30",
+        "20",
+        "None"
+      ],
+      "answer": 0,
+      "explanation": "num2는 10 객체의 주소를 받은 상태이고, num = 20은 num이 다른 객체를 가리키게 할 뿐 기존 객체를 바꾸지 않습니다. 따라서 num2는 그대로 10입니다."
+    },
+    {
+      "question": "다음 코드의 출력 결과는?\n\nx = \"hello\"\ny = x\ny += \" world\"\nprint(x)",
+      "options": [
+        "' world'",
+        "'hello world'",
+        "'hello'",
+        "오류 발생"
+      ],
+      "answer": 2,
+      "explanation": "문자열은 불변이라 y += 는 기존 객체를 수정하는 것이 아니라 새 문자열 객체를 만들어 y가 가리키게 합니다. 따라서 x는 'hello' 그대로입니다."
+    },
+    {
+      "question": "다음 코드의 출력 결과는?\n\nprint(\"\" or \"default\")",
+      "options": [
+        "''",
+        "True",
+        "False",
+        "'default'"
+      ],
+      "answer": 3,
+      "explanation": "or는 앞의 값이 거짓이면 뒤의 값을 그대로 반환합니다. 빈 문자열은 falsy이므로 'default'가 반환됩니다. 논리 연산자는 True/False가 아닌 피연산자 자체를 돌려줍니다."
+    },
+    {
+      "question": "다음 코드의 출력 결과는?\n\nprint(\"A\" and \"B\")",
+      "options": [
+        "True",
+        "False",
+        "'A'",
+        "'B'"
+      ],
+      "answer": 3,
+      "explanation": "and는 앞의 값이 참이면 뒤의 값을 그대로 반환합니다. \"A\"가 truthy이므로 뒤의 \"B\"가 반환됩니다."
+    },
+    {
+      "question": "다음 코드의 출력 결과는?\n\nprint(f\"{2 + 3}\")",
+      "options": [
+        "'2 + 3'",
+        "'5'",
+        "오류 발생",
+        "5"
+      ],
+      "answer": 1,
+      "explanation": "f-string의 중괄호 안에는 변수뿐 아니라 수식도 넣을 수 있으며, 계산 결과가 문자열로 삽입되어 '5'가 출력됩니다."
+    },
+    {
+      "question": "다음 코드의 출력 결과는?\n\nprint(\"abc\" * 0)",
+      "options": [
+        "빈 문자열(아무것도 출력 안 됨)",
+        "'abc'",
+        "TypeError 발생",
+        "0"
+      ],
+      "answer": 0,
+      "explanation": "문자열의 * 연산은 반복 횟수를 의미하므로 0을 곱하면 0번 반복, 즉 빈 문자열('')이 됩니다."
+    },
+    {
+      "question": "다음 코드의 출력 결과는?\n\nl1 = [1, 2]\nl3 = [1, 2]\nprint(l1 == l3, l1 is l3)",
+      "options": [
+        "True True",
+        "True False",
+        "False True",
+        "False False"
+      ],
+      "answer": 1,
+      "explanation": "값이 같으므로 ==는 True이지만, 서로 다른 리스트 객체가 각각 만들어졌으므로 주소를 비교하는 is는 False입니다."
+    },
+    {
+      "question": "다음 코드의 출력 결과는?\n\nn = 10\nn += 10\nn *= 2\nprint(n)",
+      "options": [
+        "20",
+        "220",
+        "40",
+        "30"
+      ],
+      "answer": 2,
+      "explanation": "n += 10 으로 n은 20이 되고, n *= 2 로 40이 됩니다. 복합 대입 연산은 오른쪽을 먼저 계산해 자신에게 재할당합니다."
+    },
+    {
+      "question": "다음 코드의 출력 결과는?\n\nt = \"\"\"\nabc\"\"\"\nprint(len(t))",
+      "options": [
+        "6",
+        "3",
+        "5",
+        "4"
+      ],
+      "answer": 3,
+      "explanation": "삼중따옴표 바로 뒤에서 줄바꿈을 하면 그 개행 문자(\\n)도 문자열에 포함됩니다. 따라서 '\\n' + 'abc' = 총 4글자입니다. 첫 줄 개행을 원하지 않으면 따옴표 뒤에 바로 내용을 쓰거나 백슬래시로 이어야 합니다."
+    },
+    {
+      "question": "CPython 기준으로 다음 코드의 출력 결과는?\n\np = 100\nq = 100\nprint(p is q)",
+      "options": [
+        "False",
+        "오류 발생",
+        "100",
+        "True"
+      ],
+      "answer": 3,
+      "explanation": "CPython은 작은 정수(-5 ~ 256)를 미리 만들어 재사용(캐싱)하므로 p와 q가 같은 객체를 가리켜 is가 True가 됩니다. 다만 이는 내부 최적화이므로 값 비교에는 반드시 ==를 사용해야 합니다."
+    },
+    {
+      "question": "Jupyter 노트북에서 작업을 마친 뒤 'Restart 후 Run All'로 검증하는 것이 권장되는 이유로 가장 적절한 것은?",
+      "options": [
+        "셀을 순서 없이 실행하면 변수 상태가 꼬여 실제로는 위에서 아래로 실행되지 않을 수 있기 때문에",
+        "실행 속도가 빨라지기 때문에",
+        "파일 용량이 줄어들기 때문에",
+        "메모리를 절약하기 위해"
+      ],
+      "answer": 0,
+      "explanation": "노트북은 셀을 임의 순서로 실행할 수 있어, 지금은 잘 되더라도 처음부터 순서대로 실행하면 오류가 날 수 있습니다. Restart 후 Run All로 재현성을 검증해야 합니다."
+    },
+    {
+      "question": "커널을 먼저 만들고 나중에 인터프리터를 설정해 ipykernel이 가상환경이 아닌 글로벌에 설치되었을 때, 이후 확인해야 할 사항으로 가장 적절한 것은?",
+      "options": [
+        "Pandas 등 라이브러리 설치 시 .venv 내부 Lib 폴더에 들어가는지 확인해야 한다",
+        "PATH를 삭제해야 한다",
+        "노트북 파일을 .py로 바꿔야 한다",
+        "파이썬을 다시 설치해야 한다"
+      ],
+      "answer": 0,
+      "explanation": "당장 실행에는 문제가 없더라도, 이후 설치하는 라이브러리가 격리된 가상환경(.venv/Lib) 안에 들어가는지 확인해야 프로젝트 간 버전 충돌을 막을 수 있습니다."
+    }
+  ]
+}

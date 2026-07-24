@@ -1,0 +1,187 @@
+{
+  "title": "Python_DAY3_ADVANCED",
+  "subject": "Python",
+  "description": "SK Shieldus Rookies: Python 3일차 심화. 3일차에 다룬 범위(자료형과 참조, JSON, 형변환, 논리값과 연산자, 조건문, 반복문, range, 2차원 리스트, 리스트 컴프리헨션, 함수와 매개변수) 안에서 한 단계 더 깊은 동작 원리와 함정을 다룹니다.",
+  "questions": [
+    {
+      "question": "print(True + True + True) 의 출력 결과는?",
+      "options": ["TypeError가 발생한다", "3", "True", "1"],
+      "answer": 1,
+      "explanation": "파이썬의 bool은 int의 하위 타입이라 True는 1, False는 0으로 연산됩니다. 그래서 1+1+1 = 3이 출력됩니다."
+    },
+    {
+      "question": "print(0 or \"기본값\") 의 출력 결과는?",
+      "options": ["True", "False", "0", "기본값"],
+      "answer": 3,
+      "explanation": "파이썬의 or는 True/False가 아니라 '먼저 참이 되는 피연산자'를 그대로 반환합니다. 0은 Falsy이므로 뒤쪽 값인 \"기본값\"이 반환됩니다."
+    },
+    {
+      "question": "-7 // 2 의 결과는?",
+      "options": ["-3", "-4", "-3.5", "3"],
+      "answer": 1,
+      "explanation": "파이썬의 //는 0 방향이 아니라 음의 무한대 방향으로 내림합니다. -3.5를 내림하면 -4가 됩니다. C나 Java의 정수 나눗셈과 결과가 다릅니다."
+    },
+    {
+      "question": "-7 % 2 의 결과는?",
+      "options": ["-1", "1", "0", "-7"],
+      "answer": 1,
+      "explanation": "파이썬의 나머지는 항상 나누는 수의 부호를 따르므로 양수 1이 나옵니다. C나 Java는 -1을 반환하므로 홀짝 판별 코드를 다른 언어에서 옮겨올 때 주의해야 합니다."
+    },
+    {
+      "question": "a = 1, b = 2 일 때 not a == b 는 어떻게 해석되나요?",
+      "options": ["(not a) == b 로 해석되어 False", "not (a == b) 로 해석되어 True", "SyntaxError가 발생한다", "not (a) == (b) 로 해석되어 True"],
+      "answer": 1,
+      "explanation": "비교 연산자(==)가 논리 부정(not)보다 우선순위가 높아 not (a == b)로 해석됩니다. 1 == 2는 False이고 이를 부정하면 True입니다."
+    },
+    {
+      "question": "print(True or False and False) 의 출력 결과는?",
+      "options": ["True", "False", "None", "SyntaxError가 발생한다"],
+      "answer": 0,
+      "explanation": "and가 or보다 우선순위가 높으므로 True or (False and False) = True or False = True 입니다. 왼쪽부터 순서대로 계산하면 False가 나오므로 우선순위를 반드시 알아야 합니다."
+    },
+    {
+      "question": "import json 후 json.dumps({1: \"a\"}) 의 결과 문자열은?",
+      "options": ["'{1: \"a\"}'", "'{\"1\": \"a\"}'", "'{1: \\'a\\'}'", "TypeError가 발생한다"],
+      "answer": 1,
+      "explanation": "JSON의 객체 키는 반드시 문자열이어야 하므로 정수 키가 문자열로 변환됩니다. 따라서 json.loads()로 되돌리면 키가 1이 아니라 \"1\"이 되어 원래 딕셔너리와 달라집니다."
+    },
+    {
+      "question": "json.dumps({1, 2, 3}) 을 실행하면 어떻게 되나요?",
+      "options": ["'[1, 2, 3]' 이 반환된다", "'{1, 2, 3}' 이 반환된다", "TypeError가 발생한다", "빈 문자열이 반환된다"],
+      "answer": 2,
+      "explanation": "JSON에는 집합(set)에 대응하는 자료형이 없어 직렬화할 수 없습니다. 저장하려면 list(my_set)으로 형변환한 뒤 dumps 해야 합니다."
+    },
+    {
+      "question": "다음 코드의 출력 결과는?\n\norig = [[1, 2], [3, 4]]\ncopied = orig.copy()\ncopied[0][0] = 99\nprint(orig)",
+      "options": ["[[1, 2], [3, 4]]", "[[99, 2], [3, 4]]", "[[99, 2], [99, 4]]", "TypeError가 발생한다"],
+      "answer": 1,
+      "explanation": "copy()는 얕은 복사라 바깥 리스트만 새로 만들고 안쪽 리스트는 원본과 같은 객체를 공유합니다. 중첩 구조까지 분리하려면 copy.deepcopy()를 써야 합니다."
+    },
+    {
+      "question": "nums = [3, 1, 2] 일 때 print(nums.sort()) 의 출력 결과는?",
+      "options": ["[1, 2, 3]", "[3, 1, 2]", "None", "TypeError가 발생한다"],
+      "answer": 2,
+      "explanation": "sort()는 리스트를 제자리에서 정렬하고 아무것도 반환하지 않으므로 None이 출력됩니다. 정렬된 새 리스트를 값으로 받고 싶으면 sorted(nums)를 사용합니다."
+    },
+    {
+      "question": "다음 코드의 출력 결과는?\n\nnums = [1, 2, 2, 3]\nfor n in nums:\n    if n == 2:\n        nums.remove(n)\nprint(nums)",
+      "options": ["[1, 3]", "[1, 2, 3]", "[1, 2, 2, 3]", "무한루프에 빠진다"],
+      "answer": 1,
+      "explanation": "반복 중 리스트에서 요소를 제거하면 뒤 요소들이 앞으로 당겨져 인덱스가 밀리면서 일부를 건너뜁니다. 2가 하나 남아 [1, 2, 3]이 됩니다. 원본을 수정하려면 새 리스트를 만들어 담아야 합니다."
+    },
+    {
+      "question": "다음 코드를 실행한 뒤 x의 값은?\n\nx = \"원본\"\nresult = [x for x in range(3)]\nprint(x)",
+      "options": ["0", "2", "\"원본\"", "NameError가 발생한다"],
+      "answer": 2,
+      "explanation": "리스트 컴프리헨션의 반복 변수는 자체 스코프를 가져 바깥으로 새지 않습니다. 반면 일반 for문의 반복 변수는 루프가 끝난 뒤에도 남아 있어 x가 2가 됩니다."
+    },
+    {
+      "question": "print(sum([1, 2, 3], 10)) 의 출력 결과는?",
+      "options": ["6", "10", "16", "TypeError가 발생한다"],
+      "answer": 2,
+      "explanation": "sum()의 두 번째 인자는 누적을 시작할 초기값입니다. 10에서 시작해 1, 2, 3을 더하므로 16이 됩니다."
+    },
+    {
+      "question": "p, *q = [1, 2, 3, 4] 를 실행했을 때 q의 값과 자료형은?",
+      "options": ["[2, 3, 4] / 리스트", "(2, 3, 4) / 튜플", "2 / 정수", "ValueError가 발생한다"],
+      "answer": 0,
+      "explanation": "확장 언패킹에서 * 가 붙은 변수는 남은 요소들을 항상 리스트로 받습니다. 필드 개수가 일정하지 않은 로그를 언패킹할 때 ValueError를 피하는 방법입니다."
+    },
+    {
+      "question": "def add(n1, n2): return n1 + n2 일 때, nums = [10, 20] 를 이 함수에 넘기는 올바른 방법은?",
+      "options": ["add(nums)", "add(*nums)", "add(**nums)", "add(nums[0], nums[1]) 외에는 방법이 없다"],
+      "answer": 1,
+      "explanation": "*를 붙이면 시퀀스가 위치 인자로 풀려서 전달됩니다. add(*[10, 20])은 add(10, 20)과 같습니다."
+    },
+    {
+      "question": "def add(n1, n2): return n1 + n2 일 때, params = {\"n1\": 10, \"n2\": 20} 를 이 함수에 넘기는 올바른 방법은?",
+      "options": ["add(params)", "add(*params)", "add(**params)", "add(params.values())"],
+      "answer": 2,
+      "explanation": "**를 붙이면 딕셔너리가 키워드 인자로 풀려서 전달됩니다. 참고로 add(*params)는 키인 문자열 \"n1\", \"n2\"가 전달되어 \"n1n2\"가 됩니다."
+    },
+    {
+      "question": "def calc(*, a, b): return a - b 로 정의했을 때, calc(10, 3) 을 호출하면?",
+      "options": ["7이 반환된다", "-7이 반환된다", "TypeError가 발생한다", "SyntaxError가 발생한다"],
+      "answer": 2,
+      "explanation": "매개변수 목록에 *를 단독으로 쓰면 그 뒤 매개변수는 모두 키워드 전용이 됩니다. 위치 인자로 호출하면 TypeError가 나고 calc(a=10, b=3)으로 호출해야 합니다."
+    },
+    {
+      "question": "다음 코드의 출력 결과는?\n\ndef push(lst):\n    lst.append(\"X\")\n\nmine = [\"A\"]\npush(mine)\nprint(mine)",
+      "options": ["['A']", "['A', 'X']", "['X']", "None"],
+      "answer": 1,
+      "explanation": "파이썬은 객체의 참조를 전달하므로 함수 안에서 리스트를 수정하면 원본도 바뀝니다. 원본을 보존하려면 함수 안에서 copy()한 뒤 작업해 반환해야 합니다."
+    },
+    {
+      "question": "type((1)) 과 type((1,)) 의 결과를 순서대로 짝지은 것은?",
+      "options": ["tuple, tuple", "int, tuple", "tuple, int", "int, int"],
+      "answer": 1,
+      "explanation": "괄호만으로는 튜플이 되지 않고 단순한 우선순위 괄호로 해석됩니다. 요소가 하나인 튜플은 반드시 뒤에 콤마를 붙여 (1,) 로 써야 합니다."
+    },
+    {
+      "question": "s = \"abc\" 일 때 s[0] = \"z\" 를 실행하면?",
+      "options": ["s가 \"zbc\"가 된다", "TypeError가 발생한다", "IndexError가 발생한다", "새 문자열 \"zbc\"가 만들어지고 s는 그대로다"],
+      "answer": 1,
+      "explanation": "문자열은 불변(immutable) 객체라 항목 대입을 지원하지 않아 TypeError가 발생합니다. 값을 바꾸려면 replace()나 슬라이싱으로 새 문자열을 만들어야 합니다."
+    },
+    {
+      "question": "다음 코드의 출력 결과는?\n\nl1 = [1, 2, 3]\nl2 = l1\nl1 += [4]\nprint(l2)",
+      "options": ["[1, 2, 3]", "[1, 2, 3, 4]", "[4]", "TypeError가 발생한다"],
+      "answer": 1,
+      "explanation": "리스트의 += 는 새 객체를 만들지 않고 원본을 제자리에서 확장합니다. l2도 같은 객체를 가리키므로 함께 바뀝니다. 반면 l1 = l1 + [5] 는 새 리스트를 만들어 l2에 영향을 주지 않습니다."
+    },
+    {
+      "question": "m = [[1, 2], [3, 4]] 일 때 [v for row in m for v in row] 의 결과는?",
+      "options": ["[[1, 2], [3, 4]]", "[1, 2, 3, 4]", "[1, 3, 2, 4]", "SyntaxError가 발생한다"],
+      "answer": 1,
+      "explanation": "컴프리헨션 안의 for는 왼쪽부터 바깥 루프 순서로 읽습니다. 바깥에서 행을 꺼내고 안쪽에서 요소를 꺼내므로 2차원 리스트가 1차원으로 펴집니다."
+    },
+    {
+      "question": "list(range(10, 0, -1)) 의 마지막 값은?",
+      "options": ["0", "1", "10", "-1"],
+      "answer": 1,
+      "explanation": "step이 음수면 역순으로 생성되며 stop(0)은 포함되지 않으므로 10부터 1까지 만들어집니다."
+    },
+    {
+      "question": "print(f\"{1234567:,}\") 의 출력 결과는?",
+      "options": ["1234567", "1,234,567", "1.234.567", "SyntaxError가 발생한다"],
+      "answer": 1,
+      "explanation": "f-string의 서식에서 콤마는 천 단위 구분 기호를 넣어줍니다. 로그 건수나 트래픽 양을 리포트에 출력할 때 유용합니다."
+    },
+    {
+      "question": "nums = [1, 2, 3] 일 때 print(*nums) 의 출력 결과는?",
+      "options": ["[1, 2, 3]", "1 2 3", "123", "TypeError가 발생한다"],
+      "answer": 1,
+      "explanation": "*가 리스트를 풀어 print(1, 2, 3)과 같아지고, sep의 기본값인 공백으로 구분되어 출력됩니다."
+    },
+    {
+      "question": "s = {1, 2, 3} 일 때 s[0] 을 실행하면?",
+      "options": ["1이 반환된다", "TypeError가 발생한다", "IndexError가 발생한다", "None이 반환된다"],
+      "answer": 1,
+      "explanation": "집합은 순서를 유지하지 않아 인덱싱을 지원하지 않으므로 TypeError가 발생합니다. 순서가 필요하면 list()로 형변환해야 합니다."
+    },
+    {
+      "question": "int(3.9) 와 int(-3.9) 의 결과를 순서대로 짝지은 것은?",
+      "options": ["4, -4", "3, -3", "3, -4", "4, -3"],
+      "answer": 1,
+      "explanation": "int()는 반올림이 아니라 소수점 이하를 잘라내는(0 방향) 변환입니다. -3.9는 -3이 됩니다. 음의 무한대 방향으로 내리는 //와 결과가 다르다는 점에 주의해야 합니다."
+    },
+    {
+      "question": "list(\"abc\") 의 결과는?",
+      "options": ["['abc']", "['a', 'b', 'c']", "[\"a\", \"b\", \"c\", \"\"]", "TypeError가 발생한다"],
+      "answer": 1,
+      "explanation": "문자열도 시퀀스이므로 list()로 변환하면 문자 하나하나가 요소가 됩니다. for문으로 문자열을 순회할 때도 같은 원리로 한 글자씩 꺼내집니다."
+    },
+    {
+      "question": "print(\"5\" * 3) 의 출력 결과는?",
+      "options": ["15", "555", "5 5 5", "TypeError가 발생한다"],
+      "answer": 1,
+      "explanation": "문자열과 정수의 * 연산은 문자열 반복입니다. 구분선을 출력할 때 쓰는 \"=\" * 30 이 같은 원리입니다."
+    },
+    {
+      "question": "다음 코드에서 print는 몇 번 실행되나요?\n\ncnt = 10\nwhile cnt < 5:\n    print(cnt)\n    cnt += 1",
+      "options": ["0번", "1번", "5번", "무한루프에 빠진다"],
+      "answer": 0,
+      "explanation": "while은 블록을 실행하기 전에 조건을 먼저 검사합니다. 처음부터 조건이 거짓이면 블록은 한 번도 실행되지 않고 바로 탈출합니다."
+    }
+  ]
+}
