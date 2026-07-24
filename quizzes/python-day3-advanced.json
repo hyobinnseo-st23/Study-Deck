@@ -14,7 +14,7 @@
       "question": "print(0 or \"기본값\") 의 출력 결과는?",
       "options": ["True", "False", "0", "기본값"],
       "answer": 3,
-      "explanation": "파이썬의 or는 True/False가 아니라 '먼저 참이 되는 피연산자'를 그대로 반환합니다. 0은 Falsy이므로 뒤쪽 값인 \"기본값\"이 반환됩니다."
+      "explanation": "파이썬의 or는 True/False가 아니라 '먼저 참이 되는 피연산자'를 그대로 반환합니다. 0은 False이므로 뒤쪽 값인 \"기본값\"이 반환됩니다."
     },
     {
       "question": "-7 // 2 의 결과는?",
