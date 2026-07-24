@@ -804,7 +804,22 @@
     subjectsTab.appendChild(label);
 
     const allSubjects = getSubjects();
-    list.forEach(quiz => subjectsTab.appendChild(quizItemEl(quiz, allSubjects, subj)));
+    const sortKey = t => {
+      const title = t || "";
+      const m = title.match(/day\s*_?\s*(\d+)/i);
+      return {
+        day: m ? parseInt(m[1], 10) : Number.MAX_SAFE_INTEGER,
+        advanced: /advanced/i.test(title) ? 1 : 0,
+        title
+      };
+    };
+    const sortedList = list.slice().sort((a, b) => {
+      const ka = sortKey(a.title), kb = sortKey(b.title);
+      if (ka.day !== kb.day) return ka.day - kb.day;
+      if (ka.advanced !== kb.advanced) return ka.advanced - kb.advanced;
+      return ka.title.localeCompare(kb.title, "ko", { numeric: true, sensitivity: "base" });
+    });
+    sortedList.forEach(quiz => subjectsTab.appendChild(quizItemEl(quiz, allSubjects, subj)));
   }
 
   function statPills(s) {
