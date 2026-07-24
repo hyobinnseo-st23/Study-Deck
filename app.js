@@ -176,6 +176,31 @@
   function removeWrong(q) { const w = getWrong(); delete w[questionId(q)]; lsSet(WRONG_KEY, w); }
   function getWrongList() { return Object.values(getWrong()).sort((a, b) => (b.wrongCount || 0) - (a.wrongCount || 0)); }
 
+  // 라이브러리에는 아직 존재하는 퀴즈인데 그 안에서 문제가 삭제/수정된 경우,
+  // 북마크·오답 노트에 남은 옛 스냅샷을 정리한다.
+  // (퀴즈 자체가 라이브러리에 없으면 = 통째로 삭제된 것이므로 그대로 보존)
+  function reconcileReview() {
+    const validIdsByTitle = {};
+    Object.values(getLibrary()).forEach(quiz => {
+      const title = quiz && quiz.title || "";
+      const ids = validIdsByTitle[title] || (validIdsByTitle[title] = {});
+      (quiz && quiz.questions || []).forEach(q => { ids[questionId(q)] = true; });
+    });
+    let changed = false;
+    [BM_KEY, WRONG_KEY].forEach(key => {
+      const store = lsGet(key, {});
+      let dirty = false;
+      Object.keys(store).forEach(id => {
+        const entry = store[id];
+        const title = entry && entry.quizTitle;
+        const known = title && validIdsByTitle[title];
+        if (known && !known[id]) { delete store[id]; dirty = true; }
+      });
+      if (dirty) { lsSet(key, store); changed = true; }
+    });
+    return changed;
+  }
+
   // ---------- 카운트 배지 갱신 ----------
   function refreshCounts() {
     document.getElementById("cntLib").textContent = getSubjects().length;
@@ -1464,9 +1489,15 @@
   renderSubjectsTab();
 
   // 기본 제공 문제 동기화 후, 메인 화면이면 다시 그려서 즉시 반영
-  syncBuiltinQuizzes().then(changed => {
-    if (!changed) return;
+  syncBuiltinQuizzes().then(syncChanged => {
+    // 동기화로 라이브러리가 갱신된 뒤, 삭제된 문제가 북마크·오답 노트에 남아 있으면 정리
+    const reviewChanged = reconcileReview();
+    if (!syncChanged && !reviewChanged) return;
     refreshCounts();
-    if (document.getElementById("tab-subjects").classList.contains("active")) renderSubjectsTab();
+    const active = document.querySelector(".tab-btn.active");
+    const activeTab = active && active.dataset.tab;
+    if (activeTab === "subjects") renderSubjectsTab();
+    else if (activeTab === "bookmark") renderBookmarkTab(true);
+    else if (activeTab === "wrong") renderWrongTab(true);
   });
 })();
