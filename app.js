@@ -196,7 +196,8 @@
       options: order.map(i => q.options[i]),
       answer: order.indexOf(q.answer),
       explanation: q.explanation || "",
-      _orig: { question: q.question, options: q.options, answer: q.answer, explanation: q.explanation || "" }
+      _source: q._source || "",
+      _orig: { question: q.question, options: q.options, answer: q.answer, explanation: q.explanation || "", _source: q._source || "" }
     };
   }
 
@@ -241,13 +242,16 @@
       const marked = isBookmarked(q._orig);
       const already = answered[idx];
       const pct = Math.round((idx / questions.length) * 100);
+      const progressText = q._source
+        ? ('문제 (' + (idx + 1) + '번/' + questions.length + '개) <span class="progress-src">- ' + escapeHtml(q._source) + '</span>')
+        : ('문제 ' + (idx + 1) + ' / ' + questions.length);
 
       container.innerHTML = "";
       const card = document.createElement("div");
       card.className = "card";
       card.innerHTML =
         '<div class="quiz-meta">' +
-          '<span class="progress-text">문제 ' + (idx + 1) + ' / ' + questions.length + '</span>' +
+          '<span class="progress-text">' + progressText + '</span>' +
           '<div class="meta-btns">' +
             (saveKey ? '<button class="bookmark-btn" id="saveBtn"><i class="fa-regular fa-bookmark"></i> 현재 지점 저장</button>' : '') +
             '<button class="bookmark-btn ' + (marked ? "active" : "") + '" id="bmBtn">' + (marked ? '<i class="fa-solid fa-star"></i> 북마크됨' : '<i class="fa-regular fa-star"></i> 북마크') + '</button>' +
@@ -279,7 +283,7 @@
       });
 
       card.querySelector("#bmBtn").addEventListener("click", () => {
-        const now = toggleBookmark(q._orig, ctx.quizTitle);
+        const now = toggleBookmark(q._orig, q._source || ctx.quizTitle);
         const b = card.querySelector("#bmBtn");
         b.classList.toggle("active", now); b.innerHTML = now ? '<i class="fa-solid fa-star"></i> 북마크됨' : '<i class="fa-regular fa-star"></i> 북마크';
         refreshCounts(); if (ctx.onChange) ctx.onChange();
@@ -329,7 +333,7 @@
         answered[idx] = i;
         const isCorrect = i === q.answer;
         if (isCorrect) { correctCount++; removeWrong(q._orig); }
-        else { addWrong(q._orig, ctx.quizTitle); sessionWrong.push(q._orig); }
+        else { addWrong(q._orig, q._source || ctx.quizTitle); sessionWrong.push(q._orig); }
         recordDaily(isCorrect, subjMap[questionId(q._orig)] || "기타");
         refreshCounts(); if (ctx.onChange) ctx.onChange();
         showResult(i);
@@ -963,7 +967,7 @@
   // 여러 퀴즈를 합쳐서 풀기 (과목 전체 / 전체 퀴즈)
   function playCombined(container, title, quizzes, statId, onExit, resume) {
     const merged = [];
-    quizzes.forEach(qz => qz.questions.forEach(q => merged.push(q)));
+    quizzes.forEach(qz => qz.questions.forEach(q => merged.push(Object.assign({}, q, { _source: qz.title }))));
     if (merged.length === 0) { alert("풀 수 있는 문제가 없습니다."); return; }
     const ctx = { quizId: statId, quizTitle: title };
     applyResume(ctx, statId, resume);
@@ -1060,7 +1064,8 @@
       playerWrap.appendChild(player);
       const ctx = { quizTitle: cfg.quizTitle, saveKey: key, onChange: () => { refreshCounts(); if (cfg.getList().length === 0) cfg.rerender(); } };
       if (resume) { const rp = getResumePoint(key); if (rp) { ctx.savedOrder = rp.order; ctx.savedIdx = rp.idx; } }
-      QuizPlayer(player, list, ctx);
+      const sourced = list.map(it => it.quizTitle ? Object.assign({}, it, { _source: it.quizTitle }) : it);
+      QuizPlayer(player, sourced, ctx);
     }
     startPlayer(false);
 
