@@ -1,0 +1,344 @@
+{
+  "title": "머신러닝 DAY1",
+  "subtitle": "데이터 수집 · REST API · 웹 스크래핑 · 파일 저장 · SQLite",
+  "subject": "머신러닝/딥러닝",
+  "description": "SK Shieldus Rookies: 머신러닝·딥러닝 1일차 수업. AI 데이터 처리 파이프라인 개요와 데이터 수집(REST API, 웹 스크래핑, 공개 데이터셋, 데이터베이스), CSV/Excel/JSON 저장 포맷 비교, SQLite CRUD를 다룹니다.",
+  "questions": [
+    {
+      "question": "AI 데이터 처리 파이프라인에서 가장 먼저 수행되는 단계는?",
+      "options": ["모델 학습", "데이터 전처리", "데이터 수집", "서빙/배포"],
+      "answer": 2,
+      "explanation": "파이프라인은 데이터 수집 → EDA → 전처리 → 피처 엔지니어링 → 모델 학습/평가 → 서빙 순으로 진행됩니다. 학습시킬 데이터가 없으면 이후 단계 자체가 성립하지 않습니다."
+    },
+    {
+      "question": "EDA(탐색적 데이터 분석) 단계에서 주로 하는 일은?",
+      "options": ["모델을 API로 배포한다", "기초 통계와 분포, 컬럼 간 관계를 파악한다", "텍스트를 숫자로 변환한다", "웹페이지에서 데이터를 수집한다"],
+      "answer": 1,
+      "explanation": "EDA는 평균, 편차, 분포 등 기초 통계값과 컬럼 간 관계를 살펴 데이터가 어떤 모양인지 파악하는 탐색 단계입니다."
+    },
+    {
+      "question": "전처리 단계에서 텍스트 데이터를 숫자로 변환하는 작업을 무엇이라 하나요?",
+      "options": ["스케일링", "인코딩", "결측치 처리", "샘플링"],
+      "answer": 1,
+      "explanation": "인코딩은 텍스트를 수치로 바꾸는 작업입니다. 컴퓨터는 연산을 하므로 문자열보다 수치 기반 학습이 훨씬 빠르고 정확합니다."
+    },
+    {
+      "question": "키 180(cm)과 몸무게 70(kg)처럼 단위가 다른 수치를 같은 기준으로 맞추는 전처리 작업은?",
+      "options": ["인코딩", "스케일링", "결측치 제거", "피처 선택"],
+      "answer": 1,
+      "explanation": "단위가 다르면 숫자가 큰 컬럼이 과도하게 중요하게 취급됩니다. 정규화, 표준화, 로그 변환 등이 스케일링에 해당합니다."
+    },
+    {
+      "question": "학습된 모델을 HTTP API 형태로 제공할 때 수업에서 소개된 라이브러리는?",
+      "options": ["Streamlit", "FastAPI", "BeautifulSoup", "pandas"],
+      "answer": 1,
+      "explanation": "FastAPI는 웹 기반 API 서비스 구조를 제공하는 라이브러리(프레임워크)입니다. Streamlit은 화면(프론트엔드) 구성용입니다."
+    },
+    {
+      "question": "웹페이지의 HTML에서 원하는 데이터를 추출하는 수집 방법을 무엇이라 하나요?",
+      "options": ["웹 스크래핑(크롤링)", "API 호출", "데이터셋 다운로드", "데이터베이스 조회"],
+      "answer": 0,
+      "explanation": "웹페이지의 HTML 안에서 필요한 데이터만 뽑아내는 방식을 웹 스크래핑 또는 크롤링이라고 합니다."
+    },
+    {
+      "question": "오픈 API와 공개 데이터셋(파일)의 차이로 옳은 것은?",
+      "options": ["API는 특정 시점의 전체 데이터를, 데이터셋은 실시간 데이터를 제공한다", "API는 요청 시점의 실시간 데이터를, 데이터셋은 특정 시점까지의 데이터를 제공한다", "둘 다 실시간 데이터만 제공한다", "둘 다 파일 형태로만 제공된다"],
+      "answer": 1,
+      "explanation": "API는 요청한 순간의 실시간 데이터를 페이지 단위로 주고, 데이터셋은 특정 시점까지 모아 정제한 스냅샷을 파일로 제공합니다."
+    },
+    {
+      "question": "머신러닝 학습용으로 정제된 CSV 데이터셋을 다운로드할 수 있는 대표적인 해외 사이트는?",
+      "options": ["Kaggle", "GitHub", "Stack Overflow", "W3Schools"],
+      "answer": 0,
+      "explanation": "Kaggle은 머신러닝 학습용 데이터셋 허브로, CSV 형식과 피처 설명을 함께 제공합니다."
+    },
+    {
+      "question": "HTTP 상태 코드 200이 의미하는 것은?",
+      "options": ["리다이렉션", "정상 응답", "서버 오류", "권한 없음"],
+      "answer": 1,
+      "explanation": "200은 요청이 정상적으로 처리되어 응답을 받았음을 뜻하는 상태 코드입니다."
+    },
+    {
+      "question": "요청한 자원이 서버에 존재하지 않을 때 반환되는 상태 코드는?",
+      "options": ["200", "301", "404", "500"],
+      "answer": 2,
+      "explanation": "404는 해당 URL에 자원이 없음을 의미합니다."
+    },
+    {
+      "question": "인증은 되었지만 해당 자원에 접근할 권한이 없을 때 반환되는 상태 코드는?",
+      "options": ["401", "403", "404", "429"],
+      "answer": 1,
+      "explanation": "401은 인증되지 않았음을, 403은 인증은 되었으나 권한이 없음을 뜻합니다."
+    },
+    {
+      "question": "HTTP 상태 코드 500번대가 의미하는 것은?",
+      "options": ["정상 처리", "리다이렉션", "클라이언트 오류", "서버 오류"],
+      "answer": 3,
+      "explanation": "500번대는 서버 측에서 발생한 오류를 나타냅니다. 400번대는 클라이언트 측 오류입니다."
+    },
+    {
+      "question": "requests.get()이 반환하는 것은?",
+      "options": ["JSON 문자열", "Response 객체", "딕셔너리", "HTML 문자열"],
+      "answer": 1,
+      "explanation": "데이터 자체가 아니라 requests.models.Response 객체가 반환되며, 그 안에 상태 코드와 본문 등이 담겨 있습니다."
+    },
+    {
+      "question": "res.text가 담고 있는 데이터의 자료형은?",
+      "options": ["dict", "list", "str", "bytes"],
+      "answer": 2,
+      "explanation": "res.text는 응답 본문을 문자열(str)로 담고 있어 슬라이싱 등 문자열 처리를 그대로 적용할 수 있습니다."
+    },
+    {
+      "question": "JSON 형식의 응답 본문을 파이썬 객체(list/dict)로 변환해 주는 Response 객체의 메서드는?",
+      "options": ["res.text", "res.json()", "res.content", "res.headers"],
+      "answer": 1,
+      "explanation": "res.json()은 JSON 문자열을 파이썬 객체로 변환해 줍니다. text는 속성이라 괄호가 없고, json()은 메서드라 괄호가 필요합니다."
+    },
+    {
+      "question": "존재하지 않는 경로로 requests.get()을 호출했을 때의 동작으로 옳은 것은?",
+      "options": ["예외가 발생하여 프로그램이 중단된다", "예외 없이 Response 객체가 반환되며 status_code로 확인해야 한다", "None이 반환된다", "빈 문자열이 반환된다"],
+      "answer": 1,
+      "explanation": "404나 500이어도 requests.get()은 예외를 던지지 않고 Response 객체를 반환합니다. 상태 코드를 직접 확인하지 않으면 에러 페이지를 정상 데이터로 착각하게 됩니다."
+    },
+    {
+      "question": "REST API에서 URL이 나타내는 것은?",
+      "options": ["수행할 동작", "자원(Resource)", "응답 형식", "인증 방식"],
+      "answer": 1,
+      "explanation": "REST에서 URL은 자원을 가리키고, 수행할 동작은 HTTP 메서드로 구분합니다. /users는 사용자 자원, /users/1은 1번 사용자입니다."
+    },
+    {
+      "question": "REST에서 새로운 데이터를 등록(Create)할 때 사용하는 HTTP 메서드는?",
+      "options": ["GET", "POST", "PUT", "DELETE"],
+      "answer": 1,
+      "explanation": "GET은 조회, POST는 등록, PUT은 수정, DELETE는 삭제에 대응합니다."
+    },
+    {
+      "question": "HTTP 메시지에서 Content-Type처럼 키-값 형태의 부가 정보가 담기는 영역은?",
+      "options": ["Start Line", "헤더(Header)", "바디(Body)", "쿼리스트링"],
+      "answer": 1,
+      "explanation": "헤더에는 부가 옵션이 키-값 형태로 담기고, 바디에는 실제 전송할 데이터가 담깁니다."
+    },
+    {
+      "question": "API 인증 토큰을 전달할 때 URL 쿼리스트링보다 헤더가 권장되는 이유는?",
+      "options": ["헤더가 전송 속도가 빠르기 때문", "쿼리스트링은 서버 로그와 브라우저 히스토리에 그대로 남기 때문", "쿼리스트링은 길이 제한이 없기 때문", "헤더는 항상 암호화되어 전송되기 때문"],
+      "answer": 1,
+      "explanation": "GET 파라미터는 웹 서버 액세스 로그, 프록시 로그, 브라우저 히스토리, Referer 헤더에 평문으로 남습니다. 그래서 인증 정보는 헤더로 전달합니다."
+    },
+    {
+      "question": "HTML 문서에서 브라우저 화면에 실제로 출력되는 내용이 들어가는 태그는?",
+      "options": ["head", "body", "title", "meta"],
+      "answer": 1,
+      "explanation": "head에는 메타 정보가, body에는 화면에 표시되는 내용이 들어갑니다. 스크래핑 대상은 주로 body 안쪽입니다."
+    },
+    {
+      "question": "다음 중 종료 태그를 사용하지 않는 단일 태그는?",
+      "options": ["p", "div", "img", "a"],
+      "answer": 2,
+      "explanation": "img는 감쌀 콘텐츠가 없어 종료 태그를 쓰지 않는 단일(빈) 태그입니다. br, input도 같은 유형입니다."
+    },
+    {
+      "question": "a 태그에서 링크 경로를 지정하는 속성은?",
+      "options": ["src", "href", "id", "class"],
+      "answer": 1,
+      "explanation": "href는 a 태그의 링크 경로를, src는 img 등 리소스의 경로를 지정합니다."
+    },
+    {
+      "question": "HTML의 id 속성에 대한 설명으로 옳은 것은?",
+      "options": ["문서 내에서 중복되어도 무방하며 그렇게 쓰는 것이 권장된다", "문서 내에서 유일한 값을 사용하기로 약속되어 있다", "반드시 숫자로만 작성해야 한다", "a 태그에만 사용할 수 있다"],
+      "answer": 1,
+      "explanation": "id는 식별자이므로 유일한 값을 쓰기로 약속되어 있습니다. 중복되어도 HTML 렌더링은 되지만 JavaScript나 CSS가 요소를 찾을 때 문제가 생깁니다."
+    },
+    {
+      "question": "BeautifulSoup을 사용하기 위해 pip으로 설치해야 하는 패키지 이름은?",
+      "options": ["bs4", "beautifulsoup", "beautifulsoup4", "BeautifulSoup"],
+      "answer": 2,
+      "explanation": "설치 패키지명은 beautifulsoup4, 임포트할 모듈명은 bs4, 클래스명은 BeautifulSoup으로 셋이 모두 다릅니다."
+    },
+    {
+      "question": "BeautifulSoup 클래스를 가져오는 올바른 임포트 구문은?",
+      "options": ["import beautifulsoup4", "from bs4 import BeautifulSoup", "import BeautifulSoup", "from beautifulsoup4 import bs4"],
+      "answer": 1,
+      "explanation": "설치는 beautifulsoup4로 하지만 임포트는 bs4 모듈에서 BeautifulSoup 클래스를 가져옵니다."
+    },
+    {
+      "question": "a 태그가 4개 있는 HTML에서 soup.a가 반환하는 것은?",
+      "options": ["4개의 a 태그 리스트", "위에서부터 처음 만난 a 태그 하나", "마지막 a 태그 하나", "None"],
+      "answer": 1,
+      "explanation": "속성 방식 접근은 위에서 아래로 읽어 내려가다 처음 만난 요소 하나만 반환합니다. 여러 개를 얻으려면 find_all()이나 select()를 써야 합니다."
+    },
+    {
+      "question": "HTML에서 모든 a 태그를 리스트로 가져오는 메서드는?",
+      "options": ["find()", "find_all()", "select_one()", "get()"],
+      "answer": 1,
+      "explanation": "find()는 첫 번째 하나만, find_all()은 조건에 맞는 모든 요소를 리스트로 반환합니다."
+    },
+    {
+      "question": "다음 중 결과를 리스트가 아닌 단일 요소로 반환하는 것은?",
+      "options": ["find_all()", "select()", "select_one()", "모두 리스트를 반환한다"],
+      "answer": 2,
+      "explanation": "find_all()과 select()는 리스트를 반환하고, find()와 select_one()은 하나의 Tag 객체를 반환합니다."
+    },
+    {
+      "question": "class가 description인 p 태그를 선택하는 CSS 선택자로 옳은 것은?",
+      "options": ["p#description", "p.description", "p description", "#p.description"],
+      "answer": 1,
+      "explanation": "클래스 선택자는 점(.), 아이디 선택자는 샵(#)을 사용합니다. p.description은 p 태그이면서 class에 description을 가진 요소를 뜻합니다."
+    },
+    {
+      "question": "find_all()에서 class 속성으로 검색할 때 사용하는 인자 이름은?",
+      "options": ["class", "class_", "className", "cls"],
+      "answer": 1,
+      "explanation": "class는 파이썬 예약어이므로 언더스코어를 붙인 class_를 사용합니다. 그냥 class를 쓰면 SyntaxError가 발생합니다."
+    },
+    {
+      "question": "태그 안에 자식 요소가 여러 개일 때 .string 대신 사용해야 하는 것은?",
+      "options": ["get_text()", "get()", "find()", "attrs"],
+      "answer": 0,
+      "explanation": ".string은 자식이 문자열 하나일 때만 값을 반환하고 그 외에는 None이 됩니다. get_text()는 하위 모든 텍스트를 이어붙여 반환합니다."
+    },
+    {
+      "question": "태그에 해당 속성이 없을 때 KeyError를 발생시키지 않고 None을 반환하는 방식은?",
+      "options": ["tag['href']", "tag.get('href')", "tag.href", "tag.attrs['href']"],
+      "answer": 1,
+      "explanation": "대괄호 접근은 속성이 없으면 KeyError가 발생하지만, get()은 None을 반환하므로 반복 수집에서 안전합니다."
+    },
+    {
+      "question": "정규표현식으로 HTML 구조를 파싱하는 것이 권장되지 않는 주된 이유는?",
+      "options": ["정규표현식이 파이썬에서 지원되지 않기 때문", "태그의 중첩 구조를 표현할 수 없기 때문", "HTML에는 텍스트가 없기 때문", "정규표현식이 항상 더 느리기 때문"],
+      "answer": 1,
+      "explanation": "정규표현식은 태그가 몇 겹으로 감싸여 있는지 셀 수 없고 속성 순서나 공백 변화에도 취약합니다. 정규표현식은 추출한 텍스트 안에서 패턴을 찾을 때 사용합니다."
+    },
+    {
+      "question": "robots.txt 파일이 위치하는 곳은?",
+      "options": ["사이트의 루트 경로", "사이트의 관리자 페이지", "HTML의 head 태그 내부", "서버의 로그 디렉터리"],
+      "answer": 0,
+      "explanation": "robots.txt는 사이트 루트(https://사이트주소/robots.txt)에 위치하며, 크롤러는 접속 시 이 파일을 먼저 확인하는 것이 원칙입니다."
+    },
+    {
+      "question": "robots.txt에서 수집을 금지하는 경로를 지정하는 항목은?",
+      "options": ["Allow", "Disallow", "User-agent", "Sitemap"],
+      "answer": 1,
+      "explanation": "Disallow는 수집 금지 경로, Allow는 예외적으로 허용하는 경로, User-agent는 적용 대상 봇을 지정합니다."
+    },
+    {
+      "question": "크롤링 시 time.sleep()으로 요청 간격을 두는 주된 이유는?",
+      "options": ["코드를 더 짧게 만들기 위해", "서버 부하를 줄이고 IP 차단을 방지하기 위해", "데이터 정확도를 높이기 위해", "메모리를 절약하기 위해"],
+      "answer": 1,
+      "explanation": "짧은 시간에 반복 요청하면 방화벽이나 WAF가 공격으로 판단해 IP를 차단하고, 서버 부하를 유발해 법적 문제가 될 수도 있습니다."
+    },
+    {
+      "question": "CSV 형식의 한계로 옳은 것은?",
+      "options": ["표 형태의 데이터를 저장할 수 없다", "계층(중첩) 구조를 표현할 수 없다", "대부분의 도구에서 열 수 없다", "다른 포맷보다 항상 용량이 크다"],
+      "answer": 1,
+      "explanation": "CSV는 가볍고 호환성이 뛰어나지만 2차원 표만 표현할 수 있어 깊이가 있는 계층 구조는 담지 못합니다. 그런 데이터에는 JSON이 적합합니다."
+    },
+    {
+      "question": "json.dump() 사용 시 한글을 유니코드 이스케이프가 아닌 원래 글자 그대로 저장하려면 지정해야 하는 옵션은?",
+      "options": ["indent=2", "ensure_ascii=False", "sort_keys=True", "separators=None"],
+      "answer": 1,
+      "explanation": "ensure_ascii의 기본값은 True라서 한글이 이스케이프 형태로 저장됩니다. False로 지정해야 원래 글자로 기록됩니다."
+    },
+    {
+      "question": "파일 저장 방식에서 발생하는 동시 접근 및 동기화 문제를 해결하기 위해 등장한 것은?",
+      "options": ["CSV 파일", "DBMS(데이터베이스 관리 시스템)", "JSON 파일", "엑셀"],
+      "answer": 1,
+      "explanation": "여러 사용자가 같은 파일에 동시에 쓰면 마지막 저장이 앞의 내용을 덮어씁니다. DBMS는 중간에서 동시성을 제어하고 최신 상태를 보장합니다."
+    },
+    {
+      "question": "파이썬에서 SQLite를 사용하는 방법에 대한 설명으로 옳은 것은?",
+      "options": ["pip install sqlite3로 설치해야 한다", "표준 내장 모듈이므로 별도 설치 없이 사용할 수 있다", "별도의 데이터베이스 서버를 실행해야 한다", "오라클 클라이언트가 필요하다"],
+      "answer": 1,
+      "explanation": "sqlite3는 파이썬 표준 내장 모듈이라 requests나 beautifulsoup4와 달리 설치가 필요 없습니다."
+    },
+    {
+      "question": "sqlite3.connect('first.db')를 실행했을 때 해당 파일이 존재하지 않으면 어떻게 되나요?",
+      "options": ["오류가 발생한다", "새로 생성한 뒤 연결한다", "None을 반환한다", "기존 DB에 자동 연결된다"],
+      "answer": 1,
+      "explanation": "connect()는 파일이 없으면 새로 만들고, 있으면 그 파일에 연결한 뒤 Connection 객체를 반환합니다."
+    },
+    {
+      "question": "SQL 문을 실제로 실행하는 역할을 하는 객체는?",
+      "options": ["Connection 객체", "Cursor 객체", "Response 객체", "BeautifulSoup 객체"],
+      "answer": 1,
+      "explanation": "Connection 객체의 cursor() 메서드로 커서를 만들고, 커서의 execute()로 SQL을 실행합니다. 조회 결과도 커서에 담깁니다."
+    },
+    {
+      "question": "INSERT, UPDATE, DELETE 실행 후 실제 파일에 반영하기 위해 반드시 호출해야 하는 것은?",
+      "options": ["con.close()", "con.commit()", "cur.fetchall()", "con.rollback()"],
+      "answer": 1,
+      "explanation": "데이터 조작 작업은 commit()을 호출해야 물리적으로 반영됩니다. 커밋을 빠뜨리면 오류 없이 조용히 저장되지 않습니다."
+    },
+    {
+      "question": "작업 중 문제가 발생해 변경 사항을 되돌릴 때 사용하는 메서드는?",
+      "options": ["commit()", "rollback()", "close()", "execute()"],
+      "answer": 1,
+      "explanation": "정상 처리되면 commit(), 문제가 있으면 rollback()으로 되돌립니다. 커밋 이전 상태로만 되돌릴 수 있습니다."
+    },
+    {
+      "question": "SELECT 문에는 commit()이 필요하지 않은 이유는?",
+      "options": ["SELECT는 데이터를 변경하지 않기 때문", "SELECT는 자동으로 커밋되기 때문", "SELECT는 커서를 사용하지 않기 때문", "SELECT는 트랜잭션 밖에서 실행되지 않기 때문"],
+      "answer": 0,
+      "explanation": "커밋은 데이터 변경 사항을 확정하는 작업입니다. 조회는 데이터를 바꾸지 않으므로 커밋 대상이 아닙니다."
+    },
+    {
+      "question": "PRIMARY KEY 제약이 동시에 만족하는 두 가지 조건은?",
+      "options": ["NOT NULL과 UNIQUE", "UNIQUE와 DEFAULT", "NOT NULL과 AUTOINCREMENT", "CHECK와 UNIQUE"],
+      "answer": 0,
+      "explanation": "기본 키는 각 행을 대표하는 식별자이므로 값이 비어 있어서도 안 되고(NOT NULL) 중복되어서도 안 됩니다(UNIQUE)."
+    },
+    {
+      "question": "cur.fetchall()이 반환하는 자료 구조는?",
+      "options": ["튜플을 담은 리스트", "딕셔너리", "문자열", "리스트를 담은 튜플"],
+      "answer": 0,
+      "explanation": "바깥은 리스트이고 각 행은 튜플입니다. 튜플 안의 순서는 SELECT에서 지정한 컬럼 순서를 따릅니다."
+    },
+    {
+      "question": "sqlite3에서 SQL에 값을 안전하게 전달하기 위해 사용하는 자리표시자 기호는?",
+      "options": ["%s", "?", "{}", "$1"],
+      "answer": 1,
+      "explanation": "sqlite3는 물음표(?)를 자리표시자로 사용합니다. pymysql 등 다른 드라이버는 %s를 쓰기도 합니다."
+    },
+    {
+      "question": "cur.execute(sql, params)에서 전달할 값이 '홍길동' 하나일 때 올바른 표기는?",
+      "options": ["('홍길동')", "('홍길동',)", "(홍길동)", "'홍길동'"],
+      "answer": 1,
+      "explanation": "괄호만 감싼 ('홍길동')은 그냥 문자열입니다. 튜플이 되려면 쉼표가 필요합니다."
+    },
+    {
+      "question": "UPDATE나 DELETE에서 WHERE 절을 생략하면 어떻게 되나요?",
+      "options": ["오류가 발생한다", "아무 행도 변경되지 않는다", "테이블의 모든 행이 대상이 된다", "첫 번째 행만 대상이 된다"],
+      "answer": 2,
+      "explanation": "오류 없이 조용히 전체 행이 수정되거나 삭제됩니다. UPDATE와 DELETE에서 WHERE는 사실상 필수입니다."
+    },
+    {
+      "question": "SELECT 문의 실행 결과를 개념적으로 무엇이라 할 수 있나요?",
+      "options": ["새로운 테이블(결과 표)", "하나의 문자열", "하나의 컬럼", "원본 테이블 그 자체"],
+      "answer": 0,
+      "explanation": "SELECT는 조건에 맞는 행을 찾고 지정한 열만 골라 새로운 표를 만들어 반환합니다."
+    },
+    {
+      "question": "여러 행의 데이터를 하나의 SQL 문으로 반복 실행하는 커서 메서드는?",
+      "options": ["execute()", "executemany()", "executescript()", "fetchmany()"],
+      "answer": 1,
+      "explanation": "executemany()는 SQL은 그대로 두고 리스트에 담긴 각 튜플로 반복 실행합니다. 대량 입력 시 훨씬 빠릅니다."
+    },
+    {
+      "question": "SQL 인젝션에 대한 가장 근본적인 방어 방법은?",
+      "options": ["특수문자를 문자열에서 제거한다", "파라미터 바인딩(Prepared Statement)을 사용한다", "에러 메시지를 숨긴다", "WAF를 설치한다"],
+      "answer": 1,
+      "explanation": "바인딩은 SQL 구조를 먼저 파싱해 두고 값은 데이터로만 채우므로, 입력값이 구문으로 해석될 여지가 없습니다. 필터링은 우회 가능성이 있어 보조 수단입니다."
+    },
+    {
+      "question": "관계형 데이터베이스에서 조회, 입력, 수정, 삭제 작업이 공통적으로 기준 삼는 단위는?",
+      "options": ["열(Column)", "행(Row)", "테이블", "데이터베이스"],
+      "answer": 1,
+      "explanation": "INSERT는 행 추가, SELECT와 UPDATE는 행을 찾은 뒤 열을 다루고, DELETE는 행 전체를 제거합니다. 모든 작업이 행 단위로 이루어집니다."
+    },
+    {
+      "question": "pandas의 DataFrame을 데이터베이스 테이블로 저장하는 메서드는?",
+      "options": ["to_csv()", "to_sql()", "read_sql()", "to_excel()"],
+      "answer": 1,
+      "explanation": "to_sql()은 DataFrame을 DB 테이블로 저장하고, read_sql()은 쿼리 결과를 DataFrame으로 읽어옵니다."
+    }
+  ]
+}
