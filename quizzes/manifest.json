@@ -1,17 +1,17 @@
 {
-    "_comment":  "이 파일은 update-manifest.ps1 (또는 GitHub Actions)가 quizzes/ 폴더를 스캔해 자동 생성합니다. 직접 수정하지 말고 스크립트를 다시 실행하세요.",
-    "quizzes":  [
-                    "machine-leaning-day1.json",
-                    "machine-leaning-day1-advanced.json",
-                    "python-day1.json",
-                    "python-day1-advanced.json",
-                    "python-day2.json",
-                    "python-day2-advanced.json",
-                    "python-day3.json",
-                    "python-day3-advanced.json",
-                    "python-day4.json",
-                    "python-day4-advanced.json",
-                    "python-day5.json",
-                    "python-day5-advanced.json"
-                ]
+  "_comment": "이 파일은 GitHub Actions(build-manifest.yml)가 quizzes/ 폴더를 스캔해 자동 생성합니다. 직접 수정하지 마세요.",
+  "quizzes": [
+    "machine-leaning-day1-advanced.json",
+    "machine-leaning-day1.json",
+    "python-day1-advanced.json",
+    "python-day1.json",
+    "python-day2-advanced.json",
+    "python-day2.json",
+    "python-day3-advanced.json",
+    "python-day3.json",
+    "python-day4-advanced.json",
+    "python-day4.json",
+    "python-day5-advanced.json",
+    "python-day5.json"
+  ]
 }
