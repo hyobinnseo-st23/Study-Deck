@@ -495,8 +495,8 @@
     border-radius: 0; background: var(--border);
     top: 2px; left: 2px; width: 14px; height: 14px;
   }
-  [data-skin="macos"] .toggle.on .switch { background: var(--card); }
-  [data-skin="macos"] .toggle.on .switch::after { background: var(--primary); transform: translateX(20px); }
+  [data-skin="macos"] .toggle.on .switch { background: var(--primary); }
+  [data-skin="macos"] .toggle.on .switch::after { background: var(--mac-fill); transform: translateX(20px); }
 
   /* 막대그래프/진행바: 각진 모서리 */
   [data-skin="macos"] .bar,
@@ -536,6 +536,30 @@
   :root[data-skin="macos"][data-color="mono"] {
     --bg: #ededed; --card: #fafafa; --card-2: #ffffff; --border: #141414;
     --primary: #555555; --primary-hover: #3d3d3d; --gold: #555555; --mac-fill: #ffffff;
+  }
+
+  /* Mac OS 다크모드: 해/달 토글(data-theme=dark) 시 색상별 어두운 팔레트.
+     밝은 테두리 + 오프셋 그림자로 클래식 다크 맥 창 느낌 유지 */
+  :root[data-skin="macos"][data-theme="dark"] {
+    --bg: #2b2226; --card: #352a2f; --card-2: #3f333a; --text: #f0e8ea; --muted: #b6a6ab;
+    --border: #cfc3c7; --primary: #d295a6; --primary-hover: #e0a8b7; --gold: #d295a6;
+    --mac-fill: #3f333a; --mac-shadow: 3px 3px 0 #0d0d0d; --mac-shadow-sm: 2px 2px 0 #141416;
+  }
+  :root[data-skin="macos"][data-theme="dark"][data-color="pink"] {
+    --bg: #2b2226; --card: #352a2f; --card-2: #3f333a; --text: #f0e8ea; --muted: #b6a6ab;
+    --border: #cfc3c7; --primary: #d295a6; --primary-hover: #e0a8b7; --gold: #d295a6; --mac-fill: #3f333a;
+  }
+  :root[data-skin="macos"][data-theme="dark"][data-color="sky"] {
+    --bg: #1b2530; --card: #26313d; --card-2: #303d4a; --text: #e6eef5; --muted: #9fb0c0;
+    --border: #c3ced9; --primary: #5a9fd8; --primary-hover: #6fb0e6; --gold: #5a9fd8; --mac-fill: #303d4a;
+  }
+  :root[data-skin="macos"][data-theme="dark"][data-color="mint"] {
+    --bg: #1c2a26; --card: #263833; --card-2: #30443e; --text: #e6f2ee; --muted: #9fbcb2;
+    --border: #c3d9d1; --primary: #45c2a8; --primary-hover: #57d1b8; --gold: #45c2a8; --mac-fill: #30443e;
+  }
+  :root[data-skin="macos"][data-theme="dark"][data-color="mono"] {
+    --bg: #232326; --card: #2e2e31; --card-2: #3a3a3e; --text: #ededed; --muted: #a0a0a6;
+    --border: #c9c9cf; --primary: #6e6e7a; --primary-hover: #82828f; --gold: #9a9aa2; --mac-fill: #3a3a3e;
   }
 
   /* =========================================================
@@ -623,7 +647,7 @@
     font-weight: normal !important;
   }
   :is([data-font="Galmuri11"], [data-font="RoundedFixedsys"], [data-skin="macos"][data-font="default"])
-    :is(h1, h2, h3, h4, .quiz-item-title, .subject-card-name, .subject-name, .num, .t-num, .score, .d-date) {
+    :is(h1, h2, h3, h4, .quiz-item-title, .subject-card-name, .subject-name, .num, .t-num, .score, .d-date, .tab-btn) {
     font-weight: 700 !important;
   }
   :is([data-font="Galmuri11"], [data-font="RoundedFixedsys"], [data-skin="macos"][data-font="default"]) body {
