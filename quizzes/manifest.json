@@ -3,6 +3,8 @@
     "quizzes":  [
                     "machine-leaning-day1.json",
                     "machine-leaning-day1-advanced.json",
+                    "machine-leaning-day2.json",
+                    "machine-leaning-day2-advanced.json",
                     "python-day1.json",
                     "python-day1-advanced.json",
                     "python-day2.json",
