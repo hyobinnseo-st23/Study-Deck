@@ -33,17 +33,8 @@
   }
   .container { max-width: 800px; margin: 0 auto; padding: 24px 16px 90px; }
 
-  .theme-toggle {
-    position: fixed; top: 16px; right: 16px; z-index: 50;
-    width: 42px; height: 42px; border-radius: 50%;
-    border: 1px solid var(--border); background: var(--card); color: var(--text);
-    cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center;
-    transition: all .15s; box-shadow: 0 4px 14px rgba(0,0,0,.15);
-  }
-  .theme-toggle:hover { border-color: var(--primary); color: var(--primary); }
-
   .stats-toggle {
-    position: fixed; top: 16px; right: 66px; z-index: 50;
+    position: fixed; top: 16px; right: 16px; z-index: 50;
     width: 42px; height: 42px; border-radius: 50%;
     border: 1px solid var(--border); background: var(--card); color: var(--text);
     cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center;
@@ -469,9 +460,8 @@
   }
   [data-skin="macos"] .tab-btn { border-radius: 0; }
 
-  /* 상단 플로팅 버튼(통계/테마) → 각진 Mac 버튼 */
-  [data-skin="macos"] .stats-toggle,
-  [data-skin="macos"] .theme-toggle {
+  /* 상단 플로팅 버튼(통계) → 각진 Mac 버튼 */
+  [data-skin="macos"] .stats-toggle {
     border-radius: 0; border: 1.5px solid var(--border);
     background: var(--card); color: var(--text); box-shadow: var(--mac-shadow-sm);
   }
@@ -541,13 +531,13 @@
   /* Mac OS 다크모드: 해/달 토글(data-theme=dark) 시 색상별 어두운 팔레트.
      밝은 테두리 + 오프셋 그림자로 클래식 다크 맥 창 느낌 유지 */
   :root[data-skin="macos"][data-theme="dark"] {
-    --bg: #2b2226; --card: #352a2f; --card-2: #3f333a; --text: #f0e8ea; --muted: #b6a6ab;
-    --border: #cfc3c7; --primary: #d295a6; --primary-hover: #e0a8b7; --gold: #d295a6;
-    --mac-fill: #3f333a; --mac-shadow: 3px 3px 0 #0d0d0d; --mac-shadow-sm: 2px 2px 0 #141416;
+    --bg: #232326; --card: #2e2e31; --card-2: #3a3a3e; --text: #ededed; --muted: #a0a0a6;
+    --border: #c9c9cf; --primary: #d295a6; --primary-hover: #e0a8b7; --gold: #d295a6;
+    --mac-fill: #3a3a3e; --mac-shadow: 3px 3px 0 #0d0d0d; --mac-shadow-sm: 2px 2px 0 #141416;
   }
   :root[data-skin="macos"][data-theme="dark"][data-color="pink"] {
-    --bg: #2b2226; --card: #352a2f; --card-2: #3f333a; --text: #f0e8ea; --muted: #b6a6ab;
-    --border: #cfc3c7; --primary: #d295a6; --primary-hover: #e0a8b7; --gold: #d295a6; --mac-fill: #3f333a;
+    --bg: #232326; --card: #2e2e31; --card-2: #3a3a3e; --text: #ededed; --muted: #a0a0a6;
+    --border: #c9c9cf; --primary: #d295a6; --primary-hover: #e0a8b7; --gold: #d295a6; --mac-fill: #3a3a3e;
   }
   :root[data-skin="macos"][data-theme="dark"][data-color="sky"] {
     --bg: #1b2530; --card: #26313d; --card-2: #303d4a; --text: #e6eef5; --muted: #9fb0c0;

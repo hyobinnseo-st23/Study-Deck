@@ -1200,11 +1200,16 @@
         const curFont = lsGet(FONT_KEY, "default");
         const curSize = clampFontSize(lsGet(FONTSIZE_KEY, 100));
         const macOn = isMacSkin();
+        const darkOn = isDarkTheme();
 
         const sec = document.createElement("div");
         sec.className = "chart-card display-settings";
         sec.innerHTML =
           '<div class="chart-card-head"><h3><i class="fa-solid fa-sliders"></i> 화면 설정</h3></div>' +
+          '<div class="ds-row">' +
+            '<span class="ds-label"><i class="fa-solid fa-moon"></i> 다크 모드</span>' +
+            '<label class="toggle ' + (darkOn ? "on" : "") + '" id="dsDark"><span class="switch"></span>' + (darkOn ? "켜짐" : "꺼짐") + '</label>' +
+          '</div>' +
           '<div class="ds-row">' +
             '<span class="ds-label"><i class="fa-brands fa-apple"></i> Mac OS 스타일</span>' +
             '<label class="toggle ' + (macOn ? "on" : "") + '" id="dsMac"><span class="switch"></span>' + (macOn ? "켜짐" : "꺼짐") + '</label>' +
@@ -1222,6 +1227,13 @@
             '<input type="range" class="ds-range" id="dsSize" min="80" max="140" step="5" value="' + curSize + '">' +
           '</div>';
 
+        sec.querySelector("#dsDark").addEventListener("click", () => {
+          const nowDark = !isDarkTheme();
+          setTheme(nowDark ? "dark" : "light");
+          const t = sec.querySelector("#dsDark");
+          t.classList.toggle("on", nowDark);
+          t.lastChild.textContent = nowDark ? "켜짐" : "꺼짐";
+        });
         sec.querySelector("#dsMac").addEventListener("click", () => {
           const nowMac = !isMacSkin();
           setSkin(nowMac ? "macos" : "default");
@@ -1435,20 +1447,12 @@
     });
   });
 
-  // ---------- 테마 (다크/라이트) ----------
+  // ---------- 테마 (다크/라이트) : 통계 화면설정 섹션에서 전환 ----------
   const THEME_KEY = "quiz_theme_v1";
-  function applyTheme(t) {
-    document.documentElement.setAttribute("data-theme", t);
-    const btn = document.getElementById("themeToggle");
-    if (btn) btn.innerHTML = (t === "light") ? '<i class="fa-solid fa-moon"></i>' : '<i class="fa-solid fa-sun"></i>';
-  }
-  let theme = lsGet(THEME_KEY, "dark");
-  applyTheme(theme);
-  document.getElementById("themeToggle").addEventListener("click", () => {
-    theme = (theme === "light") ? "dark" : "light";
-    lsSet(THEME_KEY, theme);
-    applyTheme(theme);
-  });
+  function isDarkTheme() { return document.documentElement.getAttribute("data-theme") !== "light"; }
+  function applyTheme(t) { document.documentElement.setAttribute("data-theme", t === "light" ? "light" : "dark"); }
+  function setTheme(t) { lsSet(THEME_KEY, t); applyTheme(t); }
+  applyTheme(lsGet(THEME_KEY, "dark"));
 
   // ---------- 디자인 스킨 (Mac OS 클래식) ----------
   const SKIN_KEY = "quiz_skin_v1";
