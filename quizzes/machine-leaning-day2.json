@@ -1,8 +1,8 @@
 {
-  "title": "머신러닝 DAY1",
+  "title": "머신러닝 DAY2",
   "subtitle": "데이터 수집 복습·기초 통계·시각화·pandas 데이터 분석",
   "subject": "Machine Learning",
-  "description": "SK Shieldus Rookies: 머신러닝 1일차 수업. 데이터 수집(requests/BeautifulSoup/SQLite) 복습, 기초 통계 지표, matplotlib·seaborn 시각화, pandas 그룹 집계와 공공데이터 분석 실습을 다룹니다.",
+  "description": "SK Shieldus Rookies: 머신러닝 2일차 수업. 데이터 수집(requests/BeautifulSoup/SQLite) 복습, 기초 통계 지표, matplotlib·seaborn 시각화, pandas 그룹 집계와 공공데이터 분석 실습을 다룹니다.",
   "questions": [
     {
       "question": "AI 파이프라인에서 '수집' 단계 바로 다음에 오는 단계는 무엇인가요?",

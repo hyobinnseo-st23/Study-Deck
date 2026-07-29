@@ -1,8 +1,8 @@
 {
-  "title": "머신러닝 DAY1 심화",
+  "title": "머신러닝 DAY2 심화",
   "subtitle": "계산·코드 결과 예측·함정 판별",
   "subject": "Machine Learning",
-  "description": "SK Shieldus Rookies: 머신러닝 1일차 심화 문제. 기초 통계 직접 계산, pandas·BeautifulSoup·sqlite3 코드 동작 예측, 실무에서 자주 틀리는 함정 판별을 다룹니다.",
+  "description": "SK Shieldus Rookies: 머신러닝 2일차 심화 문제. 기초 통계 직접 계산, pandas·BeautifulSoup·sqlite3 코드 동작 예측, 실무에서 자주 틀리는 함정 판별을 다룹니다.",
   "questions": [
     {
       "question": "데이터 [55, 60, 65, 70, 75, 80, 85, 90, 95]에서 Q1은 65, Q3은 85입니다. IQR 값은?",

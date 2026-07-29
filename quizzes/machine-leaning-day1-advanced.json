@@ -1,7 +1,7 @@
 {
   "title": "머신러닝 DAY1 심화",
   "subtitle": "requests 심화 · BeautifulSoup 실전 · 저장 포맷 함정 · SQLite 내부 동작",
-  "subject": "머신러닝/딥러닝",
+  "subject": "Machine Learning",
   "description": "SK Shieldus Rookies: 머신러닝·딥러닝 1일차 심화 퀴즈. requests의 예외/리다이렉션 처리, BeautifulSoup 실무 함정, CSV/JSON 저장 시 주의점, SQLite의 내부 동작과 트랜잭션, 수집 관련 법적·보안 이슈를 다룹니다.",
   "questions": [
     {

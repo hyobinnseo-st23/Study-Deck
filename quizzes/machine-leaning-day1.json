@@ -1,7 +1,7 @@
 {
   "title": "머신러닝 DAY1",
   "subtitle": "데이터 수집 · REST API · 웹 스크래핑 · 파일 저장 · SQLite",
-  "subject": "머신러닝/딥러닝",
+  "subject": "Machine Learning",
   "description": "SK Shieldus Rookies: 머신러닝·딥러닝 1일차 수업. AI 데이터 처리 파이프라인 개요와 데이터 수집(REST API, 웹 스크래핑, 공개 데이터셋, 데이터베이스), CSV/Excel/JSON 저장 포맷 비교, SQLite CRUD를 다룹니다.",
   "questions": [
     {
