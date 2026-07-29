@@ -1194,6 +1194,50 @@
       topbar.appendChild(title);
       inner.appendChild(topbar);
 
+      // ---- 화면 설정 섹션 (테마 · 색상 · 폰트) : 통계 맨 아래 배치 ----
+      function displaySettingsEl() {
+        const curColor = lsGet(COLOR_KEY, "default");
+        const curFont = lsGet(FONT_KEY, "default");
+        const curSize = clampFontSize(lsGet(FONTSIZE_KEY, 100));
+        const macOn = isMacSkin();
+
+        const sec = document.createElement("div");
+        sec.className = "chart-card display-settings";
+        sec.innerHTML =
+          '<div class="chart-card-head"><h3><i class="fa-solid fa-sliders"></i> 화면 설정</h3></div>' +
+          '<div class="ds-row">' +
+            '<span class="ds-label"><i class="fa-brands fa-apple"></i> Mac OS 스타일</span>' +
+            '<label class="toggle ' + (macOn ? "on" : "") + '" id="dsMac"><span class="switch"></span>' + (macOn ? "켜짐" : "꺼짐") + '</label>' +
+          '</div>' +
+          '<div class="ds-row">' +
+            '<span class="ds-label"><i class="fa-solid fa-palette"></i> 컬러 테마</span>' +
+            '<select class="ds-select" id="dsColor">' + colorOptionsHtml(curColor) + '</select>' +
+          '</div>' +
+          '<div class="ds-row">' +
+            '<span class="ds-label"><i class="fa-solid fa-font"></i> 폰트</span>' +
+            '<select class="ds-select" id="dsFont">' + fontOptionsHtml(curFont) + '</select>' +
+          '</div>' +
+          '<div class="ds-row">' +
+            '<span class="ds-label"><i class="fa-solid fa-text-height"></i> 폰트 크기 <b id="dsSizeVal">' + curSize + '%</b></span>' +
+            '<input type="range" class="ds-range" id="dsSize" min="80" max="140" step="5" value="' + curSize + '">' +
+          '</div>';
+
+        sec.querySelector("#dsMac").addEventListener("click", () => {
+          const nowMac = !isMacSkin();
+          setSkin(nowMac ? "macos" : "default");
+          const t = sec.querySelector("#dsMac");
+          t.classList.toggle("on", nowMac);
+          t.lastChild.textContent = nowMac ? "켜짐" : "꺼짐";
+        });
+        sec.querySelector("#dsColor").addEventListener("change", e => setColor(e.target.value));
+        sec.querySelector("#dsFont").addEventListener("change", e => setFont(e.target.value));
+        const sizeInput = sec.querySelector("#dsSize");
+        const sizeVal = sec.querySelector("#dsSizeVal");
+        sizeInput.addEventListener("input", () => { sizeVal.textContent = setFontSize(sizeInput.value) + "%"; });
+
+        return sec;
+      }
+
       // 전체 데이터 삭제 버튼 영역 (맨 아래)
       function resetRowEl() {
         const resetRow = document.createElement("div");
@@ -1210,6 +1254,7 @@
         empty.className = "empty";
         empty.innerHTML = '<div class="icon"><i class="fa-solid fa-chart-column"></i></div><p>아직 학습 기록이 없습니다.</p><small>퀴즈를 풀면 날짜별 학습량과 정답률이 여기에 쌓여요.</small>';
         inner.appendChild(empty);
+        inner.appendChild(displaySettingsEl());
         inner.appendChild(resetRowEl());
         overlay.appendChild(inner);
         window.scrollTo(0, 0);
@@ -1349,6 +1394,7 @@
         listCard.appendChild(row);
       });
       inner.appendChild(listCard);
+      inner.appendChild(displaySettingsEl());
       inner.appendChild(resetRowEl());
 
       overlay.appendChild(inner);
@@ -1403,6 +1449,80 @@
     lsSet(THEME_KEY, theme);
     applyTheme(theme);
   });
+
+  // ---------- 디자인 스킨 (Mac OS 클래식) ----------
+  const SKIN_KEY = "quiz_skin_v1";
+  function isMacSkin() { return document.documentElement.getAttribute("data-skin") === "macos"; }
+  function applySkin(s) { document.documentElement.setAttribute("data-skin", s === "macos" ? "macos" : "default"); }
+  function setSkin(s) { lsSet(SKIN_KEY, s); applySkin(s); }
+  applySkin(lsGet(SKIN_KEY, "default"));
+
+  // ---------- 컬러 테마 (기본/Mac OS 공통 적용) ----------
+  const COLOR_KEY = "quiz_color_v1";
+  const COLOR_THEMES = [
+    { id: "default", label: "기본 색상" },
+    { id: "pink", label: "핑크" },
+    { id: "sky", label: "하늘" },
+    { id: "mint", label: "민트" },
+    { id: "mono", label: "흑백" }
+  ];
+  function applyColor(c) {
+    if (c && c !== "default") document.documentElement.setAttribute("data-color", c);
+    else document.documentElement.removeAttribute("data-color");
+  }
+  function setColor(c) { lsSet(COLOR_KEY, c); applyColor(c); }
+  applyColor(lsGet(COLOR_KEY, "default"));
+  function colorOptionsHtml(cur) {
+    return COLOR_THEMES.map(t =>
+      '<option value="' + t.id + '"' + (t.id === cur ? " selected" : "") + '>' + t.label + '</option>'
+    ).join("");
+  }
+
+  // ---------- 폰트 (기본/Mac OS 공통 적용) ----------
+  const FONT_KEY = "quiz_font_v1";
+  const FONTSIZE_KEY = "quiz_fontsize_v1";
+  const FONT_FALLBACK = ", 'Malgun Gothic', sans-serif";
+  // 폰트 종류(카테고리)별로 정렬해서 표시
+  const FONT_CATS = ["산세리프", "명조", "픽셀"];
+  const FONTS = [
+    { id: "default", label: "기본", cat: "" },
+    { id: "Pretendard", label: "프리텐다드", cat: "산세리프" },
+    { id: "Suit", label: "수트(SUIT)", cat: "산세리프" },
+    { id: "NanumSquareNeo", label: "나눔스퀘어 네오", cat: "산세리프" },
+    { id: "Escoredream", label: "에스코어 드림", cat: "산세리프" },
+    { id: "OneStoreMobileGothicBody", label: "원스토어 모바일고딕", cat: "산세리프" },
+    { id: "ChosunIlboMyungjo", label: "조선일보 명조", cat: "명조" },
+    { id: "Ridibatang", label: "리디바탕", cat: "명조" },
+    { id: "Galmuri11", label: "갈무리11", cat: "픽셀" },
+    { id: "RoundedFixedsys", label: "둥근모꼴", cat: "픽셀" }
+  ];
+  function applyFont(id) {
+    if (id && id !== "default") document.documentElement.style.setProperty("--app-font", "'" + id + "'" + FONT_FALLBACK);
+    else document.documentElement.style.removeProperty("--app-font");
+  }
+  function setFont(id) { lsSet(FONT_KEY, id); applyFont(id); }
+  applyFont(lsGet(FONT_KEY, "default"));
+  function fontOptionsHtml(cur) {
+    let html = FONTS.filter(f => f.cat === "").map(f =>
+      '<option value="' + f.id + '"' + (f.id === cur ? " selected" : "") + '>' + f.label + '</option>'
+    ).join("");
+    FONT_CATS.forEach(cat => {
+      const items = FONTS.filter(f => f.cat === cat);
+      if (!items.length) return;
+      html += '<optgroup label="' + cat + '">' +
+        items.map(f => '<option value="' + f.id + '" style="font-family:\'' + f.id + '\'' + FONT_FALLBACK + '"' + (f.id === cur ? " selected" : "") + '>' + f.label + '</option>').join("") +
+        '</optgroup>';
+    });
+    return html;
+  }
+  function clampFontSize(v) { let p = parseInt(v, 10); if (isNaN(p)) p = 100; if (p < 80) p = 80; if (p > 140) p = 140; return p; }
+  function applyFontSize(pct) {
+    const p = clampFontSize(pct);
+    document.documentElement.style.zoom = String(p / 100);
+    return p;
+  }
+  function setFontSize(pct) { const p = applyFontSize(pct); lsSet(FONTSIZE_KEY, p); return p; }
+  applyFontSize(lsGet(FONTSIZE_KEY, 100));
 
   // ==========================================================
   //  기본 제공 문제 (quizzes/manifest.json) 자동 로딩·동기화
