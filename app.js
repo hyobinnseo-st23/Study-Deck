@@ -1497,8 +1497,10 @@
     { id: "RoundedFixedsys", label: "둥근모꼴", cat: "픽셀" }
   ];
   function applyFont(id) {
-    if (id && id !== "default") document.documentElement.style.setProperty("--app-font", "'" + id + "'" + FONT_FALLBACK);
+    const fid = id || "default";
+    if (fid !== "default") document.documentElement.style.setProperty("--app-font", "'" + fid + "'" + FONT_FALLBACK);
     else document.documentElement.style.removeProperty("--app-font");
+    document.documentElement.setAttribute("data-font", fid);
   }
   function setFont(id) { lsSet(FONT_KEY, id); applyFont(id); }
   applyFont(lsGet(FONT_KEY, "default"));
