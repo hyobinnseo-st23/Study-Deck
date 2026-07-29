@@ -38,17 +38,6 @@
       "explanation": "\"False\"는 비어 있지 않은 문자열이므로 True로 평가됩니다. 0, 빈 리스트 [], 빈 문자열 \"\" 은 모두 Falsy입니다."
     },
     {
-      "question": "arr이 리스트일 때, 'arr에 요소가 있으면 실행'을 파이썬답게 표현한 것은?",
-      "options": [
-        "if arr:",
-        "if arr == True:",
-        "if arr is not None:",
-        "if arr != []:"
-      ],
-      "answer": 0,
-      "explanation": "파이썬은 컬렉션을 논리값으로 자동 변환하며, 요소가 있으면 True, 비어 있으면 False가 됩니다. if arr: 가 관용적 표현입니다."
-    },
-    {
       "question": "7 // 2 의 결과는?",
       "options": [
         "3.5",
