@@ -612,3 +612,20 @@
   @font-face { font-family: 'Galmuri11'; src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/2506-1@1.0/Galmuri11-Bold.woff2') format('woff2'); font-weight: 700; font-display: swap; }
 
   @font-face { font-family: 'RoundedFixedsys'; src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_six@1.2/DungGeunMo.woff') format('woff'); font-weight: normal; font-display: swap; }
+
+  /* =========================================================
+     픽셀 폰트(갈무리·둥근모) 및 Mac OS 기본 폰트(갈무리):
+     굵은 가중치가 뭉개져 두꺼워 보이므로 굵기를 normal 로 낮춤.
+     (Font Awesome 아이콘 <i>·fa- 요소는 제외해 아이콘 깨짐 방지)
+     ========================================================= */
+  /* 기본은 normal(400), 제목·핵심 숫자만 bold(700) → 전부 굵던 것보다 가볍게 */
+  :is([data-font="Galmuri11"], [data-font="RoundedFixedsys"], [data-skin="macos"][data-font="default"]) :not(i) {
+    font-weight: normal !important;
+  }
+  :is([data-font="Galmuri11"], [data-font="RoundedFixedsys"], [data-skin="macos"][data-font="default"])
+    :is(h1, h2, h3, h4, .quiz-item-title, .subject-card-name, .subject-name, .num, .t-num, .score, .d-date) {
+    font-weight: 700 !important;
+  }
+  :is([data-font="Galmuri11"], [data-font="RoundedFixedsys"], [data-skin="macos"][data-font="default"]) body {
+    font-synthesis: none;
+  }
