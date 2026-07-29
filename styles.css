@@ -1,3 +1,5 @@
+  @import url('https://cdn.jsdelivr.net/gh/quiple/galmuri/dist/galmuri.css');
+
   :root {
     --bg: #0f172a;
     --card: #1e293b;
@@ -20,10 +22,11 @@
     --border: #e2e8f0;
   }
   * { box-sizing: border-box; }
+  button, input, select, textarea, optgroup { font-family: inherit; }
   html, body { transition: background .2s, color .2s; }
   body {
     margin: 0;
-    font-family: "Segoe UI", "Malgun Gothic", -apple-system, sans-serif;
+    font-family: var(--app-font, "Segoe UI", "Malgun Gothic", -apple-system, sans-serif);
     background: var(--bg);
     color: var(--text);
     line-height: 1.6;
@@ -389,3 +392,223 @@
     margin-top: 14px; font-size: 13px; color: var(--muted); cursor: pointer; user-select: none;
   }
   .lock-remember input { accent-color: var(--primary); }
+
+  /* =========================================================
+     클래식 Mac OS 스타일 스킨  (통계창 토글로 on/off)
+     참고 디자인: 픽셀 폰트 · 각진 테두리 · 오프셋 그림자
+     ========================================================= */
+  :root[data-skin="macos"] {
+    --bg: #ffeef1;
+    --card: #fff6f7;
+    --card-2: #fffdfd;
+    --text: #282828;
+    --muted: #7a7276;
+    --primary: #333333;
+    --primary-hover: #111111;
+    --correct: #1f8a5b;
+    --wrong: #a83232;
+    --border: #222222;
+    --gold: #b03a4a;
+    --mac-fill: #fffdfd;
+    --mac-shadow: 3px 3px 0 #555555;
+    --mac-shadow-sm: 2px 2px 0 #d9ccd0;
+  }
+
+  [data-skin="macos"] body,
+  [data-skin="macos"] .stats-overlay,
+  [data-skin="macos"] .lock-screen {
+    font-family: var(--app-font, 'Galmuri11', 'DungGeunMo', monospace);
+    background-color: var(--bg);
+    background-image: radial-gradient(rgba(30,25,25,0.06) 1px, transparent 1px);
+    background-size: 4px 4px;
+    -webkit-font-smoothing: none;
+    letter-spacing: 0.2px;
+  }
+
+  /* 각진 테두리 + 오프셋 그림자 카드류 */
+  [data-skin="macos"] .card,
+  [data-skin="macos"] .quiz-item,
+  [data-skin="macos"] .subject-card,
+  [data-skin="macos"] .chart-card,
+  [data-skin="macos"] .summary-box,
+  [data-skin="macos"] .today-stat,
+  [data-skin="macos"] .upload-box,
+  [data-skin="macos"] .modal,
+  [data-skin="macos"] .lock-box,
+  [data-skin="macos"] .explanation,
+  [data-skin="macos"] .option {
+    border: 1.5px solid var(--border);
+    border-radius: 0;
+    box-shadow: var(--mac-shadow-sm);
+  }
+  [data-skin="macos"] .modal,
+  [data-skin="macos"] .lock-box { box-shadow: var(--mac-shadow); }
+
+  /* 버튼 */
+  [data-skin="macos"] button.btn,
+  [data-skin="macos"] .bookmark-btn,
+  [data-skin="macos"] .subject-select,
+  [data-skin="macos"] .chip,
+  [data-skin="macos"] .pill,
+  [data-skin="macos"] .filter-chip {
+    border: 1.5px solid var(--border);
+    border-radius: 0;
+    box-shadow: var(--mac-shadow-sm);
+  }
+  [data-skin="macos"] button.btn { background: var(--mac-fill); color: var(--text); }
+  [data-skin="macos"] button.btn:hover { background: var(--card); }
+  [data-skin="macos"] button.btn:not(:disabled):active { transform: translate(2px, 2px); box-shadow: none; }
+  [data-skin="macos"] button.btn.secondary { background: var(--mac-fill); }
+  [data-skin="macos"] .tab-btn.active,
+  [data-skin="macos"] .filter-chip.active { background: var(--primary); color: #fff; }
+
+  /* 탭 바 */
+  [data-skin="macos"] .tabs {
+    border: 1.5px solid var(--border); border-radius: 0;
+    box-shadow: var(--mac-shadow-sm); background: var(--card);
+  }
+  [data-skin="macos"] .tab-btn { border-radius: 0; }
+
+  /* 상단 플로팅 버튼(통계/테마) → 각진 Mac 버튼 */
+  [data-skin="macos"] .stats-toggle,
+  [data-skin="macos"] .theme-toggle {
+    border-radius: 0; border: 1.5px solid var(--border);
+    background: var(--card); color: var(--text); box-shadow: var(--mac-shadow-sm);
+  }
+
+  /* 통계창 헤더 · 카드 헤더: 클래식 타이틀바 느낌(가로 줄무늬) */
+  [data-skin="macos"] .stats-topbar {
+    padding: 6px 8px 10px;
+    border-bottom: 1.5px solid var(--border);
+    background-image: repeating-linear-gradient(to bottom, var(--border) 0, var(--border) 1px, transparent 1px, transparent 3px);
+    background-repeat: no-repeat;
+    background-size: 100% 6px;
+  }
+  [data-skin="macos"] .stats-topbar h2 { font-weight: 700; }
+
+  /* 토글 스위치: 픽셀 각진 스타일 */
+  [data-skin="macos"] .toggle .switch {
+    border-radius: 0; border: 1.5px solid var(--border);
+    background: var(--mac-fill); height: 20px; width: 40px;
+  }
+  [data-skin="macos"] .toggle .switch::after {
+    border-radius: 0; background: var(--border);
+    top: 2px; left: 2px; width: 14px; height: 14px;
+  }
+  [data-skin="macos"] .toggle.on .switch { background: var(--card); }
+  [data-skin="macos"] .toggle.on .switch::after { background: var(--primary); transform: translateX(20px); }
+
+  /* 막대그래프/진행바: 각진 모서리 */
+  [data-skin="macos"] .bar,
+  [data-skin="macos"] .progress-bar,
+  [data-skin="macos"] .progress-fill,
+  [data-skin="macos"] .d-bar,
+  [data-skin="macos"] .d-fill { border-radius: 0; }
+
+  /* 원형 마커/뱃지도 각지게 */
+  [data-skin="macos"] .option .marker,
+  [data-skin="macos"] .lock-icon,
+  [data-skin="macos"] .subject-tag,
+  [data-skin="macos"] .badge { border-radius: 0; }
+
+  /* =========================================================
+     컬러 테마 (참고 파일 기반) — 기본 버전 + Mac OS 버전 공통
+     ========================================================= */
+  /* 기본 버전: 강조색(--primary)만 컬러 테마로 교체 */
+  :root[data-color="pink"] { --primary: #d68fa1; --primary-hover: #c27b8e; }
+  :root[data-color="sky"]  { --primary: #2f6fb0; --primary-hover: #255a90; }
+  :root[data-color="mint"] { --primary: #7da5ab; --primary-hover: #6a9299; }
+  :root[data-color="mono"] { --primary: #555555; --primary-hover: #3d3d3d; }
+
+  /* Mac OS 버전: 배경·테두리까지 참고 파일 팔레트로 교체 */
+  :root[data-skin="macos"][data-color="pink"] {
+    --bg: #ffeef1; --card: #fff6f7; --card-2: #fffdfd; --border: #222222;
+    --primary: #c07e90; --primary-hover: #ac6c7e; --gold: #c07e90; --mac-fill: #fffdfd;
+  }
+  :root[data-skin="macos"][data-color="sky"] {
+    --bg: #e6f1fb; --card: #f1f8fd; --card-2: #fbfdff; --border: #1c2a38;
+    --primary: #2f6fb0; --primary-hover: #255a90; --gold: #2f6fb0; --mac-fill: #fbfdff;
+  }
+  :root[data-skin="macos"][data-color="mint"] {
+    --bg: #e4f5ed; --card: #eefaf4; --card-2: #f9fffc; --border: #1f3a2f;
+    --primary: #7da5ab; --primary-hover: #6a9299; --gold: #7da5ab; --mac-fill: #f9fffc;
+  }
+  :root[data-skin="macos"][data-color="mono"] {
+    --bg: #ededed; --card: #fafafa; --card-2: #ffffff; --border: #141414;
+    --primary: #555555; --primary-hover: #3d3d3d; --gold: #555555; --mac-fill: #ffffff;
+  }
+
+  /* =========================================================
+     화면 설정 섹션 (테마 · 색상 · 폰트 · 크기)
+     ========================================================= */
+  .display-settings .ds-row {
+    display: flex; align-items: center; justify-content: space-between; gap: 14px;
+    padding: 12px 2px; border-bottom: 1px solid var(--border);
+  }
+  .display-settings .ds-row:last-child { border-bottom: none; }
+  .display-settings .ds-label {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 14px; font-weight: 600; color: var(--text); flex-shrink: 0;
+  }
+  .display-settings .ds-label i { color: var(--muted); width: 16px; text-align: center; }
+  .display-settings .ds-label b { color: var(--primary); font-weight: 700; }
+  .ds-select {
+    cursor: pointer; font: inherit; font-size: 14px; font-weight: 600;
+    background: var(--card-2); color: var(--text);
+    border: 1px solid var(--border); border-radius: 8px; padding: 8px 12px;
+    min-width: 150px; max-width: 60%;
+  }
+  .ds-select:focus { outline: none; border-color: var(--primary); }
+  .ds-range { flex: 1; max-width: 55%; accent-color: var(--primary); cursor: pointer; }
+  [data-skin="macos"] .ds-select {
+    border: 1.5px solid var(--border); border-radius: 0;
+    box-shadow: var(--mac-shadow-sm); background: var(--mac-fill);
+  }
+
+  /* =========================================================
+     추가 폰트 정의 (@font-face)
+     ========================================================= */
+  @font-face { font-family: 'Pretendard'; src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/pretendard@1.0/Pretendard-Thin.woff2') format('woff2'); font-weight: 100; font-display: swap; }
+  @font-face { font-family: 'Pretendard'; src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/pretendard@1.0/Pretendard-ExtraLight.woff2') format('woff2'); font-weight: 200; font-display: swap; }
+  @font-face { font-family: 'Pretendard'; src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/pretendard@1.0/Pretendard-Light.woff2') format('woff2'); font-weight: 300; font-display: swap; }
+  @font-face { font-family: 'Pretendard'; src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/pretendard@1.0/Pretendard-Regular.woff2') format('woff2'); font-weight: 400; font-display: swap; }
+  @font-face { font-family: 'Pretendard'; src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/pretendard@1.0/Pretendard-Medium.woff2') format('woff2'); font-weight: 500; font-display: swap; }
+  @font-face { font-family: 'Pretendard'; src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/pretendard@1.0/Pretendard-SemiBold.woff2') format('woff2'); font-weight: 600; font-display: swap; }
+  @font-face { font-family: 'Pretendard'; src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/pretendard@1.0/Pretendard-Bold.woff2') format('woff2'); font-weight: 700; font-display: swap; }
+  @font-face { font-family: 'Pretendard'; src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/pretendard@1.0/Pretendard-ExtraBold.woff2') format('woff2'); font-weight: 800; font-display: swap; }
+  @font-face { font-family: 'Pretendard'; src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/pretendard@1.0/Pretendard-Black.woff2') format('woff2'); font-weight: 900; font-display: swap; }
+
+  @font-face { font-family: 'Suit'; src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_suit@1.0/SUIT-Thin.woff2') format('woff2'); font-weight: 100; font-display: swap; }
+  @font-face { font-family: 'Suit'; src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_suit@1.0/SUIT-ExtraLight.woff2') format('woff2'); font-weight: 200; font-display: swap; }
+  @font-face { font-family: 'Suit'; src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_suit@1.0/SUIT-Light.woff2') format('woff2'); font-weight: 300; font-display: swap; }
+  @font-face { font-family: 'Suit'; src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_suit@1.0/SUIT-Regular.woff2') format('woff2'); font-weight: 400; font-display: swap; }
+  @font-face { font-family: 'Suit'; src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_suit@1.0/SUIT-Medium.woff2') format('woff2'); font-weight: 500; font-display: swap; }
+  @font-face { font-family: 'Suit'; src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_suit@1.0/SUIT-SemiBold.woff2') format('woff2'); font-weight: 600; font-display: swap; }
+  @font-face { font-family: 'Suit'; src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_suit@1.0/SUIT-Bold.woff2') format('woff2'); font-weight: 700; font-display: swap; }
+  @font-face { font-family: 'Suit'; src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_suit@1.0/SUIT-ExtraBold.woff2') format('woff2'); font-weight: 800; font-display: swap; }
+  @font-face { font-family: 'Suit'; src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_suit@1.0/SUIT-Heavy.woff2') format('woff2'); font-weight: 900; font-display: swap; }
+
+  @font-face { font-family: 'NanumSquareNeo'; src: url('https://hangeul.pstatic.net/hangeul_static/webfont/NanumSquareNeo/NanumSquareNeoTTF-bRg.woff2'); font-weight: 400; font-display: swap; }
+  @font-face { font-family: 'NanumSquareNeo'; src: url('https://hangeul.pstatic.net/hangeul_static/webfont/NanumSquareNeo/NanumSquareNeoTTF-cBd.woff2'); font-weight: 700; font-display: swap; }
+  @font-face { font-family: 'NanumSquareNeo'; src: url('https://hangeul.pstatic.net/hangeul_static/webfont/NanumSquareNeo/NanumSquareNeoTTF-dEb.woff2'); font-weight: 800; font-display: swap; }
+  @font-face { font-family: 'NanumSquareNeo'; src: url('https://hangeul.pstatic.net/hangeul_static/webfont/NanumSquareNeo/NanumSquareNeoTTF-eHv.woff2'); font-weight: 900; font-display: swap; }
+
+  @font-face { font-family: 'Escoredream'; src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_six@1.2/S-CoreDream-1Thin.woff') format('woff'); font-weight: 100; font-display: swap; }
+  @font-face { font-family: 'Escoredream'; src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_six@1.2/S-CoreDream-2ExtraLight.woff') format('woff'); font-weight: 200; font-display: swap; }
+  @font-face { font-family: 'Escoredream'; src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_six@1.2/S-CoreDream-3Light.woff') format('woff'); font-weight: 300; font-display: swap; }
+  @font-face { font-family: 'Escoredream'; src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_six@1.2/S-CoreDream-4Regular.woff') format('woff'); font-weight: 400; font-display: swap; }
+  @font-face { font-family: 'Escoredream'; src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_six@1.2/S-CoreDream-5Medium.woff') format('woff'); font-weight: 500; font-display: swap; }
+  @font-face { font-family: 'Escoredream'; src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_six@1.2/S-CoreDream-6Bold.woff') format('woff'); font-weight: 600; font-display: swap; }
+  @font-face { font-family: 'Escoredream'; src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_six@1.2/S-CoreDream-7ExtraBold.woff') format('woff'); font-weight: 700; font-display: swap; }
+  @font-face { font-family: 'Escoredream'; src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_six@1.2/S-CoreDream-8Heavy.woff') format('woff'); font-weight: 800; font-display: swap; }
+  @font-face { font-family: 'Escoredream'; src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_six@1.2/S-CoreDream-9Black.woff') format('woff'); font-weight: 900; font-display: swap; }
+
+  @font-face { font-family: 'OneStoreMobileGothicBody'; src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2105_2@1.0/ONE-Mobile-Regular.woff') format('woff'); font-weight: normal; font-display: swap; }
+
+  @font-face { font-family: 'ChosunIlboMyungjo'; src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_one@1.0/Chosunilbo_myungjo.woff') format('woff'); font-weight: normal; font-display: swap; }
+
+  @font-face { font-family: 'Ridibatang'; src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_twelve@1.0/RIDIBatang.woff') format('woff'); font-weight: normal; font-display: swap; }
+
+  @font-face { font-family: 'Galmuri11'; src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/2506-1@1.0/Galmuri11-Bold.woff2') format('woff2'); font-weight: 700; font-display: swap; }
+
+  @font-face { font-family: 'RoundedFixedsys'; src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_six@1.2/DungGeunMo.woff') format('woff'); font-weight: normal; font-display: swap; }
