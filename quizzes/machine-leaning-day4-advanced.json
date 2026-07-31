@@ -1,7 +1,7 @@
 {
   "title": "머신러닝 DAY4 심화",
   "subtitle": "코드 해석·계산·상황 판단 심화 문제",
-  "subject": "머신러닝",
+  "subject": "Machine Learning",
   "description": "SK Shieldus Rookies: 머신러닝 4일차 심화 퀴즈. 전처리와 피처 엔지니어링의 세부 동작, 선형 회귀와 평가 지표 계산, 과적합 진단과 처방, scikit-learn 코드 해석을 다룹니다.",
   "questions": [
     {
