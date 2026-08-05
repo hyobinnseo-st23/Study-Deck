@@ -1,0 +1,239 @@
+{
+  "title": "머신러닝 DAY6 심화",
+  "subtitle": "코드 해석·수치 계산·실무 판단",
+  "subject": "Machine Learning",
+  "description": "SK Shieldus Rookies: 머신러닝 6일차 심화 문제. 평가 지표 계산, 코드 오류 진단(데이터 누수·차원 오류·라벨 규약), 하이퍼파라미터 판단, 알고리즘의 한계 해석 등 한 단계 깊은 이해를 확인합니다.",
+  "questions": [
+    {
+      "question": "다음 혼동행렬은 load_breast_cancer 데이터의 결과입니다. 사이킷런 규약(행=실제, 열=예측)을 따를 때, 임상적으로 중요한 '악성(클래스 0)을 놓치지 않은 비율'은 약 얼마인가요?\n\n[[39,  4],\n [ 1, 70]]",
+      "options": [
+        "약 0.986",
+        "약 0.956",
+        "약 0.907",
+        "약 0.975"
+      ],
+      "answer": 2,
+      "explanation": "클래스 0(악성)의 재현율은 39 / (39 + 4) = 0.907입니다. recall_score()의 기본 출력 0.986은 클래스 1(benign) 기준이므로, 암 진단 관점에서는 pos_label=0으로 계산해야 합니다."
+    },
+    {
+      "question": "정밀도가 0.60, 재현율이 0.90인 모델의 F1-Score는 얼마인가요?",
+      "options": [
+        "0.75",
+        "0.80",
+        "0.72",
+        "0.85"
+      ],
+      "answer": 2,
+      "explanation": "F1은 조화평균이므로 2 x (0.60 x 0.90) / (0.60 + 0.90) = 1.08 / 1.5 = 0.72입니다. 산술평균 0.75보다 낮게 나오는 것이 조화평균의 특징입니다."
+    },
+    {
+      "question": "전체 284,807건 중 사기 거래가 492건인 신용카드 데이터에서, 모델이 모든 거래를 '정상'으로만 예측했을 때의 정확도는 약 얼마인가요?",
+      "options": [
+        "약 99.83%",
+        "약 50.00%",
+        "약 82.00%",
+        "약 95.60%"
+      ],
+      "answer": 0,
+      "explanation": "284,315 / 284,807 = 약 0.9983입니다. 사기를 단 한 건도 못 잡았는데도 99.83%가 나오므로, 불균형 데이터에서 정확도는 신뢰할 수 없습니다."
+    },
+    {
+      "question": "데이터 110개(정상 100 + 이상 10)에 IsolationForest(contamination=0.1)을 적용했습니다. -1로 판정되는 데이터는 몇 개이며, 그 결과 필연적으로 생기는 문제는?",
+      "options": [
+        "110개 판정 — 전부 이상으로 처리된다",
+        "10개 판정 — 실제 이상과 정확히 일치해 오탐이 없다",
+        "1개 판정 — 가장 이상한 1건만 잡혀 미탐이 심하다",
+        "11개 판정 — 실제 이상이 10개뿐이므로 정상 1건이 오탐으로 끌려 들어간다"
+      ],
+      "answer": 3,
+      "explanation": "contamination은 '전체의 몇 %를 이상으로 찍을지'를 강제하는 값입니다. 110 x 0.1 = 11건을 무조건 -1로 만들기 때문에, 실제 이상이 10건이면 11번째로 이상해 보이는 정상 데이터가 오탐이 됩니다."
+    },
+    {
+      "question": "엘보우 방법으로 K를 찾기 위해 수집한 Inertia 값이 다음과 같습니다. 최적의 K로 가장 적절한 것은?\n\nK=1: 19953,  K=2: 9416,  K=3: 2110,\nK=4: 565,    K=5: 513,   K=6: 462",
+      "options": [
+        "K=2",
+        "K=4",
+        "K=6",
+        "K=3"
+      ],
+      "answer": 1,
+      "explanation": "K=3에서 4로 갈 때 약 1,545 감소하지만, K=4에서 5로는 약 52만 감소합니다. 감소폭이 급격히 둔화되는 K=4가 엘보우 지점입니다."
+    },
+    {
+      "question": "iris 데이터를 PCA로 2차원 축소한 결과 explained_variance_ratio_가 [0.7296, 0.2285]로 나왔습니다. 이 결과의 해석으로 옳은 것은?",
+      "options": [
+        "PC1이 전체 데이터의 72.96%를 차지하는 컬럼이라는 뜻이다",
+        "모델의 예측 정확도가 95.8%라는 뜻이다",
+        "나머지 두 주성분을 추가하면 설명력이 200%가 된다",
+        "4차원을 2차원으로 줄이면서 원본 정보의 약 4.2%만 손실했다"
+      ],
+      "answer": 3,
+      "explanation": "두 주성분의 합이 0.7296 + 0.2285 = 0.9581이므로 약 95.8%가 보존되고 약 4.2%가 손실됩니다. 설명된 '분산'의 비율이지 예측 정확도가 아닙니다."
+    },
+    {
+      "question": "precision_recall_curve(y_test, y_proba)의 반환값으로 F1을 계산하려 합니다. 아래 코드가 ValueError를 내는 이유는?\n\nprecisions, recalls, thresholds = precision_recall_curve(y_test, y_proba)\nf1 = 2 * (precisions * recalls) / (precisions + recalls)\nbest = thresholds[np.argmax(f1)]",
+      "options": [
+        "y_proba가 아니라 y_pred를 넣어야 하기 때문",
+        "F1은 조화평균이므로 곱셈을 쓰면 안 되기 때문",
+        "precision_recall_curve는 세 개가 아니라 두 개의 값만 반환하기 때문",
+        "precisions/recalls의 길이가 thresholds보다 1 크기 때문에 [:-1] 슬라이싱이 필요하다"
+      ],
+      "answer": 3,
+      "explanation": "사이킷런은 곡선의 끝점(precision=1, recall=0)을 강제로 추가하는데 이 점에는 대응하는 threshold가 없습니다. 그래서 len(precisions) == len(thresholds) + 1이 되어 precisions[:-1], recalls[:-1]로 잘라야 합니다."
+    },
+    {
+      "question": "다음 param_grid로 GridSearchCV(cv=3)를 실행하면 총 몇 번의 학습이 일어나나요?\n\nparam_grid = {\n    'n_estimators': [100],\n    'max_depth': [12, 15],\n    'min_samples_split': [2, 5],\n    'class_weight': ['balanced']\n}",
+      "options": [
+        "6번",
+        "12번",
+        "36번",
+        "4번"
+      ],
+      "answer": 1,
+      "explanation": "조합 수는 각 리스트 길이의 곱이므로 1 x 2 x 2 x 1 = 4개이고, 여기에 cv=3을 곱해 총 12번 학습합니다. 비용이 곱셈으로 늘어나기 때문에 그리드를 넓히면 시간이 급증합니다."
+    },
+    {
+      "question": "불균형 데이터에 SMOTE를 적용한 아래 코드에서 발생하는 문제는?\n\nX_res, y_res = SMOTE().fit_resample(X, y)\nX_train, X_test, y_train, y_test = train_test_split(X_res, y_res, test_size=0.2)",
+      "options": [
+        "SMOTE는 회귀 문제에만 사용할 수 있다",
+        "테스트 세트가 너무 작아진다",
+        "SMOTE는 fit_resample 메서드가 없어 에러가 난다",
+        "합성 샘플의 원본과 복제본이 학습/테스트에 나뉘어 들어가 데이터 누수가 발생한다"
+      ],
+      "answer": 3,
+      "explanation": "분리 전에 증강하면 같은 원본에서 파생된 합성 샘플이 양쪽에 섞여, 테스트 성능이 비현실적으로 높게 나옵니다. 반드시 train_test_split 이후 학습 데이터에만 적용해야 합니다."
+    },
+    {
+      "question": "아래 코드가 'Expected 2D array, got 1D array instead' 에러를 내는 원인과 올바른 수정은?\n\nX = df['Age']\nmodel.fit(X, y)",
+      "options": [
+        "Series는 1차원이므로 df[['Age']]로 DataFrame(2차원)을 만들어야 한다",
+        "df['Age'].sort_values()로 정렬해야 한다",
+        "y도 2차원으로 바꿔야 한다",
+        "fit() 대신 fit_transform()을 써야 한다"
+      ],
+      "answer": 0,
+      "explanation": "대괄호 하나는 Series(1차원), 둘은 DataFrame(2차원)입니다. 넘파이 배열이라면 X.reshape(-1, 1)로 2차원으로 바꿉니다."
+    },
+    {
+      "question": "스케일링을 적용한 아래 코드에서 잘못된 부분은?\n\nscaler = StandardScaler()\nX_train_s = scaler.fit_transform(X_train)\nX_test_s = scaler.fit_transform(X_test)",
+      "options": [
+        "스케일링은 train_test_split 이전에 해야 한다",
+        "X_test에는 스케일링을 적용하면 안 된다",
+        "테스트 데이터에는 transform()만 써야 하는데 fit_transform()을 써서 데이터 누수가 발생한다",
+        "StandardScaler는 fit_transform 메서드를 지원하지 않는다"
+      ],
+      "answer": 2,
+      "explanation": "테스트 데이터로 다시 fit하면 테스트의 평균·표준편차가 반영되어 정보가 새어 들어갑니다. 학습 데이터로 fit한 기준을 테스트에 그대로 transform해야 합니다."
+    },
+    {
+      "question": "DBSCAN(eps=15, min_samples=5)을 정상 100개 + 인위적 이상 10개 데이터에 적용한 결과 Cluster 값 분포가 {0: 100, 1: 7, -1: 3}으로 나왔습니다. 이 결과가 드러내는 DBSCAN의 한계는?",
+      "options": [
+        "min_samples가 너무 작아 정상 데이터가 노이즈로 분류되었다",
+        "DBSCAN은 이상치를 -1로 표기하지 않으므로 결과가 잘못되었다",
+        "eps 값이 너무 커서 모든 데이터가 하나의 클러스터가 되었다",
+        "이상치 10개 중 7개가 자기들끼리 밀도 조건을 만족해 클러스터로 인정되어 탐지되지 않았다"
+      ],
+      "answer": 3,
+      "explanation": "min_samples=5인데 이상 데이터가 반경 내에 7개나 모여 있으면 DBSCAN 입장에서는 정당한 클러스터입니다. 분산 공격이나 봇넷처럼 유사 패턴이 대량 반복될수록 놓치게 됩니다."
+    },
+    {
+      "question": "최적의 K를 찾기 위해 아래 코드를 실행하면 에러가 발생합니다. 원인은?\n\nfor k in range(1, 7):\n    labels = KMeans(n_clusters=k, random_state=42).fit_predict(X)\n    print(k, silhouette_score(X, labels))",
+      "options": [
+        "silhouette_score는 fit_predict 결과를 인자로 받을 수 없다",
+        "range의 상한이 7이라 K=7이 계산되지 않는다",
+        "K=1에서는 다른 클러스터와의 거리를 정의할 수 없어 실루엣 점수를 계산할 수 없다",
+        "random_state를 고정하면 실루엣 점수를 구할 수 없다"
+      ],
+      "answer": 2,
+      "explanation": "실루엣 점수는 분리도 b(i), 즉 가장 가까운 다른 클러스터와의 평균 거리가 필요합니다. 클러스터가 하나뿐이면 이 값이 존재하지 않으므로 range(2, 7)부터 시작해야 합니다."
+    },
+    {
+      "question": "KNN에서 weights='uniform'일 때는 사기 거래를 놓치다가 weights='distance'로 바꾸자 재현율이 올라갔습니다. 그 이유로 가장 적절한 것은?",
+      "options": [
+        "아주 가까이 있는 소수 클래스 이웃 1개가 멀리 있는 다수 클래스 이웃들보다 큰 표를 갖게 되기 때문",
+        "distance 옵션이 K값을 자동으로 최적화해 주기 때문",
+        "distance 옵션은 거리 계산을 생략해 속도가 빨라지기 때문",
+        "distance 옵션이 소수 클래스 데이터를 자동으로 복제해 주기 때문"
+      ],
+      "answer": 0,
+      "explanation": "uniform은 이웃 K개가 각각 1표씩 던지므로 소수 클래스 1 : 다수 클래스 4면 다수가 이깁니다. distance는 거리의 역수로 가중치를 주어, 코앞에 있는 소수 클래스 이웃이 판정을 뒤집을 수 있게 됩니다."
+    },
+    {
+      "question": "IsolationForest 결과를 신용카드 데이터의 Class 라벨(1=사기, 0=정상)과 비교하려 합니다. 반드시 필요한 변환은?",
+      "options": [
+        "y_pred = (pred == -1).astype(int) 처럼 -1을 1로 뒤집어 라벨 규약을 맞춘다",
+        "pred 값을 0으로 모두 치환한다",
+        "predict_proba()로 확률을 받아 0.5와 비교한다",
+        "Class 라벨을 -1과 1로 바꾼 뒤 그대로 비교한다는 점에서 변환이 불필요하다"
+      ],
+      "answer": 0,
+      "explanation": "IsolationForest는 -1(이상)/1(정상)이고 Class는 1(사기)/0(정상)이라 부호가 반대입니다. 변환 없이 비교하면 지표가 통째로 뒤집힙니다."
+    },
+    {
+      "question": "K-Means 결과에 이름을 붙인 아래 코드가 재실행 시 문제를 일으킬 수 있는 이유는?\n\nkmeans = KMeans(n_clusters=4)\ndf['cluster'] = kmeans.fit_predict(X)\ndf['segment'] = df['cluster'].map({0: '충성고객', 1: '이탈위험', 2: '신규', 3: '휴면'})",
+      "options": [
+        "n_clusters가 4이므로 이름은 3개만 지정해야 한다",
+        "map()은 정수 키를 받을 수 없어 에러가 난다",
+        "fit_predict는 라벨을 반환하지 않으므로 cluster 열이 비게 된다",
+        "random_state가 고정되지 않아 실행할 때마다 클러스터 번호가 달라져 이름이 뒤바뀔 수 있다"
+      ],
+      "answer": 3,
+      "explanation": "클러스터 번호는 순서나 등급이 아니라 단순 식별자입니다. 시드를 고정하지 않으면 같은 그룹에 다른 번호가 붙어 이름이 어긋납니다. 통계를 확인한 뒤 이름을 붙이고, random_state를 고정해야 합니다."
+    },
+    {
+      "question": "PCA 결과 pca.components_를 출력하니 PC1이 [0.521, -0.269, 0.580, 0.565] (순서대로 꽃받침길이, 꽃받침너비, 꽃잎길이, 꽃잎너비)로 나왔습니다. 이 값의 의미로 옳은 것은?",
+      "options": [
+        "각 값은 해당 피처가 설명하는 분산 비율이다",
+        "PC1은 원본 컬럼 중 꽃잎길이 하나를 선택한 것이다",
+        "PC1은 네 피처를 이 계수로 가중합한 새로운 합성 축이다",
+        "음수 계수가 있으므로 계산이 잘못된 것이다"
+      ],
+      "answer": 2,
+      "explanation": "PCA는 피처를 고르는 것이 아니라 모든 피처의 선형 결합으로 새 축을 만듭니다. 음수 계수는 그 피처가 반대 방향으로 기여한다는 뜻이며 정상입니다."
+    },
+    {
+      "question": "Precision-Recall Curve에서 F1이 최대가 되는 임계값 0.918을 찾았습니다. 보안 도메인의 사기 탐지에 이 값을 그대로 쓰는 것이 부적절할 수 있는 이유는?",
+      "options": [
+        "F1은 회귀 지표라 분류 임계값 선정에 쓸 수 없기 때문",
+        "F1 최대 지점은 정밀도와 재현율의 균형점일 뿐, 재현율을 우선해야 하는 상황과 목표가 다르기 때문",
+        "임계값이 0.5보다 크면 항상 오류이기 때문",
+        "임계값은 0과 1 사이여야 하는데 0.918은 범위를 벗어나기 때문"
+      ],
+      "answer": 1,
+      "explanation": "F1 최대화는 두 지표의 균형을 맞추는 기준입니다. 사기 하나를 놓치는 비용이 훨씬 크다면 '정밀도 X% 이상을 만족하는 조건에서 재현율 최대화' 같은 제약 최적화로 임계값을 정해야 합니다."
+    },
+    {
+      "question": "아래 시각화 코드에서 클러스터별로 색이 구분되지 않고 모두 같은 색으로 나오는 이유는?\n\nplt.scatter(X[:, 0], X[:, 1], c='red', cmap='viridis')",
+      "options": [
+        "X가 2차원이 아니기 때문",
+        "c에 색 이름을 직접 주면 cmap이 무시되므로, c=cluster_labels처럼 숫자 배열을 넘겨야 한다",
+        "scatter 대신 plot을 사용해야 하기 때문",
+        "cmap='viridis'는 존재하지 않는 팔레트이기 때문"
+      ],
+      "answer": 1,
+      "explanation": "cmap은 c에 숫자 배열이 들어올 때 그 값을 색으로 매핑합니다. c='red'처럼 색을 직접 지정하면 팔레트가 적용되지 않습니다."
+    },
+    {
+      "question": "DBSCAN의 결과를 정상/이상 두 색으로 칠하려 할 때, Cluster 열이 아니라 별도의 Anomaly 열을 만들어 사용하는 이유는?",
+      "options": [
+        "Cluster 열은 시각화 시 자동으로 삭제되기 때문",
+        "DBSCAN은 Cluster 열을 생성하지 않기 때문",
+        "Cluster 열은 -1, 0, 1, 2... 여러 값을 가져 두 색 딕셔너리로 매핑할 수 없기 때문",
+        "Cluster 열은 문자열이라 map()을 쓸 수 없기 때문"
+      ],
+      "answer": 2,
+      "explanation": "map()에 없는 키를 만나면 NaN이 되어 matplotlib이 에러를 냅니다. apply와 lambda로 '-1이면 Anomaly, 나머지는 Normal'인 두 값짜리 열을 먼저 만들어야 합니다."
+    },
+    {
+      "question": "클래스 불균형이 578:1인 데이터에서 RandomForest가 소수 클래스를 거의 학습하지 못했습니다. 지니 불순도 관점의 설명으로 가장 적절한 것은?",
+      "options": [
+        "지니 불순도는 불균형 데이터에서 항상 1에 수렴하기 때문",
+        "루트 노드의 불순도가 이미 0에 가까워 분할해도 감소량이 미미하므로 규칙을 만들 유인이 약하다",
+        "RandomForest는 이진 분류를 지원하지 않기 때문",
+        "트리 모델은 거리 기반이라 스케일링이 없으면 학습이 안 되기 때문"
+      ],
+      "answer": 1,
+      "explanation": "소수 클래스가 0.17%면 Gini = 1 - (0.9983^2 + 0.0017^2)로 약 0.0034에 불과합니다. 이미 거의 순수하므로 SMOTE나 class_weight로 비율을 조정해 학습 동기를 만들어 줘야 합니다."
+    }
+  ]
+}
