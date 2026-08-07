@@ -1,0 +1,635 @@
+{
+  "title": "머신러닝 DAY8",
+  "subtitle": "딥러닝 확장 모델(CNN·RNN·Transformer)·Colab·1D-CNN·허깅페이스",
+  "subject": "Machine Learning",
+  "description": "SK Shieldus Rookies: 머신러닝 8일차 수업. 딥러닝 기초 복습, 확장 모델 계보(CNN/RNN/LSTM/Transformer), Google Colab 환경, 보안용 Character-level 1D-CNN 구현, 허깅페이스 pipeline 활용을 다룹니다.",
+  "questions": [
+    {
+      "question": "딥러닝의 이론적 베이스(기반)가 되는 것은 무엇인가요?",
+      "options": [
+        "인공신경망(ANN)",
+        "의사결정트리",
+        "서포트 벡터 머신",
+        "선형 회귀"
+      ],
+      "answer": 0,
+      "explanation": "딥러닝은 사람의 뇌를 모방한 인공신경망(ANN)을 기반으로 만들어진 머신러닝의 하위 분야입니다."
+    },
+    {
+      "question": "딥러닝에서 말하는 '스스로 학습'의 실제 의미로 가장 적절한 것은?",
+      "options": [
+        "데이터를 스스로 수집하는 것",
+        "특성의 중요도(가중치)를 스스로 찾는 것",
+        "정답 라벨을 스스로 만드는 것",
+        "하드웨어를 스스로 늘리는 것"
+      ],
+      "answer": 1,
+      "explanation": "딥러닝의 '스스로 학습'은 어떤 특성이 중요한지, 즉 가중치를 반복 학습으로 스스로 찾아내는 것을 의미합니다."
+    },
+    {
+      "question": "머신러닝과 비교했을 때 딥러닝의 가장 큰 차이점은?",
+      "options": [
+        "전처리가 전혀 필요 없다",
+        "정형 데이터만 다룬다",
+        "중요 특징 선정(특징 엔지니어링)을 자동으로 한다",
+        "적은 데이터로 항상 더 좋다"
+      ],
+      "answer": 2,
+      "explanation": "딥러닝은 중요한 특징을 사람이 고르지 않고 학습 과정에서 자동으로 추출합니다. 단, 결측/이상치 전처리는 딥러닝도 필요합니다."
+    },
+    {
+      "question": "뉴런의 구조에서 '연산(더하기)을 수행하고 신호를 보낼지 판단'하는 부분에 대응하는 것은?",
+      "options": [
+        "가지돌기(입력)",
+        "축삭돌기(출력)",
+        "시냅스(전달)",
+        "신경세포체(합산+판단)"
+      ],
+      "answer": 3,
+      "explanation": "가지돌기는 입력, 신경세포체는 신호를 합산하고 보낼지 판단, 축삭돌기/시냅스는 출력에 해당합니다."
+    },
+    {
+      "question": "퍼셉트론에서 '편향(bias)'의 주된 역할은?",
+      "options": [
+        "출력이 항상 0이 되는 것을 막아 유연하게 한다",
+        "학습 속도를 높인다",
+        "과적합을 방지한다",
+        "데이터를 정규화한다"
+      ],
+      "answer": 0,
+      "explanation": "편향은 계산에 더해지는 값으로, 출력이 항상 0이 되는 것을 막아 모델을 더 유연하게 만듭니다."
+    },
+    {
+      "question": "은닉층에서 주로 사용하며, 음수는 0으로 만들고 양수는 그대로 통과시키는 활성화 함수는?",
+      "options": [
+        "Sigmoid",
+        "ReLU",
+        "Softmax",
+        "Tanh"
+      ],
+      "answer": 1,
+      "explanation": "ReLU는 음수를 0으로, 양수를 그대로 출력하며 계산이 빠르고 단순해 주로 은닉층에 사용됩니다."
+    },
+    {
+      "question": "다중 분류 문제의 출력층에서 사용하며, 각 클래스 확률의 합이 1(100%)이 되도록 하는 활성화 함수는?",
+      "options": [
+        "ReLU",
+        "Sigmoid",
+        "Softmax",
+        "Linear"
+      ],
+      "answer": 2,
+      "explanation": "Softmax는 각 클래스의 확률을 계산하며 그 합이 1이 되게 만들어 다중 분류 출력층에 사용됩니다."
+    },
+    {
+      "question": "딥러닝 모델에서 입력층의 뉴런 수는 무엇으로 결정되나요?",
+      "options": [
+        "은닉층의 개수",
+        "출력 클래스의 개수",
+        "에포크 수",
+        "특성(열)의 개수"
+      ],
+      "answer": 3,
+      "explanation": "입력층 뉴런 수는 데이터의 특성(열) 개수로 결정됩니다. 예를 들어 28x28 이미지는 784개가 됩니다."
+    },
+    {
+      "question": "회귀 문제의 출력층 구성으로 옳은 것은?",
+      "options": [
+        "뉴런 1개, 활성화 함수 없음(또는 상황에 따라 relu)",
+        "뉴런 1개, softmax",
+        "클래스 수만큼, softmax",
+        "뉴런 2개, sigmoid"
+      ],
+      "answer": 0,
+      "explanation": "회귀는 값 하나를 출력하므로 뉴런 1개를 두고 활성화 함수는 따로 두지 않습니다(양수만 필요하면 relu)."
+    },
+    {
+      "question": "학습 과정에서 손실(오차)을 기준으로 역방향으로 올라가며 각 층의 가중치를 조금씩 수정하는 과정은?",
+      "options": [
+        "순전파",
+        "역전파",
+        "정규화",
+        "드롭아웃"
+      ],
+      "answer": 1,
+      "explanation": "역전파(Backpropagation)는 손실 함수의 오차를 기준으로 역방향으로 가중치를 조정하는 과정입니다."
+    },
+    {
+      "question": "손실 함수 선택으로 옳게 짝지어진 것은?",
+      "options": [
+        "회귀 - categorical_crossentropy",
+        "다중 분류 - MSE",
+        "이진 분류 - binary_crossentropy",
+        "회귀 - binary_crossentropy"
+      ],
+      "answer": 2,
+      "explanation": "회귀는 MSE, 이진 분류는 binary_crossentropy, 다중 분류는 categorical_crossentropy를 사용합니다."
+    },
+    {
+      "question": "학습 중 일부 뉴런을 무작위로 꺼서 과적합을 방지하는 기법은?",
+      "options": [
+        "BatchNormalization",
+        "EarlyStopping",
+        "Padding",
+        "Dropout"
+      ],
+      "answer": 3,
+      "explanation": "Dropout은 학습 중 일부 노드를 무작위로 제외(비활성)하여 과적합을 방지합니다."
+    },
+    {
+      "question": "EarlyStopping에서 검증 손실이 개선되지 않을 때 몇 번까지 참을지를 정하는 파라미터는?",
+      "options": [
+        "patience",
+        "monitor",
+        "restore_best_weights",
+        "validation_split"
+      ],
+      "answer": 0,
+      "explanation": "patience는 monitor 지표(예: val_loss)가 개선되지 않아도 몇 에포크까지 기다릴지를 정합니다."
+    },
+    {
+      "question": "CNN이 이미지 처리에 강한 이유로 가장 적절한 것은?",
+      "options": [
+        "순서 정보를 잘 기억하기 때문",
+        "근처 픽셀의 지역성을 살리고 필터를 공유하기 때문",
+        "데이터가 적어도 되기 때문",
+        "확률을 직접 계산하기 때문"
+      ],
+      "answer": 1,
+      "explanation": "이미지는 근처 픽셀끼리 의미가 강하고(지역성), 위치가 달라도 같은 필터를 공유해 특징을 잡기 때문입니다."
+    },
+    {
+      "question": "CNN 구조의 핵심 3요소가 아닌 것은?",
+      "options": [
+        "Convolution(합성곱)",
+        "Pooling(풀링)",
+        "Attention(어텐션)",
+        "Feature Map(특징맵)"
+      ],
+      "answer": 2,
+      "explanation": "CNN의 핵심 3요소는 Convolution, Pooling/Stride, Feature Map입니다. Attention은 Transformer 계열의 개념입니다."
+    },
+    {
+      "question": "Pooling(풀링)이 하는 역할로 옳은 것은?",
+      "options": [
+        "해상도를 늘려 정밀도를 높인다",
+        "가중치를 초기화한다",
+        "손실을 계산한다",
+        "해상도를 줄여 계산량을 낮추고 위치 변화에 강해진다"
+      ],
+      "answer": 3,
+      "explanation": "Pooling은 해상도를 줄이며 큰 특징만 남겨 계산량을 낮추고 약간의 위치 변화에 강해지게 합니다."
+    },
+    {
+      "question": "층을 깊게 쌓을 때 생기는 기울기 소실 문제를, 입력을 결과에 더하는 지름길 연결로 해결한 모델은?",
+      "options": [
+        "ResNet",
+        "Inception",
+        "U-Net",
+        "YOLO"
+      ],
+      "answer": 0,
+      "explanation": "ResNet은 잔차(skip) 연결로 입력을 보존한 채 변화만 학습해, 깊은 망의 기울기 소실을 완화합니다."
+    },
+    {
+      "question": "이미지를 픽셀 단위로 분류해 경계/영역을 나누는(세그멘테이션) 대표 모델로, 의료 영상 분석 등에 쓰이는 것은?",
+      "options": [
+        "YOLO",
+        "U-Net",
+        "ResNet",
+        "BERT"
+      ],
+      "answer": 1,
+      "explanation": "U-Net은 세그멘테이션(픽셀 단위 분류)에 특화되어 경계/영역을 나누며, 의료 영상 병변 탐지 등에 쓰입니다."
+    },
+    {
+      "question": "박스 좌표 + 클래스 + 확률로 객체를 탐지하며, 실시간 처리에 강한 모델 계열은?",
+      "options": [
+        "U-Net",
+        "GRU",
+        "YOLO",
+        "Seq2Seq"
+      ],
+      "answer": 2,
+      "explanation": "YOLO 계열은 어디에 무엇이 있는지 박스/클래스/확률로 한 번에 빠르게 탐지해 실시간에 강합니다."
+    },
+    {
+      "question": "RNN의 한계로 보기 어려운 것은?",
+      "options": [
+        "장기 의존성(앞의 정보를 잊음)",
+        "기울기 소실/폭주",
+        "순차 계산이라 병렬화가 어려움",
+        "이미지의 공간 패턴을 너무 잘 잡음"
+      ],
+      "answer": 3,
+      "explanation": "RNN의 한계는 장기 의존성, 학습 불안정, 병렬화 곤란입니다. 공간 패턴은 CNN의 강점입니다."
+    },
+    {
+      "question": "LSTM이 기억을 제어하기 위해 도입한 핵심 장치는?",
+      "options": [
+        "게이트(Gate)와 셀 상태",
+        "합성곱 필터",
+        "풀링",
+        "임베딩"
+      ],
+      "answer": 0,
+      "explanation": "LSTM은 입력/삭제/출력 게이트와 셀 상태(저장 통로)로 필요한 기억은 유지하고 불필요한 기억은 지웁니다."
+    },
+    {
+      "question": "GRU에 대한 설명으로 옳은 것은?",
+      "options": [
+        "LSTM보다 게이트가 많고 느리다",
+        "LSTM을 단순화해 게이트 2개(업데이트/리셋)를 쓰며 더 빠르다",
+        "이미지 전용 모델이다",
+        "게이트가 없다"
+      ],
+      "answer": 1,
+      "explanation": "GRU는 LSTM을 단순화한 구조로 업데이트/리셋 게이트 2개만 사용해 더 가볍고 빠릅니다."
+    },
+    {
+      "question": "Seq2Seq에서 입력 문장의 핵심 의미를 요약해 저장하는 부분은?",
+      "options": [
+        "디코더(Decoder)",
+        "풀링",
+        "인코더(Encoder)",
+        "드롭아웃"
+      ],
+      "answer": 2,
+      "explanation": "인코더는 입력 문장을 읽어 핵심 의미를 요약해 저장하고, 디코더는 그것을 바탕으로 출력을 생성합니다."
+    },
+    {
+      "question": "Attention이 도입된 주된 이유는?",
+      "options": [
+        "학습 속도를 늦추기 위해",
+        "이미지 해상도를 높이기 위해",
+        "가중치를 없애기 위해",
+        "인코더가 정보를 하나에 다 담아 생기는 정보 손실을 보완하기 위해"
+      ],
+      "answer": 3,
+      "explanation": "긴 입력을 벡터 하나에 담으면 정보 손실이 생기므로, 필요한 부분(중요 토큰)에 가중치를 주어 직접 참조합니다."
+    },
+    {
+      "question": "현재 GPT 등 대형 언어 모델의 기반이며, 병렬 처리와 어텐션 중심으로 동작하는 모델은?",
+      "options": [
+        "Transformer",
+        "LSTM",
+        "U-Net",
+        "ResNet"
+      ],
+      "answer": 0,
+      "explanation": "Transformer는 어텐션 중심으로 문장을 병렬 처리하며, GPT 등 대형 LLM의 기반이 됩니다."
+    },
+    {
+      "question": "Transformer에서 순서 정보가 없다는 문제를 해결하기 위해 단어의 위치 정보를 추가하는 요소는?",
+      "options": [
+        "Self-Attention",
+        "Positional Encoding",
+        "Multi-Head",
+        "Dropout"
+      ],
+      "answer": 1,
+      "explanation": "Positional Encoding은 '몇 번째 단어인지'의 위치 정보를 넣어 순서가 없는 Transformer를 보완합니다."
+    },
+    {
+      "question": "이미 학습된 모델을 가져와 내 데이터에 맞게 조정하는, 실무에서 가장 많이 쓰는 확장 학습 방법은?",
+      "options": [
+        "스크래치 학습",
+        "데이터 증강",
+        "파인튜닝(Fine-tuning)",
+        "원핫 인코딩"
+      ],
+      "answer": 2,
+      "explanation": "파인튜닝은 베이스(사전학습) 모델에 필요한 정보를 추가로 학습시키는 방식으로 실무에서 가장 널리 쓰입니다."
+    },
+    {
+      "question": "데이터 규모별 가이드에서 1D-CNN/LSTM이 머신러닝 성능을 넘어서는 '단순 딥러닝 스윗스팟' 구간은?",
+      "options": [
+        "1,000행 미만",
+        "100행 미만",
+        "100만 행 이상",
+        "5,000~20,000행"
+      ],
+      "answer": 3,
+      "explanation": "5,000~20,000행 구간에서 LSTM, 1D-CNN 같은 단순 딥러닝이 임베딩부터 직접 학습해 ML을 넘어서는 성능을 냅니다."
+    },
+    {
+      "question": "Google Colab에 대한 설명으로 옳지 않은 것은?",
+      "options": [
+        "12시간 연속 사용이 항상 보장된다",
+        "브라우저에서 실행되는 무료 Jupyter 노트북 환경이다",
+        "Pandas, TensorFlow 등이 이미 설치되어 있다",
+        "무료로 GPU를 사용할 수 있다"
+      ],
+      "answer": 0,
+      "explanation": "Colab은 최대 12시간 사용 가능하지만 자원과 연속 사용이 보장되지 않으며 세션이 중간에 끊길 수 있습니다."
+    },
+    {
+      "question": "Colab의 텍스트 셀에서 제목·설명을 작성할 때 사용하는 문법은?",
+      "options": [
+        "HTML만 가능",
+        "마크다운(Markdown)",
+        "LaTeX만 가능",
+        "YAML"
+      ],
+      "answer": 1,
+      "explanation": "Colab의 텍스트 셀은 마크다운으로 작성하며, HTML 태그나 LaTeX 수식도 함께 사용할 수 있습니다."
+    },
+    {
+      "question": "Colab에서 업로드한 파일이 세션 종료 시 사라지는 것을 막고, 데이터를 계속 유지하는 방법은?",
+      "options": [
+        "파일을 두 번 업로드한다",
+        "런타임을 CPU로 바꾼다",
+        "구글 드라이브를 마운트해서 사용한다",
+        "매직 커맨드를 쓴다"
+      ],
+      "answer": 2,
+      "explanation": "업로드 파일은 런타임 종속 임시 파일이라 세션이 끊기면 사라지므로, 드라이브를 마운트해 영구 저장해서 씁니다."
+    },
+    {
+      "question": "Colab 코드 셀에서 리눅스 셸 명령을 실행할 때 명령 앞에 붙이는 기호는?",
+      "options": [
+        "% (퍼센트)",
+        "# (샵)",
+        "@ (앳)",
+        "! (느낌표)"
+      ],
+      "answer": 3,
+      "explanation": "!는 셸(리눅스) 명령, %는 주피터 매직 커맨드를 실행할 때 사용합니다."
+    },
+    {
+      "question": "함수나 객체의 소스 코드까지 표시하는 in-notebook 도움말 문법은?",
+      "options": [
+        "min??",
+        "min?",
+        "help(min)",
+        "%min"
+      ],
+      "answer": 0,
+      "explanation": "?는 Docstring 도움말, ??는 소스 코드까지 표시합니다. help()도 도움말을 출력합니다."
+    },
+    {
+      "question": "구글 드라이브를 코드로 마운트할 때 사용하는 함수는?",
+      "options": [
+        "files.upload()",
+        "drive.mount('/content/drive')",
+        "pd.read_csv()",
+        "os.mount()"
+      ],
+      "answer": 1,
+      "explanation": "from google.colab import drive 후 drive.mount('/content/drive')로 드라이브를 마운트합니다."
+    },
+    {
+      "question": "교안(colab1) PDF에는 무료 GPU가 Tesla K80으로 적혀 있지만, 실제 화면에서 강사가 보여준 현재 무료 GPU는?",
+      "options": [
+        "A100",
+        "V100",
+        "T4",
+        "H100"
+      ],
+      "answer": 2,
+      "explanation": "교안 문구는 작성 당시(K80) 기준이며, 현재 무료 Colab은 주로 T4 GPU를 제공합니다."
+    },
+    {
+      "question": "Character-level 1D-CNN에서 텍스트를 단어가 아니라 '문자 단위'로 처리하는 주된 이유는?",
+      "options": [
+        "학습 속도가 느려서",
+        "이미지를 처리하기 위해",
+        "정답 라벨이 필요 없어서",
+        "특수문자 조합/변종을 표현하고 OOV(모르는 단어) 문제를 없애기 위해"
+      ],
+      "answer": 3,
+      "explanation": "단어 단위는 특수문자 조합을 모르는 단어(OOV)로 처리하지만, 문자 단위는 100개 미만 문자 조합으로 모든 페이로드를 표현합니다."
+    },
+    {
+      "question": "1D-CNN의 동작 4단계 순서로 옳은 것은?",
+      "options": [
+        "임베딩 → 1D 합성곱 → 맥스풀링 → 분류",
+        "합성곱 → 임베딩 → 분류 → 풀링",
+        "풀링 → 합성곱 → 임베딩 → 분류",
+        "분류 → 임베딩 → 합성곱 → 풀링"
+      ],
+      "answer": 0,
+      "explanation": "문자 벡터화(임베딩) → 1차원 합성곱(필터로 패턴 추출) → 맥스풀링(최고 점수 추림) → 완전연결 분류 순입니다."
+    },
+    {
+      "question": "1D-CNN에서 임베딩(Embedding) 레이어의 역할은?",
+      "options": [
+        "가장 높은 점수만 남긴다",
+        "문자(텍스트)를 수치 벡터로 변환한다",
+        "과적합을 방지한다",
+        "손실을 계산한다"
+      ],
+      "answer": 1,
+      "explanation": "임베딩 레이어는 문자 인덱스를 밀집 수치 벡터로 변환해 신경망이 처리할 수 있게 합니다."
+    },
+    {
+      "question": "Character-level 1D-CNN의 실제 장점으로 옳은 것은?",
+      "options": [
+        "대소문자 섞기/공백 삽입 같은 난독화에 약하다",
+        "데이터가 전혀 필요 없다",
+        "난독화·오타에 강하고, 병렬 처리로 RNN보다 빠르다",
+        "순서를 한 글자씩만 읽어 느리다"
+      ],
+      "answer": 2,
+      "explanation": "문자 단위로 패턴을 훑어 난독화/오타에 강하고, 문장 전체를 동시에 처리해 RNN 계열보다 빠릅니다."
+    },
+    {
+      "question": "실습 코드의 문자 사전에서 '패딩(PAD)'과 '모르는 문자(OOV)'에 지정된 인덱스는?",
+      "options": [
+        "PAD=1, OOV=2",
+        "PAD=2, OOV=3",
+        "PAD=0, OOV=0",
+        "PAD=0, OOV=1"
+      ],
+      "answer": 3,
+      "explanation": "0은 패딩(<PAD>), 1은 모르는 문자(<OOV>)로 예약하고, 일반 문자는 인덱스 2부터(idx+2) 부여합니다."
+    },
+    {
+      "question": "pad_sequences 함수의 역할로 옳은 것은?",
+      "options": [
+        "모든 시퀀스 길이를 고정(예: 100자)하고 부족분을 0으로 채운다",
+        "문자를 벡터로 변환한다",
+        "과적합을 방지한다",
+        "확률을 계산한다"
+      ],
+      "answer": 0,
+      "explanation": "pad_sequences는 서로 다른 길이의 시퀀스를 고정 길이로 맞추며, 짧으면 0으로 채우고 길면 자릅니다."
+    },
+    {
+      "question": "실습 1D-CNN 모델의 출력층에서 정상/공격을 이진 판단하기 위해 쓴 활성화 함수는?",
+      "options": [
+        "softmax",
+        "sigmoid",
+        "relu",
+        "tanh"
+      ],
+      "answer": 1,
+      "explanation": "이진 분류(정상 0 / 공격 1)이므로 출력층에 sigmoid를 사용하고 손실은 binary_crossentropy를 씁니다."
+    },
+    {
+      "question": "PBL4에서 status_code로부터 만드는 'label'의 의미로 정정된 내용은?",
+      "options": [
+        "악성/정상을 판단하는 정답",
+        "URL의 길이",
+        "오류 여부(이상 있다/없다)를 나타내는 파생 변수",
+        "사용자 ID"
+      ],
+      "answer": 2,
+      "explanation": "강사 정정에 따르면 PBL4의 label은 악성 탐지 정답이 아니라 status_code 기반 오류 여부를 나타내는 파생 변수입니다."
+    },
+    {
+      "question": "외국(서구권) URL 데이터셋으로 학습한 모델이 naver.com 같은 국내 정상 도메인을 악성으로 잘못 판정하는 현상은?",
+      "options": [
+        "과소적합",
+        "기울기 소실",
+        "데이터 누수",
+        "학습 데이터의 지역 편향으로 인한 오탐"
+      ],
+      "answer": 3,
+      "explanation": "학습 분포에 없는 국내 도메인을 처음 보는 조합으로 인식해 악성으로 오탐하는, 지역 편향 문제입니다."
+    },
+    {
+      "question": "개선판 URL 1D-CNN에서 합성곱 뒤·활성화 함수 앞에 배치해 출력 분포를 정규화하고 학습을 안정화한 기법은?",
+      "options": [
+        "BatchNormalization",
+        "Dropout",
+        "Padding",
+        "Attention"
+      ],
+      "answer": 0,
+      "explanation": "BatchNormalization을 합성곱 뒤, 활성화 앞에 두어 분포를 정규화하고 기울기 소실을 완화해 학습을 안정화합니다."
+    },
+    {
+      "question": "URL 전처리에서 http://, https:// 스킴을 삭제하는 이유로 가장 적절한 것은?",
+      "options": [
+        "보안상 위험해서",
+        "정상·악성 공통이라 변별력이 없어 도메인·파라미터에 집중하기 위해",
+        "길이를 늘리기 위해",
+        "라벨을 만들기 위해"
+      ],
+      "answer": 1,
+      "explanation": "스킴은 거의 모든 URL에 공통이라 변별력이 없으므로, 제거해 도메인/파라미터 패턴에 집중하게 합니다."
+    },
+    {
+      "question": "허깅페이스에서 사전학습 모델을 가장 쉽게 불러와 추론하는 API는?",
+      "options": [
+        "compile()",
+        "fit()",
+        "pipeline()",
+        "pad_sequences()"
+      ],
+      "answer": 2,
+      "explanation": "pipeline()은 토크나이저 로드·전처리·추론·후처리를 한 줄로 감싼, 가장 쉬운 추론 도구입니다."
+    },
+    {
+      "question": "허깅페이스의 메인 AI 라이브러리와, 그 백엔드 딥러닝 연산을 담당하는 프레임워크가 옳게 짝지어진 것은?",
+      "options": [
+        "pandas - numpy",
+        "sklearn - matplotlib",
+        "keras - flask",
+        "transformers - torch(PyTorch)"
+      ],
+      "answer": 3,
+      "explanation": "transformers는 허깅페이스의 메인 라이브러리이고, torch(PyTorch, Meta 제작)가 실제 연산을 처리하는 백엔드입니다."
+    },
+    {
+      "question": "허깅페이스 사이트의 3대 메뉴로 옳은 것은?",
+      "options": [
+        "Models, Datasets, Spaces",
+        "Train, Test, Deploy",
+        "Code, Issues, Wiki",
+        "Input, Output, Log"
+      ],
+      "answer": 0,
+      "explanation": "허깅페이스는 Models(모델), Datasets(데이터셋), Spaces(데모 앱 공간)로 구성됩니다."
+    },
+    {
+      "question": "Colab에서 허깅페이스 예제를 돌릴 때 transformers, torch 설치에 대한 설명으로 옳은 것은?",
+      "options": [
+        "매번 반드시 설치해야 한다",
+        "Colab에는 이미 설치되어 있어 별도 설치가 필요 없다",
+        "Colab에서는 설치가 불가능하다",
+        "설치하면 오류가 난다"
+      ],
+      "answer": 1,
+      "explanation": "Colab에는 transformers, torch가 기본 설치되어 있어 별도 설치가 필요 없습니다. 로컬에서만 설치하면 됩니다."
+    },
+    {
+      "question": "pipeline 내부 3단계 순서로 옳은 것은?",
+      "options": [
+        "추론 → 전처리 → 후처리",
+        "후처리 → 추론 → 전처리",
+        "전처리(토크나이저) → 추론(모델) → 후처리(softmax)",
+        "전처리 → 후처리 → 추론"
+      ],
+      "answer": 2,
+      "explanation": "pipeline은 전처리(텍스트→토큰), 추론(모델 실행), 후처리(softmax로 확률화 후 라벨 선택)를 순서대로 수행합니다."
+    },
+    {
+      "question": "추론 코드를 torch.no_grad() 블록 안에서 실행하는 이유는?",
+      "options": [
+        "학습 속도를 늦추려고",
+        "정확도를 높이려고",
+        "라벨을 만들려고",
+        "가중치를 학습하지 않으니 그래디언트 계산을 꺼서 메모리·속도를 아끼려고"
+      ],
+      "answer": 3,
+      "explanation": "추론은 가중치를 학습하지 않으므로 그래디언트가 불필요합니다. no_grad로 이를 끄면 메모리를 아끼고 빨라집니다."
+    },
+    {
+      "question": "후처리에서 logits를 확률로 바꾼 뒤, 가장 높은 확률의 인덱스를 고르는 연산은?",
+      "options": [
+        "argmax",
+        "softmax",
+        "sigmoid",
+        "dropout"
+      ],
+      "answer": 0,
+      "explanation": "softmax로 확률 분포(합=1)를 만든 뒤 argmax로 가장 높은 확률의 인덱스를 골라 라벨로 매핑합니다."
+    },
+    {
+      "question": "toxic-bert 모델에서 top_k=None으로 설정하면 어떤 결과를 얻나요?",
+      "options": [
+        "가장 높은 레이블 하나만",
+        "모든 유해 레이블의 점수를 전부",
+        "아무 결과도 안 나옴",
+        "무작위 레이블"
+      ],
+      "answer": 1,
+      "explanation": "top_k=None이면 최고 점수 하나가 아니라 여러 유해 레이블 전체의 점수를 반환합니다(멀티 레이블)."
+    },
+    {
+      "question": "허깅페이스 공개 보안 모델을 실제로 돌려 보니 정상 URL을 위험으로 오탐하는 경우가 있었습니다. 이에 대한 올바른 태도는?",
+      "options": [
+        "공개 모델이므로 무조건 신뢰한다",
+        "모든 탐지를 포기한다",
+        "내 환경 데이터로 오탐/미탐을 측정하고 최신 모델 확인·파인튜닝을 고려한다",
+        "라벨을 임의로 바꾼다"
+      ],
+      "answer": 2,
+      "explanation": "공개 모델도 오탐/미탐이 있으므로, 내 데이터로 성능을 측정하고 모델 카드·업데이트를 확인하며 필요시 파인튜닝합니다."
+    },
+    {
+      "question": "여러 보안 모델을 하나로 엮어, 하나의 입력을 여러 pipeline에 태우고 결과를 종합해 최종 판단을 내리는 방식을 무엇이라 볼 수 있나요?",
+      "options": [
+        "단일 모델 학습",
+        "데이터 증강",
+        "원핫 인코딩",
+        "다중 모델 조립(파이프라인 결합)"
+      ],
+      "answer": 3,
+      "explanation": "pipeline은 task+model로 여러 개를 만들 수 있어, 하나의 입력을 여러 모델에 통과시켜 결과를 조립할 수 있습니다."
+    },
+    {
+      "question": "머신러닝(ML)과 딥러닝(DL)의 데이터 분석 관점 비교로 옳은 것은?",
+      "options": [
+        "ML은 도메인 지식 기반 특징 설계·설명이 쉽고, DL은 자동 특징 추출이지만 블랙박스다",
+        "ML은 블랙박스, DL은 설명이 쉽다",
+        "둘 다 정형 데이터만 쓴다",
+        "DL은 도메인 지식이 전혀 필요 없다"
+      ],
+      "answer": 0,
+      "explanation": "ML은 도메인 지식으로 특징을 설계해 설명이 쉽고, DL은 특징을 자동 추출하지만 내부가 복잡한 블랙박스입니다."
+    }
+  ]
+}
