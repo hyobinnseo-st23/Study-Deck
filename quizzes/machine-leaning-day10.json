@@ -1,0 +1,580 @@
+{
+  "title": "머신러닝 DAY10",
+  "subtitle": "OpenAI 내장 도구·구조화 출력·Streamlit 챗봇",
+  "subject": "머신러닝",
+  "description": "SK Shieldus Rookies: 머신러닝 10일차 수업. Responses API 총복습과 Function Calling, 내장 도구(Web search·File search·Code interpreter), Pydantic 구조화 출력, Streamlit UI 요소와 OpenAI 연동 챗봇 제작, 그리고 10일 과정 총정리와 모델 프로젝트 안내를 다룹니다.",
+  "questions": [
+    {
+      "question": "Responses API 응답에서 output 리스트의 각 아이템이 어떤 종류인지 구별할 때 확인하는 속성은?",
+      "options": [
+        "id",
+        "status",
+        "type",
+        "role"
+      ],
+      "answer": 2,
+      "explanation": "각 아이템은 type 속성으로 reasoning / function_call / web_search_call / message 등을 구별합니다. 인덱스가 아니라 type으로 분기해야 안전합니다."
+    },
+    {
+      "question": "Chat Completions API에서 응답 텍스트를 꺼내는 경로로 옳은 것은?",
+      "options": [
+        "completion.choices[0].message.content",
+        "completion.output_text",
+        "completion.output[0].text",
+        "completion.message.content"
+      ],
+      "answer": 0,
+      "explanation": "Chat Completions는 choices 배열 안의 message.content로 접근합니다. Responses API의 output_text와 대비됩니다."
+    },
+    {
+      "question": "Function Calling에서 GPT 모델이 실제로 수행하는 일은?",
+      "options": [
+        "함수를 직접 실행하고 결과를 만든다",
+        "함수 코드를 대신 작성해 준다",
+        "함수를 서버에 등록해 준다",
+        "함수 호출 '요청'만 생성한다"
+      ],
+      "answer": 3,
+      "explanation": "교안 p20에 명시된 대로 모델은 호출 요청만 생성하고, 실제 함수 실행과 결과 반영은 개발자/애플리케이션이 수행합니다."
+    },
+    {
+      "question": "모델이 반환한 function_call 아이템의 arguments는 어떤 자료형인가?",
+      "options": [
+        "파이썬 딕셔너리",
+        "JSON 형식의 문자열",
+        "리스트",
+        "튜플"
+      ],
+      "answer": 1,
+      "explanation": "arguments는 문자열이므로 json.loads()로 파이썬 딕셔너리로 변환해야 함수 인자로 넘길 수 있습니다."
+    },
+    {
+      "question": "json.load()와 json.loads()의 차이로 옳은 것은?",
+      "options": [
+        "loads()는 문자열을, load()는 파일 객체를 받는다",
+        "loads()는 파일 객체를, load()는 문자열을 받는다",
+        "둘 다 문자열을 받고 반환형만 다르다",
+        "loads()는 저장, load()는 불러오기다"
+      ],
+      "answer": 0,
+      "explanation": "s가 붙은 loads()가 string(문자열)용입니다. load()에 문자열을 넣으면 AttributeError가 납니다."
+    },
+    {
+      "question": "함수 실행 결과를 대화에 되돌릴 때 사용하는 항목의 type 값은?",
+      "options": [
+        "function_result",
+        "tool_output",
+        "assistant_output",
+        "function_call_output"
+      ],
+      "answer": 3,
+      "explanation": "type, call_id, output(문자열) 세 필드로 구성된 function_call_output 형식으로 결과를 되돌립니다."
+    },
+    {
+      "question": "function_call_output에서 call_id가 필요한 이유는?",
+      "options": [
+        "함수의 이름을 식별하기 위해",
+        "응답 순서를 정렬하기 위해",
+        "어떤 호출 요청에 대한 결과인지 짝을 맞추기 위해",
+        "과금 단위를 구분하기 위해"
+      ],
+      "answer": 2,
+      "explanation": "여러 함수가 동시에 호출될 수 있으므로, call_id로 요청과 결과를 1:1로 연결해야 합니다."
+    },
+    {
+      "question": "tools에 등록한 함수 스펙에서, 모델이 '이 함수를 쓸지' 판단하는 근거가 되는 항목은?",
+      "options": [
+        "name",
+        "strict",
+        "type",
+        "description"
+      ],
+      "answer": 3,
+      "explanation": "모델은 함수 본문을 볼 수 없고 description과 parameters 스펙만 봅니다. description이 모호하면 함수가 호출되지 않습니다."
+    },
+    {
+      "question": "Responses API의 temperature 값을 높였을 때 나타나는 현상으로 옳은 것은?",
+      "options": [
+        "응답 속도가 빨라진다",
+        "창의성이 높아지지만 할루시네이션 위험이 커진다",
+        "출력 토큰 수가 늘어난다",
+        "항상 같은 답만 반복한다"
+      ],
+      "answer": 1,
+      "explanation": "temperature는 창의성/무작위성을 조절합니다. 보안 로그 분류처럼 재현성이 중요한 작업은 낮게 설정합니다."
+    },
+    {
+      "question": "input의 role 중 우선순위가 가장 높은 것은?",
+      "options": [
+        "user",
+        "developer",
+        "assistant",
+        "function"
+      ],
+      "answer": 1,
+      "explanation": "교안 p13에 따르면 developer 메시지가 user 메시지보다 우선순위가 높고, assistant는 모델이 생성한 보조 역할입니다."
+    },
+    {
+      "question": "리즈닝 모델을 사용할 때 response.output[0]에 주로 들어오는 아이템은?",
+      "options": [
+        "function_call",
+        "message",
+        "reasoning",
+        "web_search_call"
+      ],
+      "answer": 2,
+      "explanation": "교안 코드는 output[0]을 function_call로 가정하지만, 리즈닝 모델은 [0]에 reasoning이 먼저 옵니다. 그래서 type으로 찾아야 합니다."
+    },
+    {
+      "question": "하나의 프롬프트에 여러 function_call이 동시에 오는 경우의 올바른 처리는?",
+      "options": [
+        "가장 첫 번째 function_call만 처리한다",
+        "가장 마지막 function_call만 처리한다",
+        "에러이므로 요청을 다시 보낸다",
+        "output을 반복하며 type이 function_call인 항목을 모두 처리한다"
+      ],
+      "answer": 3,
+      "explanation": "사용자가 여러 질문을 한 번에 하면 function_call이 여러 개 옵니다. 각 호출의 call_id를 개별로 사용해 결과를 되돌려야 합니다."
+    },
+    {
+      "question": "내장 도구(Built-in tools)가 커스텀 함수(Function Calling)와 다른 결정적인 점은?",
+      "options": [
+        "tools에 등록하지 않아도 자동으로 동작한다",
+        "description을 반드시 작성해야 한다",
+        "OpenAI 서버가 도구 실행까지 수행해 2차 요청이 필요 없다",
+        "응답에 type 속성이 없다"
+      ],
+      "answer": 2,
+      "explanation": "교안 p44에 '실행을 처리하기 위해 코드를 구현할 필요가 없음'이라고 명시되어 있습니다. 결과 병합과 2차 요청이 불필요합니다."
+    },
+    {
+      "question": "Web search 도구를 tools에 등록할 때 사용하는 type 값으로 교안에 나온 것은?",
+      "options": [
+        "search_web",
+        "web_search_preview",
+        "internet_search",
+        "browser"
+      ],
+      "answer": 1,
+      "explanation": "교안 p37/p39/p43은 web_search_preview를, p38은 web_search를 사용합니다. 둘 다 동작하지만 모델 버전에 따라 다를 수 있습니다."
+    },
+    {
+      "question": "모델이 웹 검색 도구를 반드시 사용하도록 강제할 때 쓰는 매개변수는?",
+      "options": [
+        "tool_choice",
+        "tool_force",
+        "require_tool",
+        "search_mode"
+      ],
+      "answer": 0,
+      "explanation": "tools에 등록하는 것은 '허용'이고, tool_choice로 지정하면 '강제'입니다. 지연 시간을 줄이고 더 일관된 결과를 얻을 수 있습니다."
+    },
+    {
+      "question": "search_context_size의 기본값은?",
+      "options": [
+        "low",
+        "high",
+        "medium",
+        "auto"
+      ],
+      "answer": 2,
+      "explanation": "high / medium(기본) / low 세 가지가 있으며, 클수록 품질은 좋아지지만 비용과 지연 시간이 늘어납니다."
+    },
+    {
+      "question": "File search를 사용하기 위한 준비 단계 순서로 옳은 것은?",
+      "options": [
+        "벡터 스토어 생성 → file_search 등록 → 파일 객체 생성 → 파일 연결",
+        "file_search 등록 → 파일 객체 생성 → 벡터 스토어 생성 → 파일 연결",
+        "파일 객체 생성 → 벡터 스토어 생성 → 스토어에 파일 연결 → file_search 등록",
+        "파일 객체 생성 → file_search 등록 → 벡터 스토어 생성 → 파일 연결"
+      ],
+      "answer": 2,
+      "explanation": "files.create → vector_stores.create → vector_stores.files.create → tools에 file_search 등록 순서이며, 모든 연결은 id 기반입니다."
+    },
+    {
+      "question": "client.files.create()로 파일을 올릴 때 파일 검색용으로 지정하는 purpose 값은?",
+      "options": [
+        "assistants",
+        "file_search",
+        "vector_store",
+        "knowledge"
+      ],
+      "answer": 0,
+      "explanation": "purpose는 파일의 용도를 선언하는 값으로, 파일 검색(어시스턴트 지식)용은 assistants입니다."
+    },
+    {
+      "question": "벡터 스토어에 파일을 연결한 직후 바로 검색이 되지 않을 수 있는 이유는?",
+      "options": [
+        "문서를 조각내고 임베딩하는 인덱싱이 끝나야 하기 때문",
+        "파일 크기가 항상 압축되기 때문",
+        "API 키 권한이 갱신되어야 하기 때문",
+        "벡터 스토어가 하루 단위로 갱신되기 때문"
+      ],
+      "answer": 0,
+      "explanation": "교안 p49가 '파일이 사용 가능해질 때까지(상태가 완료될 때까지)' 확인하라고 안내합니다. status가 completed인지 확인해야 합니다."
+    },
+    {
+      "question": "file_search 도구 설정에서 vector_store_ids에 넣어야 하는 값의 형태는?",
+      "options": [
+        "벡터 스토어 ID 문자열 하나",
+        "벡터 스토어 이름",
+        "파일 ID들의 리스트",
+        "벡터 스토어 ID들의 리스트"
+      ],
+      "answer": 3,
+      "explanation": "이름이 복수형(_ids)이므로 리스트입니다. 벡터 스토어는 여러 개를 만들어 동시에 검색할 수 있습니다."
+    },
+    {
+      "question": "Responses API에서 code_interpreter 도구를 사용할 때 추가로 반드시 지정해야 하는 항목은?",
+      "options": [
+        "purpose",
+        "container",
+        "vector_store_ids",
+        "search_context_size"
+      ],
+      "answer": 1,
+      "explanation": "Chat Completions는 type만으로 되지만 Responses는 {\"type\": \"auto\"} 같은 container 지정이 필수입니다. 코드를 격리 샌드박스에서 실행하기 때문입니다."
+    },
+    {
+      "question": "Pydantic 스키마를 tools에 등록해 구조화 출력을 받을 때, 결과가 담기는 위치는?",
+      "options": [
+        "function_call 아이템의 arguments",
+        "response.output_text",
+        "message 아이템의 content",
+        "reasoning 아이템의 summary"
+      ],
+      "answer": 0,
+      "explanation": "구조화 출력은 function_call 형태로 오므로 message가 없고 output_text는 비어 있습니다. arguments를 json.loads()로 파싱해 사용합니다."
+    },
+    {
+      "question": "Pydantic 클래스를 OpenAI가 요구하는 JSON 스키마로 변환해 주는 메서드는?",
+      "options": [
+        "to_json()",
+        "json_schema()",
+        "model_json_schema()",
+        "dict()"
+      ],
+      "answer": 2,
+      "explanation": "Pydantic v2의 model_json_schema()가 파라미터 스펙을 자동 생성해 줍니다. v1에서는 schema()였습니다."
+    },
+    {
+      "question": "웹 검색 도구를 사용한 응답의 output 아이템 구성으로 가장 알맞은 것은?",
+      "options": [
+        "web_search_call 하나만 오고 끝난다",
+        "message 하나만 온다",
+        "reasoning과 web_search_call이 여러 번 반복된 뒤 마지막에 message가 온다",
+        "function_call과 function_call_output이 번갈아 온다"
+      ],
+      "answer": 2,
+      "explanation": "모델이 검색 결과를 보고 다시 판단해 재검색하는 에이전틱 루프가 서버 내부에서 자동으로 돕니다."
+    },
+    {
+      "question": "파인튜닝과 File search(RAG)의 차이로 가장 적절한 것은?",
+      "options": [
+        "파인튜닝은 '어떻게 말할지', RAG는 '무엇을 알지'를 바꾼다",
+        "파인튜닝은 즉시 반영되고 RAG는 재학습이 필요하다",
+        "파인튜닝은 출처 추적이 가능하고 RAG는 불가능하다",
+        "둘은 완전히 동일한 기술이다"
+      ],
+      "answer": 0,
+      "explanation": "RAG는 파일 교체만으로 지식이 즉시 갱신되고 출처 추적도 가능해, 사내 챗봇 대부분의 요구사항에 더 적합합니다."
+    },
+    {
+      "question": "작성한 Streamlit 앱 파일을 실행하는 올바른 명령은?",
+      "options": [
+        "python st_app.py",
+        "streamlit st_app.py",
+        "streamlit run st_app.py",
+        "streamlit hello st_app.py"
+      ],
+      "answer": 2,
+      "explanation": "streamlit hello는 내장 데모이고, 내 파일은 streamlit run으로 실행해야 서버가 뜹니다."
+    },
+    {
+      "question": "st.text()와 st.markdown()의 차이로 옳은 것은?",
+      "options": [
+        "st.text()가 마크다운을 렌더링하고 st.markdown()은 원문을 보여 준다",
+        "st.text()는 서식을 해석하지 않고, st.markdown()은 마크다운을 렌더링한다",
+        "둘 다 동일하게 동작한다",
+        "st.text()는 여러 줄만, st.markdown()은 한 줄만 지원한다"
+      ],
+      "answer": 1,
+      "explanation": "LLM 응답에는 굵은 글씨나 코드 블록이 섞여 오므로 챗봇에서는 st.markdown()을 사용합니다."
+    },
+    {
+      "question": "st.write()에 파이썬 딕셔너리를 넘기면 화면에 어떻게 표시되는가?",
+      "options": [
+        "접었다 펼 수 있는 JSON 뷰어 형태로 표시된다",
+        "문자열로 변환되어 한 줄로 표시된다",
+        "에러가 발생한다",
+        "표(DataFrame) 형태로만 표시된다"
+      ],
+      "answer": 0,
+      "explanation": "st.write()는 넘긴 자료형에 맞춰 알아서 렌더링합니다. DataFrame은 표로, Figure는 그래프로 나옵니다."
+    },
+    {
+      "question": "모델이 악성 코드를 탐지했을 때 표시할 메시지 박스로 강사가 예로 든 함수는?",
+      "options": [
+        "st.success()",
+        "st.info()",
+        "st.warning()",
+        "st.balloons()"
+      ],
+      "answer": 2,
+      "explanation": "안내는 info, 모델 로드/추론 완료는 success, 악성 판정 같은 경고 상황은 warning으로 구분하도록 설명했습니다."
+    },
+    {
+      "question": "Streamlit 스크립트 안의 print() 출력은 어디에서 확인할 수 있는가?",
+      "options": [
+        "브라우저 화면",
+        "브라우저 개발자 도구 콘솔",
+        "session_state 안",
+        "앱을 실행한 터미널(콘솔)"
+      ],
+      "answer": 3,
+      "explanation": "화면에 표시하려면 st.write()를 써야 합니다. print()는 서버 콘솔로 나가므로 디버깅 로그용으로 유용합니다."
+    },
+    {
+      "question": "st.button()으로 출력한 메시지가 다른 위젯을 조작하면 사라지는 이유는?",
+      "options": [
+        "버튼 결과가 5초 후 만료되기 때문",
+        "브라우저 캐시가 지워지기 때문",
+        "st.button이 일회용 위젯이기 때문",
+        "상호작용마다 스크립트가 처음부터 다시 실행되기 때문"
+      ],
+      "answer": 3,
+      "explanation": "Streamlit은 재실행 모델이라 이전 화면이 남지 않습니다. 값을 유지하려면 st.session_state를 사용해야 합니다."
+    },
+    {
+      "question": "st.set_page_config()에 대한 설명으로 옳은 것은?",
+      "options": [
+        "스크립트에서 실행되는 첫 번째 Streamlit 명령이어야 한다",
+        "파일의 아무 위치에나 두어도 된다",
+        "반드시 파일 맨 마지막에 두어야 한다",
+        "함수 안에서만 호출할 수 있다"
+      ],
+      "answer": 0,
+      "explanation": "페이지 제목·아이콘·레이아웃은 HTML을 보내기 전에 정해져야 하므로 다른 st 명령보다 먼저 호출해야 합니다."
+    },
+    {
+      "question": "Streamlit에서 사이드바에 여러 요소를 배치하는 일반적인 방법은?",
+      "options": [
+        "st.layout('side') 로 지정한다",
+        "with st.sidebar: 블록 안에 작성한다",
+        "st.column(0) 을 사용한다",
+        "위젯마다 position='left' 를 지정한다"
+      ],
+      "answer": 1,
+      "explanation": "with st.sidebar: 블록 안의 요소가 왼쪽 영역으로 배치됩니다. st.sidebar.header(...)처럼 점으로 이어 쓰는 축약형도 가능합니다."
+    },
+    {
+      "question": "st.chat_input()의 배치 특성으로 옳은 것은?",
+      "options": [
+        "코드에 작성한 순서대로 배치된다",
+        "코드 위치와 무관하게 항상 화면 하단에 고정된다",
+        "사이드바에만 배치할 수 있다",
+        "화면 상단에 고정된다"
+      ],
+      "answer": 1,
+      "explanation": "챗봇 UI에 맞춰 설계된 위젯이라 하단 입력창으로 고정됩니다. 그래서 대화 기록을 먼저 그리고 마지막에 두는 것이 자연스럽습니다."
+    },
+    {
+      "question": "st.chat_message()에 넘기는 값이 OpenAI API의 role과 이름이 같아서 얻는 이점은?",
+      "options": [
+        "API 호출 비용이 절감된다",
+        "응답 속도가 빨라진다",
+        "토큰 수가 자동으로 줄어든다",
+        "하나의 메시지 리스트로 화면 렌더링과 API 호출을 모두 처리할 수 있다"
+      ],
+      "answer": 3,
+      "explanation": "role/content 구조가 동일해 변환 코드 없이 st.session_state.messages 하나를 양쪽에 그대로 사용할 수 있습니다."
+    },
+    {
+      "question": "st.session_state에 저장된 값이 사라지는 경우는?",
+      "options": [
+        "위젯을 조작했을 때",
+        "브라우저를 새로고침(F5)했을 때",
+        "코드를 저장해 자동 갱신되었을 때",
+        "사이드바를 접었을 때"
+      ],
+      "answer": 1,
+      "explanation": "session_state는 Streamlit 서버 메모리에 세션 단위로 유지되지만, 새로고침하면 초기화됩니다. 영구 보관은 파일이나 DB가 필요합니다."
+    },
+    {
+      "question": "대화 기록처럼 값이 누적되어야 하는 경우의 올바른 초기화 패턴은?",
+      "options": [
+        "if 'messages' not in st.session_state: st.session_state.messages = []",
+        "st.session_state.messages = []",
+        "messages = []",
+        "global messages; messages = []"
+      ],
+      "answer": 0,
+      "explanation": "조건 없이 대입하면 재실행마다 초기화되어 한 마디도 쌓이지 않습니다. 없을 때만 한 번 초기화해야 합니다."
+    },
+    {
+      "question": "API 키가 없을 때 st.error()와 함께 사용해 스크립트 실행을 중단시키는 함수는?",
+      "options": [
+        "st.exit()",
+        "st.halt()",
+        "st.quit()",
+        "st.stop()"
+      ],
+      "answer": 3,
+      "explanation": "st.stop()은 그때까지 그린 화면은 유지한 채 실행만 중단합니다. 생략하면 아래에서 진짜 트레이스백이 그대로 노출됩니다."
+    },
+    {
+      "question": "챗봇에서 input=st.session_state.messages 를 전달하는 이유는?",
+      "options": [
+        "화면 렌더링 속도를 높이기 위해",
+        "이전 대화 전체를 보내 모델이 문맥을 이어 가게 하기 위해",
+        "토큰 사용량을 줄이기 위해",
+        "API 키를 갱신하기 위해"
+      ],
+      "answer": 1,
+      "explanation": "대화가 쌓일수록 리스트가 길어지고 매번 전체를 다시 보냅니다. 그래서 토큰 비용 관리가 필요합니다."
+    },
+    {
+      "question": "stream=True로 요청했을 때 나타나는 현상으로 옳은 것은?",
+      "options": [
+        "응답이 아직 완성되지 않아 output_text를 바로 쓸 수 없다",
+        "output_text에 완성된 답변이 즉시 담긴다",
+        "tools를 사용할 수 없게 된다",
+        "응답이 JSON 객체로만 반환된다"
+      ],
+      "answer": 0,
+      "explanation": "이터레이터가 반환되므로 delta 조각을 반복해서 받아야 하며, 조각을 모아 완성본을 직접 만들어야 합니다."
+    },
+    {
+      "question": "스트리밍 청크 생성 함수에서 yield를 사용하는 이유는?",
+      "options": [
+        "함수를 즉시 종료시키기 위해",
+        "값을 하나씩 흘려보내는 제너레이터를 만들기 위해",
+        "예외를 발생시키기 위해",
+        "반환값을 리스트로 모으기 위해"
+      ],
+      "answer": 1,
+      "explanation": "return은 값을 주고 함수를 끝내지만, yield는 값을 주고 대기했다가 다음 요청 시 이어서 실행됩니다."
+    },
+    {
+      "question": "st.write_stream()의 반환값을 반드시 받아야 하는 이유는?",
+      "options": [
+        "조각을 이어 붙인 완성 문자열을 대화 기록에 저장해야 하기 때문",
+        "반환값을 받지 않으면 화면에 출력되지 않기 때문",
+        "반환값이 API 사용량 정보이기 때문",
+        "반환값을 받아야 스트리밍이 시작되기 때문"
+      ],
+      "answer": 0,
+      "explanation": "화면 출력은 부수효과로 이루어지지만, 반환값을 session_state에 저장하지 않으면 다음 재실행 때 봇의 답이 사라집니다."
+    },
+    {
+      "question": "스트리밍 이벤트 처리에서 hasattr(event, 'delta')를 확인하는 이유는?",
+      "options": [
+        "모든 이벤트가 delta 속성을 갖지는 않아 AttributeError를 막기 위해",
+        "delta 값을 문자열로 변환하기 위해",
+        "이벤트 순서를 정렬하기 위해",
+        "이벤트를 세션에 저장하기 위해"
+      ],
+      "answer": 0,
+      "explanation": "시작·종료·메타 이벤트가 섞여 오므로 속성 존재 여부를 먼저 확인하는 방어적 코딩이 필요합니다."
+    },
+    {
+      "question": "Function Calling을 붙인 챗봇에서 대화 기록을 화면에 그릴 때 주의할 점은?",
+      "options": [
+        "메시지를 역순으로 출력해야 한다",
+        "매번 새로 API를 호출해 다시 받아야 한다",
+        "assistant 메시지는 출력하면 안 된다",
+        "role이 없는 항목(function_call 등)이 섞이므로 필터링해야 한다"
+      ],
+      "answer": 3,
+      "explanation": "msg.get('role') in ('user','assistant') 처럼 걸러내거나, 화면용 기록과 API용 기록을 분리해야 합니다."
+    },
+    {
+      "question": "배포 코드 chatbot2.py가 file_search 도구를 조건부로만 추가하는 이유는?",
+      "options": [
+        "웹 검색과 동시에 사용할 수 없기 때문",
+        "파일 검색이 유료 기능이기 때문",
+        "도구는 최대 2개까지만 등록할 수 있기 때문",
+        "벡터 스토어가 만들어지지 않았으면 넘길 ID가 없기 때문"
+      ],
+      "answer": 3,
+      "explanation": "존재하지 않는 vector_store_id를 넣으면 오류가 나므로, 세션에 ID가 있을 때만 추가합니다."
+    },
+    {
+      "question": "1차 응답에서 function_call 유무로 분기하는 이유로 가장 알맞은 것은?",
+      "options": [
+        "function_call은 과금 방식이 다르기 때문",
+        "내장 도구는 스트리밍을 지원하지 않기 때문",
+        "웹/파일 검색은 output_text에 최종 답이 이미 있지만, function_call은 텍스트가 없어 2차 요청이 필요하기 때문",
+        "function_call은 항상 오류를 포함하기 때문"
+      ],
+      "answer": 2,
+      "explanation": "내장 도구는 서버가 실행까지 끝내지만, 커스텀 함수는 우리가 실행하고 결과를 되돌려야 최종 답이 만들어집니다."
+    },
+    {
+      "question": "강사가 이 과정에서 가장 우선한다고 말한 것은?",
+      "options": [
+        "알고리즘 수식 암기",
+        "GPU 인프라 구축",
+        "데이터 분석 능력",
+        "웹 디자인"
+      ],
+      "answer": 2,
+      "explanation": "모델은 데이터 품질을 넘어설 수 없으며, 알고리즘은 라이브러리가 대신해 주지만 데이터의 의미 해석은 도메인 지식을 가진 사람의 몫입니다."
+    },
+    {
+      "question": "모델 프로젝트에서 요구되는 핵심 구조로 옳은 것은?",
+      "options": [
+        "학습 → 웹 크롤링 → 파인튜닝 → 배포",
+        "데이터 수집 → 시각화 → 보고서 작성",
+        "프롬프트 작성 → LLM 호출 → 결과 저장",
+        "학습 → 모델 저장 → 로드·추론 함수 → tools 등록(Function Calling) → OpenAI 응답 생성"
+      ],
+      "answer": 3,
+      "explanation": "9일차 2교시의 모델 저장/로드와 10일차의 Function Calling이 합쳐진 구조가 프로젝트의 뼈대입니다."
+    },
+    {
+      "question": "우리 모델과 LLM의 역할 분담으로 가장 알맞은 것은?",
+      "options": [
+        "우리 모델은 대화, LLM은 예측·분류",
+        "우리 모델은 정확한 예측·분류, LLM은 설명과 대화",
+        "둘 다 예측만 담당",
+        "LLM이 모든 판단과 실행을 담당"
+      ],
+      "answer": 1,
+      "explanation": "LLM에 판별을 맡기면 재현성·근거 추적·최신성이 무너집니다. 각자 잘하는 일을 시키는 것이 이 아키텍처의 핵심입니다."
+    },
+    {
+      "question": "모델 프로젝트 1과 2의 차이로 옳은 것은?",
+      "options": [
+        "1은 개인 과제이고, 2는 팀 과제다",
+        "1은 주제가 자유이고, 2는 보안 주제로 한정된다",
+        "1은 딥러닝만, 2는 머신러닝만 사용한다",
+        "1은 발표가 없고, 2만 발표한다"
+      ],
+      "answer": 1,
+      "explanation": "모델 프로젝트 1은 내일부터 주제 자유로 진행되고, 보안 과정 이후의 모델 프로젝트 2는 보안 주제로 한정됩니다."
+    },
+    {
+      "question": "비지도 학습으로 만든 군집을 해석할 때 반드시 필요한 것은?",
+      "options": [
+        "더 많은 레이블 데이터",
+        "GPU 자원",
+        "정규표현식",
+        "도메인 지식"
+      ],
+      "answer": 3,
+      "explanation": "군집은 번호만 부여하므로, 그것이 정상 업무 패턴인지 스캔 트래픽인지는 시스템과 도메인을 아는 사람이 판단해야 합니다."
+    },
+    {
+      "question": "모든 주제의 애플리케이션이 공유하는 공통 골격으로 강사가 강조한 것은?",
+      "options": [
+        "데이터 수집 → 시각화 → 저장",
+        "로그인 → 권한 확인 → 조회",
+        "상태값(input) 수집 → 처리 → 결과 안내",
+        "학습 → 평가 → 재학습"
+      ],
+      "answer": 2,
+      "explanation": "요리 추천이든 악성 URL 판별이든 뼈대는 같으며, 주제는 바꿔 끼우는 것일 뿐이라고 설명했습니다."
+    }
+  ]
+}

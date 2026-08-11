@@ -1,0 +1,250 @@
+{
+  "title": "머신러닝 DAY10 심화",
+  "subtitle": "코드 디버깅·설계 판단·보안 함정",
+  "subject": "머신러닝",
+  "description": "SK Shieldus Rookies: 머신러닝 10일차 심화 퀴즈. Responses API와 Function Calling 코드의 실제 오류 진단, Streamlit 재실행 모델에서 발생하는 함정, 도구·벡터 스토어 설계 판단, 그리고 프롬프트 인젝션과 데이터 경계 등 보안 관점 문제를 다룹니다.",
+  "questions": [
+    {
+      "question": "다음 코드를 실행했더니 AttributeError가 발생했다. 원인은?\n\nresponse = client.responses.create(model='gpt-5.5', input='안녕')\nprint(response.choices[0].message.content)",
+      "options": [
+        "input에 리스트가 아닌 문자열을 넣었다",
+        "Responses API 응답에 Chat Completions 방식의 접근 경로를 섞어 썼다",
+        "model 이름이 잘못되었다",
+        "print() 대신 st.write()를 써야 한다"
+      ],
+      "answer": 1,
+      "explanation": "choices[0].message.content는 Chat Completions 방식입니다. Responses API는 output_text 또는 output을 사용합니다. AI가 생성한 코드에서 가장 자주 나오는 혼용 오류입니다."
+    },
+    {
+      "question": "여러 함수가 동시에 호출된 상황에서 아래 코드가 잘못된 이유는?\n\ntool_call = response.output[1]\nfor item in response.output:\n    if item.type == 'function_call':\n        args = json.loads(item.arguments)\n        result = run(item.name, args)\n        input_message.append({'type':'function_call_output',\n                              'call_id': tool_call.call_id,\n                              'output': str(result)})",
+      "options": [
+        "json.loads 대신 json.load를 써야 한다",
+        "output을 반복하면 안 되고 인덱스로 접근해야 한다",
+        "반복 변수 item이 아닌 바깥 변수 tool_call의 call_id를 써서 모든 결과에 같은 ID가 붙는다",
+        "function_call_output에는 name 필드가 반드시 있어야 한다"
+      ],
+      "answer": 2,
+      "explanation": "call_id는 요청과 결과를 1:1로 짝지어 주는 값입니다. 바깥 변수를 그대로 쓰면 세 개의 결과가 모두 같은 요청에 매달려 응답이 어긋납니다."
+    },
+    {
+      "question": "Pydantic 스키마로 구조화 출력을 받으려 했으나 평범한 문장 답변만 돌아오고 output에 function_call이 없다. 가장 먼저 확인할 것은?",
+      "options": [
+        "responses.create() 호출에 tools= 인자를 실제로 넘겼는지",
+        "Field의 description을 더 길게 썼는지",
+        "temperature를 0으로 낮췄는지",
+        "model_json_schema() 대신 dict()를 썼는지"
+      ],
+      "answer": 0,
+      "explanation": "tools를 정의만 하고 요청에 넘기지 않으면 에러 없이 조용히 일반 응답이 옵니다. 수업 중에도 실제로 발생한 실수로, 스키마를 의심하기 전에 tools= 인자를 먼저 확인해야 합니다."
+    },
+    {
+      "question": "아래 코드에서 대화가 전혀 쌓이지 않는다. 원인은?\n\nst.session_state.messages = []\nfor m in st.session_state.messages:\n    with st.chat_message(m['role']):\n        st.markdown(m['content'])",
+      "options": [
+        "for 문이 chat_message보다 먼저 와야 하기 때문",
+        "st.markdown 대신 st.text를 써야 하기 때문",
+        "재실행마다 messages가 빈 리스트로 덮어써지기 때문",
+        "session_state는 리스트를 저장할 수 없기 때문"
+      ],
+      "answer": 2,
+      "explanation": "Streamlit은 상호작용마다 스크립트를 처음부터 다시 실행합니다. if 'messages' not in st.session_state: 로 감싸 한 번만 초기화해야 합니다."
+    },
+    {
+      "question": "Streamlit 앱을 실행하자 StreamlitSetPageConfigMustBeFirstCommandError가 발생했다. 해결 방법은?",
+      "options": [
+        "st.set_page_config()를 파일 맨 마지막으로 옮긴다",
+        "st.set_page_config()를 다른 모든 st 명령보다 앞으로 옮긴다",
+        "layout 인자를 'centered'로 바꾼다",
+        "st.set_page_config()를 함수 안으로 옮긴다"
+      ],
+      "answer": 1,
+      "explanation": "페이지 제목·아이콘·레이아웃은 브라우저에 HTML을 보내기 전에 정해져야 합니다. 실습 파일 st_app.py도 이 함수가 중간에 있어 그대로 실행하면 오류가 납니다."
+    },
+    {
+      "question": "스트리밍 챗봇에서 답변이 화면에는 타이핑되며 잘 나오는데, 다음 질문을 하면 이전 봇 답변만 사라진다. 원인은?\n\nwith st.chat_message('assistant'):\n    st.write_stream(gen_chunks())",
+      "options": [
+        "write_stream()의 반환값을 받아 session_state에 저장하지 않았다",
+        "chat_message의 인자가 'assistant'라서 저장되지 않는다",
+        "stream=True일 때는 대화가 저장되지 않는다",
+        "gen_chunks()가 제너레이터라서 값이 소멸한다"
+      ],
+      "answer": 0,
+      "explanation": "st.write_stream()은 화면 출력과 동시에 완성 문자열을 반환합니다. 그 반환값을 messages에 append하지 않으면 재실행 시 다시 그릴 내용이 없습니다."
+    },
+    {
+      "question": "Function Calling을 붙인 뒤 대화 기록 출력부에서 오류가 발생했다. 가장 알맞은 조치는?\n\nfor m in st.session_state.messages:\n    with st.chat_message(m['role']):\n        st.markdown(m['content'])",
+      "options": [
+        "messages를 문자열로 형변환한 뒤 출력한다",
+        "chat_message 대신 st.write를 사용한다",
+        "for 문을 while 문으로 바꾼다",
+        "role이 없는 항목이 섞이므로 m.get('role') in ('user','assistant') 로 필터링한다"
+      ],
+      "answer": 3,
+      "explanation": "function_call, function_call_output, reasoning 항목에는 role 키가 없습니다. 화면용 기록과 API용 기록을 분리하는 방법도 있습니다."
+    },
+    {
+      "question": "파일을 벡터 스토어에 올린 직후 관련 질문을 했더니 '해당 내용을 찾을 수 없다'는 답이 돌아왔다. 가장 가능성 높은 원인은?",
+      "options": [
+        "purpose를 'assistants'가 아닌 값으로 지정했다",
+        "vector_store_ids를 리스트로 넘기지 않았다",
+        "파일 크기가 5MB를 넘었다",
+        "문서 청킹·임베딩 인덱싱이 아직 끝나지 않았다"
+      ],
+      "answer": 3,
+      "explanation": "교안 p49가 '파일이 사용 가능해질 때까지(상태가 완료될 때까지)' 확인하라고 안내합니다. files.list()로 status가 completed인지 확인해야 합니다."
+    },
+    {
+      "question": "stream=True로 요청한 뒤 response.output_text에 접근했더니 원하는 값이 나오지 않는다. 올바른 처리는?",
+      "options": [
+        "이벤트를 반복하며 delta 조각을 모아 완성 문자열을 직접 만든다",
+        "response.output[0].text로 접근한다",
+        "stream=True와 output_text를 함께 쓰려면 tools를 제거한다",
+        "response.choices[0].delta로 접근한다"
+      ],
+      "answer": 0,
+      "explanation": "stream=True는 이터레이터를 반환하며 응답이 아직 완성되지 않은 상태입니다. Streamlit에서는 st.write_stream()이 이 과정을 대신해 줍니다."
+    },
+    {
+      "question": "Responses API에서 아래 코드가 오류를 낸다. 빠진 것은?\n\ntools = [{'type': 'code_interpreter'}]",
+      "options": [
+        "container 설정 (예: {'type': 'auto'})",
+        "description 필드",
+        "parameters 필드",
+        "vector_store_ids 필드"
+      ],
+      "answer": 0,
+      "explanation": "Chat Completions는 type만으로 동작하지만 Responses API는 코드를 실행할 격리 컨테이너를 명시적으로 요구합니다."
+    },
+    {
+      "question": "SOC에서 방화벽 로그를 자동 분류하는 챗봇을 만들 때 temperature 설정으로 가장 적절한 것은?",
+      "options": [
+        "0.7~1.0 — 다양한 관점의 해석을 얻기 위해",
+        "0.0~0.3 — 같은 입력에 같은 판단이 나와야 감사 추적이 가능하므로",
+        "2.0 — 놓치는 패턴을 줄이기 위해",
+        "설정하지 않고 기본값에 맡긴다 — 모델이 알아서 조절하므로"
+      ],
+      "answer": 1,
+      "explanation": "보안 도구는 재현성이 곧 신뢰성입니다. 같은 로그를 두 번 물었는데 다른 판단이 나오면 탐지 시스템으로 쓸 수 없습니다."
+    },
+    {
+      "question": "악성 URL 판별 서비스를 만들 때 가장 적절한 역할 분담은?",
+      "options": [
+        "판별과 설명 모두 LLM에게 맡긴다",
+        "판별과 설명 모두 학습시킨 모델이 한다",
+        "판별은 학습시킨 모델이 하고, 판단 근거 설명과 대응 안내는 LLM이 한다",
+        "판별은 LLM이, 설명은 학습시킨 모델이 한다"
+      ],
+      "answer": 2,
+      "explanation": "LLM에 판별을 맡기면 재현성·근거 추적·최신성이 무너지고 대량 처리에서 비용과 지연이 커집니다. 각자 잘하는 일을 시키는 것이 이 아키텍처의 핵심입니다."
+    },
+    {
+      "question": "배포 코드 chatbot2.py는 함수 실행 결과를 function_call_output 대신 사용자 메시지 문자열에 이어 붙여 2차 요청을 보낸다. 이 방식의 한계로 가장 적절한 것은?",
+      "options": [
+        "2차 요청 자체가 불가능해진다",
+        "웹 검색 도구를 함께 사용할 수 없게 된다",
+        "스트리밍 응답을 받을 수 없게 된다",
+        "call_id가 없어 여러 함수가 동시에 호출될 때 결과와 요청의 짝을 맞추기 어렵다"
+      ],
+      "answer": 3,
+      "explanation": "동작은 하지만 함수가 늘어나면 문자열 조합이 복잡해지고, 함수 결과가 사용자 메시지에 섞여 지시문처럼 작동할 여지도 생깁니다. 프로젝트에서는 표준 방식을 권장합니다."
+    },
+    {
+      "question": "사내 챗봇을 만들 때 벡터 스토어 설계로 가장 적절한 것은?",
+      "options": [
+        "모든 문서를 하나의 큰 스토어에 넣어 검색 누락을 방지한다",
+        "문서마다 스토어를 하나씩 만들어 완전히 분리한다",
+        "스토어를 만들지 않고 매 질문마다 파일을 새로 업로드한다",
+        "공개 문서와 내부 대외비 문서를 별도 스토어로 나누고, 사용자 권한에 따라 연결할 스토어를 다르게 한다"
+      ],
+      "answer": 3,
+      "explanation": "벡터 스토어 자체에는 사용자별 권한 개념이 없습니다. 애플리케이션 레벨에서 어떤 스토어를 tools에 붙일지 결정해 통제해야 합니다."
+    },
+    {
+      "question": "문서 Q&A 봇을 만든 뒤 '파일 검색이 실제로 동작했는지' 검증하는 방법으로 가장 확실한 것은?",
+      "options": [
+        "답변이 자연스럽고 길게 나오는지 확인한다",
+        "벡터 스토어의 file_counts가 0이 아닌지 확인한다",
+        "응답 시간이 평소보다 오래 걸리는지 확인한다",
+        "그 문서에만 있는 구체적 정보를 물어보고, output에 file_search_call이 있는지 확인한다"
+      ],
+      "answer": 3,
+      "explanation": "모델의 사전 지식이 빈틈을 메워 그럴듯한 답을 만들어 낼 수 있습니다. 문서 고유 정보로 검증하고 도구 호출 흔적을 확인해야 합니다."
+    },
+    {
+      "question": "Function Calling으로 등록한 calculate_bmi 함수가 종종 엉뚱한 값을 반환한다. 스펙에서 가장 먼저 보완할 부분은?",
+      "options": [
+        "strict를 False로 바꾼다",
+        "height의 단위(cm인지 m인지)를 description에 명시한다",
+        "함수 이름을 한글로 바꾼다",
+        "required 배열에서 height를 제거한다"
+      ],
+      "answer": 1,
+      "explanation": "모델은 함수 본문을 볼 수 없으므로 단위가 불명확하면 170을 넘길지 1.7을 넘길지 임의로 결정합니다. 결과가 에러 없이 조용히 틀리는 유형입니다."
+    },
+    {
+      "question": "모델 프로젝트를 시작하며 팀이 파일 구성을 논의하고 있다. 강사가 강조한 방향은?",
+      "options": [
+        "한 파일에 모두 넣어 실행 순서를 단순하게 유지한다",
+        "화면(app.py)과 모델·도구 함수를 모듈로 분리해 구조화한다",
+        "노트북(.ipynb) 하나로 최종 산출물을 제출한다",
+        "팀원별로 완전히 독립된 앱을 만든 뒤 마지막에 합친다"
+      ],
+      "answer": 1,
+      "explanation": "'한 번에 다 구성할 생각하지 말고 모듈화·구조화하라'고 강조했습니다. 협업·테스트·재사용 측면에서 모두 유리합니다."
+    },
+    {
+      "question": "웹 검색 도구를 붙인 챗봇에서 발생할 수 있는 간접 프롬프트 인젝션에 대한 설명으로 옳은 것은?",
+      "options": [
+        "검색 도구는 서버에서 실행되므로 인젝션 위험이 전혀 없다",
+        "developer 역할로 지침을 주면 인젝션이 원천 차단된다",
+        "검색된 웹 페이지 안에 숨겨진 문장이 모델에게 지시문처럼 작용할 수 있다",
+        "search_context_size를 low로 낮추면 인젝션이 차단된다"
+      ],
+      "answer": 2,
+      "explanation": "모델이 읽는 외부 콘텐츠는 모두 잠재적 공격면입니다. 출처 URL을 사용자에게 노출하고, 모델 출력을 그대로 실행·전송하지 않는 것이 기본 방어입니다."
+    },
+    {
+      "question": "사내 보안 문서를 File search용으로 업로드하기 전에 반드시 확인해야 할 사항으로 가장 적절한 것은?",
+      "options": [
+        "파일을 zip으로 압축해 용량을 줄인다",
+        "파일 확장자를 txt로 변경한다",
+        "파일이 OpenAI 서버로 전송되므로 조직의 데이터 처리 정책과 개인정보 포함 여부를 확인한다",
+        "벡터 스토어 이름을 영문으로 짓는다"
+      ],
+      "answer": 2,
+      "explanation": "벡터 스토어는 로컬이 아니라 OpenAI 서버에 생성됩니다. 실제 로그의 IP·계정명 등은 가명화·마스킹 후 올려야 합니다."
+    },
+    {
+      "question": "st.file_uploader()에서 type 인자를 지정하지 않았을 때의 보안상 문제는?",
+      "options": [
+        "업로드 속도가 느려진다",
+        "파일 이름이 자동으로 변경된다",
+        "허용하지 않은 형식의 파일까지 서버로 올라올 수 있다",
+        "session_state에 저장되지 않는다"
+      ],
+      "answer": 2,
+      "explanation": "type=['txt','pdf','docx'] 처럼 확장자를 제한하는 것이 1차 방어선입니다. 업로드 후 임시 파일을 os.remove로 정리하는 것도 함께 필요합니다."
+    },
+    {
+      "question": "Function Calling 아키텍처가 보안 관점에서 갖는 이점으로 가장 적절한 것은?",
+      "options": [
+        "모델이 함수를 직접 실행하므로 중간 단계 오류가 줄어든다",
+        "함수 실행 권한이 OpenAI 서버로 위임되어 책임이 이전된다",
+        "arguments가 암호화되어 전달된다",
+        "모델의 호출 요청과 실제 실행 사이에 개발자 코드가 있어 검증·거부가 가능하다"
+      ],
+      "answer": 3,
+      "explanation": "모델이 직접 실행한다면 원치 않는 시점에 파괴적 연산이 수행될 수 있습니다. 함수 이름 화이트리스트 검증과 인자 재검증이 그 지점에서 이루어져야 합니다."
+    },
+    {
+      "question": "Streamlit 앱 실행 시 표시되는 Network URL로 접속을 열어 둘 때의 위험은?",
+      "options": [
+        "같은 네트워크의 다른 사용자가 인증 없이 접속해 API 크레딧을 소비할 수 있다",
+        "앱이 자동으로 인터넷에 공개 배포된다",
+        "session_state가 모든 접속자에게 공유된다",
+        "API 키가 URL 파라미터로 노출된다"
+      ],
+      "answer": 0,
+      "explanation": "Streamlit 자체에는 인증 기능이 없습니다. 실습·데모를 넘어서는 용도라면 인증을 반드시 별도로 붙여야 합니다."
+    }
+  ]
+}
