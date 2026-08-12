@@ -1,7 +1,7 @@
 {
   "title": "머신러닝 DAY10 심화",
   "subtitle": "코드 디버깅·설계 판단·보안 함정",
-  "subject": "머신러닝",
+  "subject": "Machine Learning",
   "description": "SK Shieldus Rookies: 머신러닝 10일차 심화 퀴즈. Responses API와 Function Calling 코드의 실제 오류 진단, Streamlit 재실행 모델에서 발생하는 함정, 도구·벡터 스토어 설계 판단, 그리고 프롬프트 인젝션과 데이터 경계 등 보안 관점 문제를 다룹니다.",
   "questions": [
     {

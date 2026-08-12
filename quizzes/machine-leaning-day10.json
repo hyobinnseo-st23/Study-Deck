@@ -1,7 +1,7 @@
 {
   "title": "머신러닝 DAY10",
   "subtitle": "OpenAI 내장 도구·구조화 출력·Streamlit 챗봇",
-  "subject": "머신러닝",
+  "subject": "Machine Learning",
   "description": "SK Shieldus Rookies: 머신러닝 10일차 수업. Responses API 총복습과 Function Calling, 내장 도구(Web search·File search·Code interpreter), Pydantic 구조화 출력, Streamlit UI 요소와 OpenAI 연동 챗봇 제작, 그리고 10일 과정 총정리와 모델 프로젝트 안내를 다룹니다.",
   "questions": [
     {
