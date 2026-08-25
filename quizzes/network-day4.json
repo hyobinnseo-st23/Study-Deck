@@ -1,0 +1,613 @@
+{
+  "title": "네트워크 보안 DAY4",
+  "subtitle": "라우팅 심화·Inter-VLAN·네트워크 보안 개론·Port Security·VLAN/DHCP 공격",
+  "subject": "네트워크 보안",
+  "description": "SK Shieldus Rookies: 네트워크 보안 4일차 수업. 이더채널·TCP/IP·서브네팅 복습, Static/Default/Dynamic 라우팅, 라우팅 프로토콜 분류와 Best-Path 선택, Inter-VLAN Routing과 SVI, Cisco IOS 모드 구조, 네트워크 보안 개론(CIA·보안장비·Zero Trust), Port Security와 MAC Flooding, VLAN 공격(DTP·Double Tagging), DHCP DORA 동작을 다룹니다.",
+  "questions": [
+    {
+      "question": "이더채널(EtherChannel)을 한 문장으로 정의하면?",
+      "options": [
+        "브로드캐스트 도메인을 분할하는 기술",
+        "서로 다른 VLAN 간 통신을 라우터로 중계하는 기술",
+        "하나의 물리 포트를 여러 개의 논리 포트로 나누는 기술",
+        "물리적으로 분리된 두 개 이상의 회선(포트)을 하나의 그룹으로 묶어 주는 기술"
+      ],
+      "answer": 3,
+      "explanation": "이더채널은 최대 8개까지의 물리 링크를 하나의 논리적 이더넷 링크로 묶는 프로토콜입니다."
+    },
+    {
+      "question": "이더채널을 구현하는 두 가지 목적으로 옳게 짝지어진 것은?",
+      "options": [
+        "VLAN 분리와 트렁크 자동 협상",
+        "대역폭 확장(Load Balancing)과 안정성(Redundancy·Fail-over)",
+        "브로드캐스트 차단과 IP 절약",
+        "라우팅 테이블 축소와 CPU 부하 감소"
+      ],
+      "answer": 1,
+      "explanation": "이더채널의 목적은 트래픽 분산을 통한 대역폭 확장과, 대체 경로 제공을 통한 안정성 향상 두 가지입니다."
+    },
+    {
+      "question": "시스코 장비에서 이더채널로 묶인 2개 링크에 트래픽이 분산되는 방식으로 옳은 것은?",
+      "options": [
+        "먼저 비어 있는 링크로 매번 다시 선택해 보낸다",
+        "Source MAC 같은 흐름 기준으로 링크가 고정 배정된다",
+        "패킷 단위로 두 링크에 50:50으로 나눠 보낸다",
+        "링크 중 하나만 쓰고 나머지는 항상 대기 상태다"
+      ],
+      "answer": 1,
+      "explanation": "같은 흐름은 같은 링크로 보내야 패킷 순서가 뒤바뀌지 않습니다. 그래서 50:50 분할이 아니라 흐름 단위 고정 배정을 씁니다."
+    },
+    {
+      "question": "응용 계층 프로토콜들의 공통적인 특징으로 옳은 것은?",
+      "options": [
+        "사용자를 대신해 데이터를 새로 생성한다",
+        "흐름 제어와 오류 제어를 담당한다",
+        "데이터를 만들어 내지 않고, 사용자 데이터를 전송에 적합한 형태로 바꾸어 아래 계층으로 내려보낸다",
+        "IP 헤더를 직접 붙여 라우팅까지 수행한다"
+      ],
+      "answer": 2,
+      "explanation": "응용 계층 프로토콜의 목적은 데이터 전송이며, 사용자의 데이터를 전송 가능한 형태로 변환하는 역할을 합니다."
+    },
+    {
+      "question": "TCP와 UDP의 비교로 옳지 않은 것은?",
+      "options": [
+        "TCP는 Connection-Oriented, UDP는 Connection-less이다",
+        "UDP는 흐름 제어와 오류 제어를 수행하므로 헤더 오버헤드가 크다",
+        "UDP는 실시간 데이터 전송에 적합하다",
+        "TCP는 헤더 오버헤드가 커서 상대적으로 전송 속도가 느리다"
+      ],
+      "answer": 1,
+      "explanation": "UDP는 흐름 제어·오류 제어를 하지 않아 헤더(8바이트)가 작고 커넥션도 맺지 않기 때문에 빠릅니다."
+    },
+    {
+      "question": "IP 프로토콜의 Best-Effort Delivery가 의미하는 것은?",
+      "options": [
+        "항상 최단 경로만을 선택한다",
+        "최선을 다해 전송하지만 전송 실패에 대해 책임을 지지 않는다",
+        "전송 순서를 반드시 보장한다",
+        "전송 실패 시 IP가 스스로 재전송한다"
+      ],
+      "answer": 1,
+      "explanation": "IP는 신뢰성을 보장하지 않으며, 드랍이 발생하면 그 뒤처리는 ICMP가 담당합니다."
+    },
+    {
+      "question": "데이터가 중간 장비에서 드랍되었을 때 ICMP 오류 메시지를 보내는 주체는?",
+      "options": [
+        "DHCP 서버",
+        "최종 목적지 호스트",
+        "패킷을 드랍한 그 장비",
+        "출발지 호스트가 스스로 생성"
+      ],
+      "answer": 2,
+      "explanation": "드랍이 일어난 장비가 Source 쪽으로 ICMP 오류 보고 메시지를 전송합니다."
+    },
+    {
+      "question": "ARP가 라우터를 넘어가지 못하는 근본적인 이유는?",
+      "options": [
+        "IP 아래에서 만들어져 IP 헤더를 달지 못하기 때문",
+        "라우터가 브로드캐스트를 그대로 전달하기 때문",
+        "ARP 패킷 크기가 너무 크기 때문",
+        "ARP가 UDP 포트를 사용하지 않기 때문"
+      ],
+      "answer": 0,
+      "explanation": "3계층 장비인 라우터는 IP 헤더를 근거로 전달합니다. ARP는 IP 헤더가 없어 하나의 네트워크 내에서만 동작합니다."
+    },
+    {
+      "question": "서브네팅을 하는 이유 중 강사가 '실질적으로 가장 크다'고 강조한 것은?",
+      "options": [
+        "MAC 테이블 크기를 줄이기 위해서",
+        "IP 주소를 절약하기 위해서",
+        "로컬과 리모트를 구분하기 위해서",
+        "라우팅 프로토콜을 자동화하기 위해서"
+      ],
+      "answer": 2,
+      "explanation": "로컬/리모트 구분이 본질이고, 그 결과로 IP 절약과 브로드캐스트 감소 효과가 따라옵니다."
+    },
+    {
+      "question": "IP 주소 172.16.0.255 에 서브넷 마스크 /16 이 적용된 경우 이 주소의 성격은?",
+      "options": [
+        "루프백 주소이므로 할당할 수 없다",
+        "PC에 할당할 수 있는 일반 호스트 IP이다",
+        "브로드캐스트 주소이므로 할당할 수 없다",
+        "네트워크 주소이므로 할당할 수 없다"
+      ],
+      "answer": 1,
+      "explanation": "/16이면 호스트 부분은 0.255이고 모두 1이 아닙니다. 이 네트워크의 브로드캐스트 주소는 172.16.255.255입니다."
+    },
+    {
+      "question": "L2 스위치와 라우터가 '모르는 목적지'를 만났을 때의 동작 차이로 옳은 것은?",
+      "options": [
+        "스위치는 플러딩하지만 라우터는 패킷을 버린다(Discard)",
+        "둘 다 즉시 ICMP Redirect를 보낸다",
+        "둘 다 플러딩한다",
+        "스위치는 버리지만 라우터는 플러딩한다"
+      ],
+      "answer": 0,
+      "explanation": "그래서 MAC 테이블이 비어도 스위치 통신은 되지만, 라우팅 테이블이 부실하면 라우터는 통신 자체가 불가합니다."
+    },
+    {
+      "question": "Hop-by-Hop 라우팅에 대한 설명으로 옳은 것은?",
+      "options": [
+        "경로상의 모든 라우터가 동일한 라우팅 테이블을 공유한다",
+        "목적지 호스트의 MAC 주소를 미리 기록한다",
+        "출발지부터 목적지까지 전체 경로를 모두 기록한다",
+        "목적지까지 가는 Best 경로상의 바로 다음 장비까지만 라우팅 테이블에 기록한다"
+      ],
+      "answer": 3,
+      "explanation": "각 라우터는 다음 홉만 알고 넘기며, 그다음은 그 라우터가 알아서 처리합니다."
+    },
+    {
+      "question": "running-config와 startup-config의 차이로 옳은 것은?",
+      "options": [
+        "running-config는 부팅 시 불러오는 설정이다",
+        "running-config는 하드디스크에, startup-config는 RAM에 저장된다",
+        "running-config는 RAM에, startup-config는 NVRAM 또는 플래시에 저장된다",
+        "둘 다 NVRAM에 저장되며 이름만 다르다"
+      ],
+      "answer": 2,
+      "explanation": "running-config는 휘발성이라 전원을 끄면 사라지고, 저장하면 비휘발성인 NVRAM/플래시의 startup-config가 됩니다."
+    },
+    {
+      "question": "R1의 f0/1을 192.168.12.1에서 192.168.13.1로 바꾼 뒤, 기존 스태틱 경로가 show run에는 있는데 show ip route에는 없다면 원인은?",
+      "options": [
+        "명령어 문법 오류로 설정이 저장되지 않았기 때문",
+        "라우팅 프로토콜이 동작하지 않기 때문",
+        "서브넷 마스크를 생략했기 때문",
+        "Next Hop(192.168.12.2)에 도달할 방법이 없어 경로가 설치되지 않았기 때문"
+      ],
+      "answer": 3,
+      "explanation": "설정은 문법만 맞으면 남지만, Next Hop에 도달할 수 없으면 라우팅 테이블에는 설치되지 않습니다."
+    },
+    {
+      "question": "Stub Network의 정의로 옳은 것은?",
+      "options": [
+        "라우터 없이 스위치만으로 구성된 네트워크",
+        "네트워크 최말단에 형성되어 외부와 통신할 수 있는 출입구가 하나뿐인 네트워크",
+        "동적 라우팅 프로토콜을 반드시 사용해야 하는 네트워크",
+        "여러 ISP와 동시에 연결된 대규모 네트워크"
+      ],
+      "answer": 1,
+      "explanation": "출구가 하나뿐이라 경로를 고민할 필요가 없고, 그래서 Default Route를 사용합니다."
+    },
+    {
+      "question": "show ip route 출력의 'Gateway of last resort is not set'이 의미하는 것은?",
+      "options": [
+        "인터페이스가 모두 shutdown 상태이다",
+        "동적 라우팅 프로토콜이 수렴 중이다",
+        "Default Route가 설정되지 않아, 모르는 목적지로 가는 패킷은 버려진다",
+        "라우팅 테이블이 완전히 비어 있다"
+      ],
+      "answer": 2,
+      "explanation": "강사의 표현으로는 '비상구가 없다'는 뜻이며, 라우터가 모르는 목적지를 Discard하는 근거가 됩니다."
+    },
+    {
+      "question": "Default Route에서 0.0.0.0 0.0.0.0이 의미하는 것은?",
+      "options": [
+        "라우터가 구체적으로 알고 있는 네트워크를 제외한 나머지 모든 네트워크",
+        "자기 자신의 루프백 네트워크",
+        "직접 연결된 네트워크 전체",
+        "브로드캐스트 대상 네트워크"
+      ],
+      "answer": 0,
+      "explanation": "마스크가 전부 0이라 목적지를 특정하지 않으며, 결과적으로 '나머지 전부'를 가리킵니다."
+    },
+    {
+      "question": "인터넷 공유기가 Default Route를 Next Hop IP가 아니라 Exit Interface로 설정할 수밖에 없는 이유는?",
+      "options": [
+        "Next Hop IP 방식이 표준에서 폐기되었기 때문",
+        "공유기에는 라우팅 기능이 없기 때문",
+        "제조 시점에 어느 ISP에 연결될지, 상대 라우터 IP가 무엇일지 알 수 없기 때문",
+        "Exit Interface 방식이 항상 더 빠르기 때문"
+      ],
+      "answer": 2,
+      "explanation": "확실히 아는 것은 자신의 WAN 인터페이스뿐이므로, 출고 시점에 넣어 둘 수 있는 형태가 Exit Interface입니다."
+    },
+    {
+      "question": "AS(Autonomous System)에 대한 설명으로 옳은 것은?",
+      "options": [
+        "라우터 한 대가 가진 인터페이스의 집합이다",
+        "하나의 스위치가 관리하는 VLAN 집합이다",
+        "단일 네트워크 관리자 집단이 관리할 수 있는 네트워크 범위로, 인터넷상의 행정 구역에 해당한다",
+        "동일한 서브넷 마스크를 사용하는 호스트 집합이다"
+      ],
+      "answer": 2,
+      "explanation": "규모가 너무 커서 한 조직이 전체 라우팅 정책을 좌우할 수 없기 때문에 AS 단위로 나눕니다."
+    },
+    {
+      "question": "IGP와 EGP의 구분으로 옳은 것은?",
+      "options": [
+        "IGP는 L2에서, EGP는 L3에서 동작한다",
+        "IGP는 정적 경로, EGP는 동적 경로를 다룬다",
+        "IGP는 AS 간, EGP는 AS 내부에서 동작한다",
+        "IGP는 하나의 AS 내부에서, EGP는 AS와 AS 사이에서 동작한다"
+      ],
+      "answer": 3,
+      "explanation": "RIP·OSPF·EIGRP는 IGP이고, 현재 인터넷에서 사용되는 EGP는 BGP 버전 4+가 유일합니다."
+    },
+    {
+      "question": "Distance Vector 방식에서 Routing Looping이 발생하는 근본 원인은?",
+      "options": [
+        "이웃이 알려 준 경로 정보를 검증 없이 그대로 믿고 라우팅 테이블에 반영하기 때문",
+        "TTL 값을 사용하지 않기 때문",
+        "라우팅 정보를 전혀 교환하지 않기 때문",
+        "전체 네트워크 지도를 스스로 계산하기 때문"
+      ],
+      "answer": 0,
+      "explanation": "잘못된 정보가 반영되면 패킷이 라우터 사이를 오가다 TTL이 0이 되어야 드랍됩니다."
+    },
+    {
+      "question": "OSPF에서 Area를 나누는 목적으로 가장 적절한 것은?",
+      "options": [
+        "Hop Count를 15 이하로 제한하기 위해",
+        "AS 번호를 여러 개 사용하기 위해",
+        "Native VLAN을 분리하기 위해",
+        "LSA 전달 범위를 줄이고 라우팅 업데이트를 최소화해 라우터의 메모리·CPU 부담을 줄이기 위해"
+      ],
+      "answer": 3,
+      "explanation": "AS 전체 정보를 모든 라우터가 들고 있으면 부담이 커지므로, 더 작은 영역으로 나눠 관리합니다."
+    },
+    {
+      "question": "시스코 기준 Administrative Distance 값의 크기 순서로 옳은 것은?",
+      "options": [
+        "Connected(0) < Static(1) < RIP(90) < OSPF(110) < EIGRP(120)",
+        "Connected(0) < Static(1) < EIGRP(90) < OSPF(110) < RIP(120)",
+        "Connected(1) < Static(0) < OSPF(90) < EIGRP(110) < RIP(120)",
+        "Static(0) < Connected(1) < OSPF(90) < EIGRP(110) < RIP(120)"
+      ],
+      "answer": 1,
+      "explanation": "AD는 값이 낮을수록 신뢰도가 높으며, 라우터가 직접 아는 Connected가 0으로 가장 낮습니다."
+    },
+    {
+      "question": "라우팅 프로토콜별 Metric 기준으로 옳게 짝지어진 것은?",
+      "options": [
+        "RIP는 대역폭, OSPF는 Hop Count, EIGRP는 Cost",
+        "RIP는 Cost, OSPF는 Hop Count, EIGRP는 AD 값",
+        "세 프로토콜 모두 Hop Count를 사용한다",
+        "RIP는 Hop Count, OSPF는 Cost, EIGRP는 대역폭·지연·부하·신뢰도의 조합"
+      ],
+      "answer": 3,
+      "explanation": "각 프로토콜이 경로를 고르는 기준이 다르기 때문에 Best Path도 달라집니다."
+    },
+    {
+      "question": "목적지 10.1.1.100인 패킷이 도착했고 라우팅 테이블에 10.1.1.0/24, 10.1.0.0/16, 10.0.0.0/8이 모두 있을 때 선택되는 경로는?",
+      "options": [
+        "10.1.1.0/24",
+        "세 경로에 부하 분산된다",
+        "10.1.0.0/16",
+        "10.0.0.0/8"
+      ],
+      "answer": 0,
+      "explanation": "Longest Prefix Match 원칙에 따라 네트워크 표현 비트가 가장 긴, 즉 가장 구체적인 경로를 선택합니다."
+    },
+    {
+      "question": "RIP 설정에서 network 명령 뒤에 적는 것은?",
+      "options": [
+        "내가 직접 연결되어 알고 있는 네트워크",
+        "Default Gateway 주소",
+        "Next Hop 라우터의 IP 주소",
+        "내가 모르는 목적지 네트워크"
+      ],
+      "answer": 0,
+      "explanation": "Static은 모르는 네트워크를 적지만, Dynamic은 아는 네트워크를 광고하고 모르는 정보는 자동으로 받습니다."
+    },
+    {
+      "question": "ARP 테이블·MAC 테이블·라우팅 테이블에 공통으로 적용되는 원칙은?",
+      "options": [
+        "자동으로 학습된 정보는 일정 시간이 지나면 사라지므로 주기적으로 다시 교환해야 유지된다",
+        "모두 NVRAM에 저장되어 비휘발성이다",
+        "관리자가 수동으로 입력해야만 생성된다",
+        "한 번 학습되면 재부팅 전까지 절대 사라지지 않는다"
+      ],
+      "answer": 0,
+      "explanation": "동적으로 인식된 정보는 동적으로 사라집니다. 그래서 RIP는 30초마다 업데이트합니다."
+    },
+    {
+      "question": "VLAN으로 브로드캐스트 도메인을 나누는 본래 목적은?",
+      "options": [
+        "같은 네트워크의 시스템끼리 통신하지 못하게 막기 위해",
+        "IP 주소를 절약하기 위해",
+        "라우팅 테이블 크기를 줄이기 위해",
+        "상대편이 뿌리는 브로드캐스트 트래픽의 영향을 줄이기 위해"
+      ],
+      "answer": 3,
+      "explanation": "통신 차단이 목적이 아니라 부하 감소가 목적이며, 그래서 Inter-VLAN Routing이 필요해집니다."
+    },
+    {
+      "question": "라우터의 물리 인터페이스가 VLAN Trunk를 직접 이해하지 못해 도입된 개념은?",
+      "options": [
+        "Sub-interface",
+        "SVI",
+        "Port-channel",
+        "Loopback interface"
+      ],
+      "answer": 0,
+      "explanation": "L3 포트를 논리적으로 나눈 Sub-interface에 encapsulation dot1q로 VLAN을 지정합니다."
+    },
+    {
+      "question": "North-South Routing과 East-West Routing의 구분으로 옳은 것은?",
+      "options": [
+        "North-South는 L2, East-West는 L3 트래픽이다",
+        "North-South는 외부망과 내부망 사이, East-West는 내부망 시스템 간 트래픽이다",
+        "North-South는 VLAN 간, East-West는 인터넷 방향 트래픽이다",
+        "둘 다 외부망 트래픽을 가리키는 같은 말이다"
+      ],
+      "answer": 1,
+      "explanation": "East-West 트래픽을 스위치 내부에서 처리하기 위해 멀티레이어 스위치가 만들어졌습니다."
+    },
+    {
+      "question": "멀티레이어(L3) 스위치가 만들어진 주된 목적은?",
+      "options": [
+        "외부망과의 BGP 연동을 위해",
+        "무선 AP 기능을 통합하기 위해",
+        "Inter-VLAN Routing을 ASIC 기반으로 고속 처리하기 위해",
+        "STP 수렴 시간을 단축하기 위해"
+      ],
+      "answer": 2,
+      "explanation": "East-West 라우팅 엔진을 스위치 안으로 내려 Wire Speed로 처리합니다."
+    },
+    {
+      "question": "SVI(Switched Virtual Interface)에 대한 설명으로 옳은 것은?",
+      "options": [
+        "라우터의 물리 포트를 논리적으로 분할한 인터페이스",
+        "물리적으로 존재하지 않지만 설정으로 만들어, VLAN 트래픽을 라우팅 엔진에 넘겨 주는 가상 인터페이스",
+        "트렁크 링크를 여러 개 묶은 논리 인터페이스",
+        "무선 클라이언트를 수용하는 전용 인터페이스"
+      ],
+      "answer": 1,
+      "explanation": "interface vlan <ID>로 생성하고, 그 VLAN의 Default Gateway가 되는 IP를 부여합니다."
+    },
+    {
+      "question": "L3 스위치에서 ip routing 명령이 하는 일은?",
+      "options": [
+        "SVI를 자동으로 생성한다",
+        "스위치의 3계층 기능을 활성화해 라우터로 동작하게 한다",
+        "모든 포트를 트렁크 모드로 전환한다",
+        "라우팅 프로토콜 RIP를 자동으로 시작한다"
+      ],
+      "answer": 1,
+      "explanation": "3560 같은 L3 스위치도 기본은 L2로 동작하며, ip routing이 L3 스위치로 동작하겠다는 선언입니다."
+    },
+    {
+      "question": "User 모드(hostname>)에서 show running-config를 사용할 수 없는 이유는?",
+      "options": [
+        "running-config가 NVRAM에 저장되어 있기 때문",
+        "출력이 너무 길어 콘솔이 멈추기 때문",
+        "전체 설정에는 패스워드 정보까지 포함되어 있어 누구나 볼 수 있게 하면 안 되기 때문",
+        "User 모드에서는 show 계열 명령을 전혀 쓸 수 없기 때문"
+      ],
+      "answer": 2,
+      "explanation": "show ip route·show vlan brief 같은 부분 설정 조회는 가능하지만, 전체 설정 조회는 제한됩니다."
+    },
+    {
+      "question": "네트워크 보안을 하는 가장 근본적인 이유로 강사가 강조한 것은?",
+      "options": [
+        "장비 수명을 늘리기 위해",
+        "비즈니스 연속성(Business Continuity)을 유지하기 위해",
+        "네트워크 속도를 향상시키기 위해",
+        "법적 규제를 준수하기 위해"
+      ],
+      "answer": 1,
+      "explanation": "데이터가 없으면 기업 활동 자체가 불가능해지므로, 9·11 사례처럼 가용성이 기업의 존폐를 가릅니다."
+    },
+    {
+      "question": "정보보안 3요소 CIA에서 A가 Authentication에서 Availability로 바뀐 이유는?",
+      "options": [
+        "인증 기술이 더 이상 필요하지 않게 되었기 때문",
+        "암호화 기술이 발전해 인증이 자동화되었기 때문",
+        "인증 개념이 기밀성과 무결성 정의에 이미 전제로 포함되어 있고, 서비스 지속성이 중요해졌기 때문",
+        "가용성이 인증을 대체하는 기술이기 때문"
+      ],
+      "answer": 2,
+      "explanation": "'인가된 사용자만 접근', '허가되지 않은 사용자에 의해 변조되지 않도록'이라는 정의에 이미 인증이 들어 있습니다."
+    },
+    {
+      "question": "강사가 말한 '가장 무식한 DoS 공격'은?",
+      "options": [
+        "장비의 전원을 꺼 버리는 것",
+        "DNS 증폭 공격을 수행하는 것",
+        "MAC 테이블을 가득 채우는 것",
+        "SYN Flood를 대량으로 보내는 것"
+      ],
+      "answer": 0,
+      "explanation": "그래서 랙 시건장치, 전원 이중화, Hot Swap 같은 물리적 통제가 기본 보안이 됩니다."
+    },
+    {
+      "question": "IDS와 IPS의 결정적 차이는?",
+      "options": [
+        "IDS는 외부망, IPS는 내부망 전용이다",
+        "IDS는 시그니처를 쓰고 IPS는 쓰지 않는다",
+        "IDS는 L2, IPS는 L3에서 동작한다",
+        "IDS는 트래픽 복사본을 받는 경로 밖에 있고, IPS는 데이터 전송 경로 위에 배치되어 차단까지 한다"
+      ],
+      "answer": 3,
+      "explanation": "IDS는 이미 공격이 들어간 뒤 알려 줄 뿐이라는 한계 때문에 IPS가 등장했습니다."
+    },
+    {
+      "question": "Zero Trust 관점으로 전환된 배경으로 옳은 것은?",
+      "options": [
+        "브로드캐스트 트래픽이 증가했기 때문",
+        "IP 주소가 고갈되었기 때문",
+        "방화벽 성능이 부족해졌기 때문",
+        "경계 방어를 강화해도 내부에서 문제가 발생했고, 클라우드·가상화로 확산 범위가 넓어졌기 때문"
+      ],
+      "answer": 3,
+      "explanation": "'내부는 무한 신뢰'라는 전제가 깨지면서 개별 시스템 단위로 경계를 치는 마이크로세그멘테이션으로 이어집니다."
+    },
+    {
+      "question": "MAC Flooding Attack이 성립하는 핵심 전제는?",
+      "options": [
+        "MAC 테이블을 저장하는 메모리 용량이 유한하다는 점",
+        "라우터가 브로드캐스트를 차단한다는 점",
+        "VLAN 태그를 위조할 수 있다는 점",
+        "스위치가 ARP를 검증하지 않는다는 점"
+      ],
+      "answer": 0,
+      "explanation": "쓰레기 MAC으로 테이블을 가득 채우면 정상 MAC이 기록되지 못해 스위치가 플러딩하게 됩니다."
+    },
+    {
+      "question": "Port Security 설정 시 switchport mode access를 먼저 하는 이유는?",
+      "options": [
+        "그 포트가 스위치가 아닌 PC와 연결되는 포트임을 확정해, MAC 개수를 제한해도 되는 포트임을 정하기 위해",
+        "VLAN 번호를 자동으로 할당받기 위해",
+        "sticky 학습을 강제하기 위해",
+        "트렁크 포트에도 동일하게 적용하기 위해"
+      ],
+      "answer": 0,
+      "explanation": "트렁크 포트에는 하위 스위치의 모든 MAC이 올라오므로 Port Security를 걸면 통신이 끊깁니다."
+    },
+    {
+      "question": "Port Security의 maximum 값을 1이 아닌 값으로 설정해야 하는 경우가 아닌 것은?",
+      "options": [
+        "가상화 호스트에서 여러 VM의 MAC이 올라오는 경우",
+        "스위치와 스위치를 연결하는 트렁크 포트인 경우",
+        "하나의 포트에 여러 단말이 물리는 구성인 경우",
+        "IP 전화기 뒤에 PC가 연결된 경우"
+      ],
+      "answer": 1,
+      "explanation": "트렁크 포트에는 Port Security 자체를 적용하지 않습니다. maximum 값을 조정하는 문제가 아닙니다."
+    },
+    {
+      "question": "Port Security의 violation 옵션 중 정상 단말은 통신을 유지하면서 위반만 차단하고 로그도 남기는 것은?",
+      "options": [
+        "err-disable",
+        "shutdown",
+        "restrict",
+        "protect"
+      ],
+      "answer": 2,
+      "explanation": "protect는 로그를 남기지 않고, shutdown은 포트를 닫아 정상 단말까지 차단합니다."
+    },
+    {
+      "question": "Port Security의 sticky 방식에 대한 설명으로 옳은 것은?",
+      "options": [
+        "MAC을 Dynamic하게 인식하되 그 결과를 running-config에 Static하게 기록한다",
+        "링크가 끊기면 학습한 MAC이 즉시 삭제된다",
+        "관리자가 모든 MAC을 직접 입력해야 한다",
+        "MAC 학습을 아예 하지 않는다"
+      ],
+      "answer": 0,
+      "explanation": "Dynamic 방식은 케이블을 뽑으면 MAC이 사라져 공격자가 자기 장비를 꽂으면 통과되는 허점이 있습니다."
+    },
+    {
+      "question": "Port Security 위반으로 닫힌 포트를 다시 살리는 올바른 방법은?",
+      "options": [
+        "switchport mode access를 다시 입력한다",
+        "no shutdown만 입력한다",
+        "shutdown을 한 번 입력한 뒤 no shutdown을 입력한다",
+        "장비를 reload한다"
+      ],
+      "answer": 2,
+      "explanation": "관리자가 shut 명령으로 닫은 것이 아니라 err-disabled 상태이므로, shut을 거쳐야 정상 해제됩니다."
+    },
+    {
+      "question": "show interfaces switchport 출력에서 Administrative Mode가 dynamic auto라면?",
+      "options": [
+        "해당 포트가 이미 트렁크로 동작 중이다",
+        "해당 포트가 shutdown 상태이다",
+        "해당 포트가 영구적으로 Access로 고정되어 있다",
+        "DTP가 동작 중이며, 상대가 협상을 걸어오면 트렁크로 바뀔 수 있다"
+      ],
+      "answer": 3,
+      "explanation": "Operational Mode가 static access여도 Administrative가 dynamic이면 고정된 것이 아닙니다."
+    },
+    {
+      "question": "Native VLAN이 등장한 배경으로 옳은 것은?",
+      "options": [
+        "스위치 사이에 허브가 끼어 있던 환경에서 태그 없는 프레임이 트렁크 포트에서 버려지는 문제를 해결하기 위해",
+        "트렁크 링크의 대역폭을 늘리기 위해",
+        "VLAN 개수를 4094개까지 확장하기 위해",
+        "스위치 간 자동 트렁크 협상을 위해"
+      ],
+      "answer": 0,
+      "explanation": "허브와 그에 연결된 시스템은 VLAN을 모르므로 Untagged Frame을 만들고, 이를 처리할 VLAN이 필요했습니다."
+    },
+    {
+      "question": "Double Tagging(VLAN Hopping) 공격에서 바깥쪽 태그에 넣는 VLAN은?",
+      "options": [
+        "파킹 VLAN(999)",
+        "관리 VLAN",
+        "목표로 삼은 VLAN",
+        "Native VLAN"
+      ],
+      "answer": 3,
+      "explanation": "바깥 태그가 Native라서 첫 스위치에서 벗겨지고, 안쪽에 넣어 둔 목표 VLAN 태그가 살아남아 전달됩니다."
+    },
+    {
+      "question": "VLAN 공격 완화 방법 중 트렁크 포트에서 DTP 기능을 비활성화하는 명령은?",
+      "options": [
+        "switchport port-security",
+        "switchport mode access",
+        "switchport trunk native vlan 86",
+        "switchport nonegotiate"
+      ],
+      "answer": 3,
+      "explanation": "일반 포트는 switchport mode access로, 트렁크 포트는 switchport nonegotiate로 DTP를 제거합니다."
+    },
+    {
+      "question": "사용하지 않는 스위치 포트를 파킹 VLAN(예: 999)에 넣은 뒤 그 VLAN을 삭제하면?",
+      "options": [
+        "해당 포트가 트렁크 포트로 전환된다",
+        "해당 포트의 MAC 학습만 중지된다",
+        "해당 포트가 자동으로 VLAN 1로 복귀한다",
+        "해당 포트 자체가 사라져 데이터 송수신이 불가능해진다"
+      ],
+      "answer": 3,
+      "explanation": "VLAN에 할당된 포트는 그 VLAN이 삭제되면 사라집니다. 교안에서는 이 VLAN에 Blackhole이라는 이름을 붙입니다."
+    },
+    {
+      "question": "DHCP의 DORA 프로세스 순서로 옳은 것은?",
+      "options": [
+        "Request → Discover → Offer → Ack",
+        "Discover → Offer → Request → Ack",
+        "Discover → Request → Offer → Ack",
+        "Offer → Discover → Ack → Request"
+      ],
+      "answer": 1,
+      "explanation": "클라이언트가 서버를 찾고(Discover), 서버가 IP를 제시하고(Offer), 확인을 요청하고(Request), 확정받습니다(Ack)."
+    },
+    {
+      "question": "DHCP Discover 메시지의 출발지 IP와 목적지 IP로 옳은 것은?",
+      "options": [
+        "출발지 0.0.0.0, 목적지 서버의 유니캐스트 IP",
+        "출발지 0.0.0.0, 목적지 255.255.255.255",
+        "출발지 클라이언트의 임시 IP, 목적지 0.0.0.0",
+        "출발지 127.0.0.1, 목적지 255.255.255.255"
+      ],
+      "answer": 1,
+      "explanation": "아직 IP를 받지 못했으므로 출발지는 미지정 주소이고, 서버가 누구인지 모르므로 로컬 브로드캐스트를 사용합니다."
+    },
+    {
+      "question": "DHCP가 사용하는 트랜스포트 프로토콜과 포트 번호로 옳은 것은?",
+      "options": [
+        "UDP 53(서버), UDP 54(클라이언트)",
+        "TCP 22(서버), TCP 23(클라이언트)",
+        "TCP 67(서버), TCP 68(클라이언트)",
+        "UDP 67(서버), UDP 68(클라이언트)"
+      ],
+      "answer": 3,
+      "explanation": "DHCP는 TCP/IP 스택 위에서 동작하지만 트랜스포트 계층 프로토콜은 UDP입니다."
+    },
+    {
+      "question": "L3 주소가 브로드캐스트일 때 대응하는 L2 주소는?",
+      "options": [
+        "출발지와 동일한 MAC 주소",
+        "예약된 멀티캐스트 MAC 주소",
+        "브로드캐스트 MAC 주소",
+        "유니캐스트 MAC 주소"
+      ],
+      "answer": 2,
+      "explanation": "대상을 특정할 수 없으므로 ARP로 상대 MAC을 알아올 방법이 없고, L2도 브로드캐스트일 수밖에 없습니다."
+    },
+    {
+      "question": "시스템 성능에 직접 영향을 주는 것은 브로드캐스트 패킷과 프레임 중 무엇이며 그 이유는?",
+      "options": [
+        "패킷이다. 라우터를 넘어 전파되기 때문",
+        "둘 다 영향이 없다. 랜카드에서 모두 폐기되기 때문",
+        "프레임이다. 랜카드를 통과해 내부로 들어가면서 CPU·메모리 리소스를 소모하기 때문",
+        "패킷이다. IP 헤더 처리 비용이 크기 때문"
+      ],
+      "answer": 2,
+      "explanation": "랜카드를 통과하느냐 여부가 리소스 소모를 결정하며, DHCP는 패킷·프레임 모두 브로드캐스트라 부담이 큽니다."
+    }
+  ]
+}

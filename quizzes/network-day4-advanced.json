@@ -1,0 +1,250 @@
+{
+  "title": "네트워크 보안 DAY4 심화",
+  "subtitle": "라우팅 판단·Inter-VLAN 트러블슈팅·Port Security·VLAN/DHCP 공격 응용",
+  "subject": "네트워크 보안",
+  "description": "SK Shieldus Rookies: 네트워크 보안 4일차 심화 문제. 단순 암기가 아니라 계산·증상 추론·교시 간 개념 연결을 요구합니다. Longest Prefix Match와 AD의 적용 범위, OSPF Cost 기준값, Port Security 오적용 증상, err-disabled 복구, Double Tagging 성립 조건, DHCP 브로드캐스트 구조 등을 다룹니다.",
+  "questions": [
+    {
+      "question": "172.16.0.0/16을 통으로 쓰다가 /24 단위로 분할했다. 한 대의 시스템이 처리해야 하는 브로드캐스트 발신 대수는 어떻게 변하는가? (네트워크 주소·브로드캐스트 주소 제외, 모든 주소가 사용 중이라고 가정)",
+      "options": [
+        "65,533대에서 253대로 줄어든다",
+        "65,536대에서 256대로 줄어든다",
+        "32,767대에서 127대로 줄어든다",
+        "65,534대에서 254대로 줄어든다"
+      ],
+      "answer": 0,
+      "explanation": "/16은 2^16-2=65,534대가 할당 가능하고 자기 자신을 빼면 65,533대, /24는 2^8-2=254대에서 자기 자신을 빼면 253대입니다."
+    },
+    {
+      "question": "본사(HQ) — 인터넷 라우터 — 지사(BO) 구조에서, HQ 라우터에 BO 네트워크로 가는 스태틱 경로를 설정하려 한다. Next Hop으로 지정해야 하는 주소는?",
+      "options": [
+        "인터넷 라우터의 BO 측 인터페이스 IP",
+        "BO 네트워크에 속한 호스트 중 하나의 IP",
+        "HQ와 인터넷 라우터를 잇는 구간의 인터넷 라우터 측 인터페이스 IP",
+        "BO 라우터의 내부망 측 인터페이스 IP"
+      ],
+      "answer": 2,
+      "explanation": "Hop-by-Hop 원칙상 Next Hop은 반드시 내가 직접 연결된 구간의 상대편 주소여야 합니다. 그렇지 않으면 경로가 라우팅 테이블에 설치되지 않습니다."
+    },
+    {
+      "question": "R1은 192.168.13.0/24로 인터넷 라우터(.13.3)와, R2는 192.168.23.0/24로 인터넷 라우터(.23.3)와 연결되어 있다. R2에 `ip route 0.0.0.0 0.0.0.0 192.168.13.3`을 입력하면?",
+      "options": [
+        "정상적으로 설치되어 통신이 된다",
+        "문법 오류로 명령 자체가 거부된다",
+        "인터넷 라우터가 자동으로 경로를 재작성해 준다",
+        "명령은 running-config에 남지만 Next Hop에 도달할 수 없어 라우팅 테이블에는 설치되지 않는다"
+      ],
+      "answer": 3,
+      "explanation": "R2는 13망에 직접 연결되어 있지 않으므로 .13.3에 도달할 방법이 없습니다. show run과 show ip route를 반드시 구분해서 확인해야 합니다."
+    },
+    {
+      "question": "라우팅 테이블에 `S 10.1.0.0/16 [1/0] via A`와 `R 10.1.1.0/24 [120/2] via B`가 함께 있다. 목적지가 10.1.1.50인 패킷은 어디로 전달되는가?",
+      "options": [
+        "두 경로에 부하가 분산된다",
+        "B로 전달된다. Prefix가 더 긴 /24 경로가 선택되기 때문",
+        "AD와 Metric이 서로 달라 패킷이 드랍된다",
+        "A로 전달된다. Static의 AD 값 1이 RIP의 120보다 낮기 때문"
+      ],
+      "answer": 1,
+      "explanation": "AD 비교는 동일한 목적지 네트워크를 여러 프로토콜이 알려 줄 때 적용됩니다. Prefix가 다르면 포워딩 시점의 Longest Prefix Match가 최종 판단 기준입니다."
+    },
+    {
+      "question": "OSPF의 Reference Bandwidth를 시스코 기본값(100Mbps)으로 둘 때 발생하는 문제는?",
+      "options": [
+        "1Gbps 링크와 100Mbps 링크의 Cost가 모두 1이 되어 우열을 구분하지 못한다",
+        "Cost 값이 음수가 되어 SPF 계산이 실패한다",
+        "10Mbps 링크의 Cost가 0이 되어 경로 계산에서 제외된다",
+        "Hop Count가 15를 넘으면 경로가 무효화된다"
+      ],
+      "answer": 0,
+      "explanation": "Cost는 Reference BW ÷ 인터페이스 BW이며 최솟값이 1입니다. 기가 이상 회선을 구분하려면 auto-cost reference-bandwidth로 기준값을 올려야 하며, 모든 라우터에 동일하게 적용해야 합니다."
+    },
+    {
+      "question": "A에서 B로 가는 경로가 두 개 있다. 경로 ①은 1Gbps 회선으로 라우터 3개를 거치고, 경로 ②는 10Mbps 회선으로 라우터 2개를 거친다. RIP가 선택하는 경로는?",
+      "options": [
+        "경로 ①. Cost 합이 더 작기 때문",
+        "경로 ②. RIP는 Hop Count만 보므로 회선 속도를 반영하지 못한다",
+        "경로 ①. 대역폭이 더 크기 때문",
+        "두 경로에 균등 분산한다"
+      ],
+      "answer": 1,
+      "explanation": "RIP의 Metric은 Hop Count 하나뿐이라 2홉인 경로 ②를 선택합니다. 대역폭을 반영하려면 OSPF의 Cost나 EIGRP의 Composite Metric이 필요합니다."
+    },
+    {
+      "question": "L3 스위치에서 VLAN 1·2를 만들고 SVI에 IP까지 부여하고 no shutdown도 했지만, `ip routing`을 입력하지 않았다. 결과는?",
+      "options": [
+        "모든 통신이 차단된다",
+        "SVI 자체가 생성되지 않아 IP 설정이 거부된다",
+        "같은 VLAN 안에서는 통신되지만 VLAN 간 통신은 되지 않는다",
+        "VLAN 간 통신은 되지만 같은 VLAN 통신이 되지 않는다"
+      ],
+      "answer": 2,
+      "explanation": "ip routing은 스위치의 3계층 기능을 켜는 선언입니다. 켜지 않으면 L2 스위칭만 동작하므로 Inter-VLAN Routing이 이루어지지 않습니다."
+    },
+    {
+      "question": "Inter-VLAN Routing 구성에서 PC의 Default Gateway를 해당 VLAN의 SVI IP가 아닌 다른 주소로 잘못 입력했다. 나타나는 증상으로 가장 적절한 것은?",
+      "options": [
+        "SVI가 down 상태로 바뀐다",
+        "스위치의 MAC 테이블이 초기화된다",
+        "같은 VLAN 내 통신은 되지만 다른 VLAN으로는 패킷이 라우팅 엔진까지 도달하지 못한다",
+        "같은 VLAN 통신도 즉시 차단된다"
+      ],
+      "answer": 2,
+      "explanation": "같은 네트워크 통신은 ARP로 직접 이루어지므로 영향이 없지만, 다른 네트워크로 나가려면 Default Gateway가 정확해야 합니다."
+    },
+    {
+      "question": "Router-on-a-Stick 구성에서 서브 인터페이스에 IP는 부여했으나 `encapsulation dot1q` 명령을 빠뜨렸다. 결과는?",
+      "options": [
+        "해당 서브 인터페이스가 어느 VLAN 담당인지 알 수 없어 그 VLAN의 Inter-VLAN Routing이 동작하지 않는다",
+        "모든 VLAN 트래픽이 그 서브 인터페이스로 몰린다",
+        "물리 인터페이스까지 함께 down된다",
+        "자동으로 Native VLAN으로 지정되어 정상 동작한다"
+      ],
+      "answer": 0,
+      "explanation": "서브 인터페이스에는 IP 부여와 VLAN 번호 지정(encapsulation dot1q) 두 가지가 모두 필요합니다."
+    },
+    {
+      "question": "Access Switch와 하위 Access Switch를 잇는 트렁크 포트에 `switchport port-security maximum 1`을 적용했다. 예상되는 결과는?",
+      "options": [
+        "트렁크가 자동으로 Access 모드로 전환된다",
+        "트렁크 포트에는 Port Security가 적용되지 않아 아무 변화가 없다",
+        "하위 스위치의 MAC만 학습되어 정상 동작한다",
+        "하위 스위치에 연결된 여러 단말의 MAC이 올라오면서 위반이 발생해 해당 구간 통신이 끊긴다"
+      ],
+      "answer": 3,
+      "explanation": "트렁크 포트로는 하위 스위치의 모든 MAC이 인식되므로 Port Security를 걸면 효과가 없는 정도가 아니라 통신 자체가 끊깁니다."
+    },
+    {
+      "question": "IP 전화기 내부 스위치 포트에 PC가 연결된 구성에서 `switchport port-security maximum 1`을 적용했다. 가장 가능성이 높은 증상은?",
+      "options": [
+        "전화기 트래픽만 항상 우선 허용된다",
+        "전화기와 PC 모두 정상 통신한다",
+        "포트가 자동으로 maximum 2로 조정된다",
+        "먼저 학습된 단말만 통신되고 나중에 올라온 단말의 트래픽은 차단된다"
+      ],
+      "answer": 3,
+      "explanation": "이 구성에서는 IP 폰과 PC의 MAC이 모두 올라오므로 maximum은 2로 설정해야 합니다."
+    },
+    {
+      "question": "Port Security를 sticky로 설정해 MAC이 running-config에 기록된 상태에서, `wr`을 하지 않고 스위치를 재부팅했다. 결과는?",
+      "options": [
+        "startup-config에 자동 저장되어 그대로 유지된다",
+        "포트가 err-disabled 상태로 부팅된다",
+        "sticky로 학습된 MAC 기록이 사라지고 재부팅 후 처음 올라온 단말의 MAC을 다시 학습한다",
+        "Port Security 설정 자체가 사라진다"
+      ],
+      "answer": 2,
+      "explanation": "sticky가 기록하는 위치는 running-config입니다. 저장하지 않으면 재부팅 시 소멸하므로 반드시 wr이 필요합니다."
+    },
+    {
+      "question": "violation 옵션을 protect로 설정했을 때 보안 관점에서의 문제는?",
+      "options": [
+        "정상 단말까지 함께 차단되어 가용성이 떨어진다",
+        "MAC 학습이 중단되어 정상 통신이 불가능해진다",
+        "위반 트래픽은 차단되지만 로그가 남지 않아 공격 시도 자체를 인지하지 못한다",
+        "포트가 err-disabled 상태가 되어 수동 복구가 필요하다"
+      ],
+      "answer": 2,
+      "explanation": "protect와 restrict는 동작이 같지만 로그 유무가 다릅니다. 막는 것보다 막았다는 사실을 아는 것이 중요하므로 실무 표준은 restrict입니다."
+    },
+    {
+      "question": "Port Security 위반으로 err-disabled가 된 포트에서 violation을 restrict로 변경한 뒤 `no shutdown`만 입력했다. 결과는?",
+      "options": [
+        "즉시 정상 복구되어 통신이 재개된다",
+        "포트가 살아나지 않는다. shutdown을 한 번 입력한 뒤 no shutdown을 해야 한다",
+        "violation 설정 변경만으로 자동 복구된다",
+        "장비를 reload해야만 복구된다"
+      ],
+      "answer": 1,
+      "explanation": "관리자가 shut 명령으로 닫은 상태가 아니라 시스템이 정책 위반으로 닫은 상태이므로, shut을 거쳐 상태를 맞춘 뒤 no shut을 해야 합니다."
+    },
+    {
+      "question": "`show interfaces switchport` 결과가 Administrative Mode: dynamic auto / Operational Mode: static access인 사용자 포트가 있다. 보안상 판단으로 옳은 것은?",
+      "options": [
+        "해당 포트는 shutdown 상태이므로 조치가 필요 없다",
+        "지금은 Access로 동작하지만 DTP 협상에 응할 수 있으므로 switchport mode access로 고정해야 한다",
+        "Administrative가 dynamic이면 트렁크로 이미 동작 중이라는 뜻이다",
+        "Operational이 static access이므로 이미 안전한 상태다"
+      ],
+      "answer": 1,
+      "explanation": "Administrative Mode에 dynamic이 보이면 DTP가 살아 있다는 뜻이며, 공격자가 스위치인 척 협상을 걸면 트렁크로 승격될 수 있습니다."
+    },
+    {
+      "question": "Double Tagging 공격이 성립하기 위한 조건으로 옳은 것은?",
+      "options": [
+        "공격자가 라우터의 ACL 권한을 획득해야 한다",
+        "목표 VLAN과 공격자 VLAN의 서브넷 마스크가 같아야 한다",
+        "공격자 포트가 반드시 트렁크로 설정되어 있어야 한다",
+        "공격자가 Native VLAN에 속해 있고 그 Native VLAN 번호를 알고 있어야 한다"
+      ],
+      "answer": 3,
+      "explanation": "바깥 태그가 Native VLAN이어야 첫 스위치에서 벗겨지고 안쪽 태그가 살아남습니다. Native VLAN 기본값이 1이라는 점이 공격을 쉽게 만듭니다."
+    },
+    {
+      "question": "Native VLAN을 VLAN 1이 아닌 다른 번호로 변경하는 것이 Double Tagging 대응이 되는 이유는?",
+      "options": [
+        "공격자가 바깥 태그에 넣을 Native VLAN 번호를 알 수 없게 되어 태그가 벗겨지지 않기 때문",
+        "DTP가 자동으로 비활성화되기 때문",
+        "VLAN 번호가 커질수록 태그 길이가 늘어나기 때문",
+        "Native VLAN이 아닌 프레임은 트렁크를 통과하지 못하기 때문"
+      ],
+      "answer": 0,
+      "explanation": "바깥 태그가 Native와 일치해야 벗겨집니다. 번호를 모르면 두 태그가 그대로 남아 목표 VLAN으로 넘어가지 않습니다."
+    },
+    {
+      "question": "사용하지 않는 스위치 포트에 대한 조치 중, 케이블을 꽂아도 데이터 송수신이 원천적으로 불가능해지는 방법은?",
+      "options": [
+        "미사용 VLAN에 소속시킨 뒤 그 VLAN 자체를 삭제한다",
+        "포트에 Port Security maximum 1을 설정한다",
+        "포트를 트렁크 모드로 변경한다",
+        "포트의 Native VLAN을 999로 변경한다"
+      ],
+      "answer": 0,
+      "explanation": "VLAN에 할당된 포트는 그 VLAN이 삭제되면 포트 자체가 사라집니다. 교안은 이 VLAN에 Blackhole이라는 이름을 붙입니다."
+    },
+    {
+      "question": "DHCP Request 메시지를 Offer를 보낸 서버에게 유니캐스트로 보내지 않고 브로드캐스트로 보내는 이유는?",
+      "options": [
+        "서버의 MAC 주소를 ARP로 알아올 수 없기 때문",
+        "UDP는 유니캐스트를 지원하지 않기 때문",
+        "이중화된 다른 DHCP 서버에도 상태를 알려 동일 IP가 중복 할당되는 상황을 확인하기 위해",
+        "Offer 메시지에 서버 IP가 포함되어 있지 않기 때문"
+      ],
+      "answer": 2,
+      "explanation": "DHCP 서버는 Redundancy를 위해 두 대 이상 구성될 수 있고, 같은 Pool을 가질 수 있으므로 브로드캐스트로 확인 절차를 거칩니다."
+    },
+    {
+      "question": "ARP Spoofing이 같은 브로드캐스트 도메인 안에서만 성립한다는 사실로부터 도출되는 방어 전략은?",
+      "options": [
+        "ARP 캐시 타이머를 늘려 재학습을 줄인다",
+        "라우터에 Default Route를 추가해 우회 경로를 만든다",
+        "트렁크 포트를 늘려 트래픽을 분산한다",
+        "VLAN으로 브로드캐스트 도메인을 잘게 나누어 공격 영향 범위를 제한한다"
+      ],
+      "answer": 3,
+      "explanation": "ARP는 IP 헤더가 없어 라우터를 넘지 못하므로 공격도 같은 도메인 안으로 제한됩니다. VLAN 분리와 DAI, Static ARP가 대응 수단입니다."
+    },
+    {
+      "question": "East-West 트래픽이 보안상 사각지대가 되는 이유로 가장 적절한 것은?",
+      "options": [
+        "L3 스위치 내부에서 처리되어 경계에 배치된 방화벽을 지나가지 않기 때문",
+        "암호화되어 있어 방화벽이 내용을 볼 수 없기 때문",
+        "라우팅 테이블에 기록되지 않기 때문",
+        "브로드캐스트 프레임이라 랜카드에서 폐기되기 때문"
+      ],
+      "answer": 0,
+      "explanation": "멀티레이어 스위치가 VLAN 간 라우팅을 ASIC으로 처리하므로 경계 방화벽은 이 트래픽을 보지 못합니다. 마이크로세그멘테이션이 필요한 기술적 이유입니다."
+    },
+    {
+      "question": "`show ip protocols` 출력의 Gateway 목록에 관리자가 모르는 IP가 나타났다. 가장 적절한 해석과 대응은?",
+      "options": [
+        "Default Route가 설정되지 않아 생기는 정상 출력이다",
+        "정체불명의 장비가 라우팅 정보를 주입하고 있을 수 있으므로 라우팅 프로토콜 인증과 passive-interface를 검토한다",
+        "Longest Prefix Match 결과가 표시된 것이므로 무시해도 된다",
+        "단순한 캐시 잔여 정보이므로 시간이 지나면 사라진다"
+      ],
+      "answer": 1,
+      "explanation": "show ip protocols는 내 라우터가 누구의 말을 듣고 있는지를 보여 줍니다. 모르는 이웃은 경로 주입 공격의 신호일 수 있습니다."
+    }
+  ]
+}
