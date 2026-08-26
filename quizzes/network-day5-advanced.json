@@ -1,0 +1,250 @@
+{
+  "title": "네트워크 보안 DAY5 심화",
+  "subtitle": "시나리오 판정·설계 판단·실무 함정",
+  "subject": "네트워크 보안",
+  "description": "SK Shieldus Rookies: 네트워크 보안 5일차 심화 문제. 단순 개념 확인을 넘어 설정 결과 예측, 장애 원인 판정, 설계 트레이드오프 판단을 다룹니다. DHCP Snooping·DAI 연계, Relay Agent, ARP 공격 시나리오, ACL 순서와 방향 설계, VTY ACL 운영 리스크를 포함합니다.",
+  "questions": [
+    {
+      "question": "DHCP Offer는 L2가 Unicast인데 L3 목적지는 여전히 255.255.255.255다. 이런 비정상 조합이 성립할 수 있었던 근본 배경은?",
+      "options": [
+        "TCP/IP가 2계층을 정의하지 않아 L3와 L2의 매핑 방식을 독립적으로 수정할 수 있었기 때문",
+        "라우터가 DHCP 패킷에 한해 계층 간 주소 변환을 수행하기 때문",
+        "DHCP가 UDP를 사용하므로 계층 간 매칭 규칙이 적용되지 않기 때문",
+        "IEEE 802.3 표준이 브로드캐스트 IP에 대한 유니캐스트 프레임 전송을 명시했기 때문"
+      ],
+      "answer": 0,
+      "explanation": "TCP/IP는 상위 3계층만 정의하고 Network Access 계층은 IEEE 802 등 다른 표준의 영역이므로, 둘이 분리되어 매핑 방식만 따로 바꿀 수 있었습니다. 실제 표준에서는 DHCP 헤더의 Broadcast Flag(B 비트)로 제어합니다."
+    },
+    {
+      "question": "Wireshark로 DHCP를 분석하는데 어떤 장비는 Offer가 브로드캐스트로, 어떤 장비는 유니캐스트로 온다. 올바른 판단은?",
+      "options": [
+        "스위치의 DHCP Snooping이 오작동하고 있다는 신호다",
+        "브로드캐스트로 오는 쪽이 Rogue DHCP 서버이므로 즉시 차단해야 한다",
+        "클라이언트가 설정한 Broadcast Flag 값의 차이이므로 그 자체로는 이상 징후가 아니다",
+        "유니캐스트로 오는 쪽이 Rogue DHCP 서버이므로 즉시 차단해야 한다"
+      ],
+      "answer": 2,
+      "explanation": "B=1이면 브로드캐스트로, B=0이면 유니캐스트로 응답합니다. 오래된 임베디드 장비나 PXE 부팅 환경은 B=1을 씁니다. 진짜 이상 징후는 하나의 Discover에 Offer가 둘 이상 오는 경우입니다."
+    },
+    {
+      "question": "공격자가 DHCP Starvation과 Spoofing을 함께 사용할 때의 전형적인 순서와 그 이유는?",
+      "options": [
+        "먼저 Spoofing으로 게이트웨이를 장악한 뒤 Starvation으로 로그를 지운다",
+        "두 공격은 동시에 수행해야 하며 순서에는 의미가 없다",
+        "Starvation으로 스위치의 MAC 테이블을 채운 뒤 Spoofing으로 플러딩을 유도한다",
+        "먼저 Starvation으로 정상 서버의 Pool을 고갈시킨 뒤 Rogue 서버가 Offer를 주어, 클라이언트가 선택의 여지 없이 Rogue를 쓰게 만든다"
+      ],
+      "answer": 3,
+      "explanation": "정상 서버가 응답할 수 없는 상태를 먼저 만드는 것이 핵심이며, 그래서 교안이 대응책으로 Rate Limiting을 함께 제시합니다."
+    },
+    {
+      "question": "경로상의 여러 스위치에 DHCP Snooping을 적용하면서 스위치 간 링크를 한쪽에만 Trust로 지정했다. 예상되는 결과는?",
+      "options": [
+        "Rate Limit이 자동으로 적용되어 성능만 저하된다",
+        "정상 서버가 보낸 Offer/Ack이 중간 스위치의 Untrusted 포트에서 Drop되어 다수 사용자가 IP를 받지 못한다",
+        "Snooping Binding Table이 중복 생성되어 DAI가 오작동한다",
+        "Trust를 지정한 쪽에서만 IP 할당이 되고 반대쪽은 정상 동작한다"
+      ],
+      "answer": 1,
+      "explanation": "Offer/Ack은 서버 메시지이므로 Untrusted 포트에서 올라오면 무조건 Drop됩니다. 실무 최다 사고 유형이며, 스위치 간 링크는 양쪽 모두 Trust로 지정해야 합니다."
+    },
+    {
+      "question": "DHCP Snooping과 DAI를 적용한 뒤 고정 IP를 쓰는 프린터와 서버가 통신 불가 상태가 되었다. 원인과 해결책은?",
+      "options": [
+        "DHCP를 쓰지 않아 Binding Table에 없으므로 정상 ARP가 Drop된 것이며, ARP ACL로 수동 등록해야 한다",
+        "Rate Limit에 걸린 것이며 limit rate 값을 높여야 한다",
+        "Trust Port 설정이 누락된 것이며 해당 포트를 Trust로 바꿔야 한다",
+        "Port Security의 Sticky MAC과 충돌한 것이며 Sticky를 해제해야 한다"
+      ],
+      "answer": 0,
+      "explanation": "DAI는 Binding Table을 근거로 판정하는데 고정 IP 장비는 그 표에 존재하지 않습니다. 실무 순서는 ①Snooping → ②고정 IP 장비 ARP ACL 등록 → ③DAI 활성화입니다."
+    },
+    {
+      "question": "DHCP Relay Agent 환경에서 서버는 8.8.8.8에 있고 클라이언트에게는 192.168.1.x를 할당한다. 서버가 어느 Pool을 사용할지 판단하는 근거는?",
+      "options": [
+        "서버 인터페이스에 설정된 IP가 속한 네트워크",
+        "Relay Agent가 전달하며 기록한 자신의 인터페이스 IP(giaddr) 값",
+        "클라이언트가 Discover에 담아 보낸 자신의 이전 IP",
+        "ip helper-address에 지정된 서버 IP"
+      ],
+      "answer": 1,
+      "explanation": "giaddr(Gateway IP Address) 필드에 Relay Agent가 자기 인터페이스 IP를 기록하고, 서버는 그 값으로 대상 대역을 판단합니다. 클라이언트가 직접 보낸 경우 이 값은 0.0.0.0입니다."
+    },
+    {
+      "question": "DHCP 서버를 라우터 건너편으로 옮기고 Relay Agent를 구성했다. 기존 Access 스위치의 DHCP Snooping Trust Port 설정은 어떻게 해야 하는가?",
+      "options": [
+        "Relay 환경에서는 Snooping이 동작하지 않으므로 비활성화해야 한다",
+        "Trust Port를 Relay Agent 쪽 인터페이스로 옮겨야 한다",
+        "변경할 필요가 없다. 서버가 어디로 가든 Offer/Ack은 여전히 업링크로 들어오기 때문",
+        "모든 포트를 Trust로 바꿔야 한다"
+      ],
+      "answer": 2,
+      "explanation": "Trust Port는 '서버가 꽂힌 포트'가 아니라 '서버로 가는 길'이므로, 서버의 물리적 위치가 바뀌어도 업링크가 경로인 한 그대로입니다."
+    },
+    {
+      "question": "Rate Limit 위반으로 반복적으로 err-disabled가 발생해 errdisable recovery를 설정하려 한다. 반드시 함께 고려해야 할 점은?",
+      "options": [
+        "recovery interval을 60초 미만으로 두면 IOS가 명령을 거부한다",
+        "자동 복구를 켜면 DHCP Snooping이 함께 비활성화된다",
+        "공격이 지속되면 차단과 복구를 무한 반복하게 되므로, 원인 파악 전에 켜는 것은 위험하다",
+        "자동 복구는 shutdown/no shutdown과 달리 포트를 초기화하므로 설정이 사라진다"
+      ],
+      "answer": 2,
+      "explanation": "'차단 상태를 유지하고 사람이 확인할 것인가, 서비스 연속성을 우선할 것인가'의 판단 문제입니다."
+    },
+    {
+      "question": "ACL로 차단된 트래픽에 대한 응답을 숨기려고 인터페이스에 no ip unreachables를 걸었다. 발생할 수 있는 부작용은?",
+      "options": [
+        "Path MTU Discovery가 의존하는 메시지까지 차단되어 큰 패킷이 조용히 사라지는 장애가 생길 수 있다",
+        "라우팅 프로토콜의 Hello 패킷이 차단되어 인접 관계가 끊긴다",
+        "ping 응답 자체가 차단되어 모든 ICMP 통신이 불가능해진다",
+        "ARP 응답이 차단되어 같은 네트워크 통신이 불가능해진다"
+      ],
+      "answer": 0,
+      "explanation": "PMTUD는 Fragmentation Needed(Code 4)에 의존합니다. 실무에서는 정책 노출과 관련된 Code 13만 선별적으로 억제합니다."
+    },
+    {
+      "question": "다음 ACL이 f0/0 out에 적용되어 있다. 192.168.1.10이 보낸 패킷의 처리 결과는?\n\n  10 permit 192.168.1.0 0.0.0.255\n  20 deny   host 192.168.1.10\n  30 permit any",
+      "options": [
+        "조건이 모순되므로 암묵적 deny로 차단된다",
+        "20번에서 deny되어 차단된다",
+        "10번과 20번이 충돌하여 30번의 permit any가 적용된다",
+        "10번에서 permit되어 통과한다"
+      ],
+      "answer": 3,
+      "explanation": "First Match이므로 10번에 일치하는 순간 아래는 읽지 않습니다. 좁은 범위(20번)를 위로 올려야 의도대로 동작합니다."
+    },
+    {
+      "question": "2.80 호스트가 1.0 네트워크로 가는 것만 막으려고 Standard ACL을 2.80이 붙은 인터페이스의 Inbound에 걸었다. 실제 결과는?",
+      "options": [
+        "Inbound에는 Standard ACL을 적용할 수 없어 명령이 거부된다",
+        "의도대로 1.0 네트워크로 가는 트래픽만 차단된다",
+        "돌아오는 응답만 차단되고 나가는 요청은 정상 동작한다",
+        "2.80의 모든 통신이 차단되어 인터넷 접속까지 불가능해진다"
+      ],
+      "answer": 3,
+      "explanation": "Standard ACL은 Source만 보므로 목적지를 구분할 수 없습니다. 그래서 목적지에 가까운 곳의 Outbound에 걸어야 합니다."
+    },
+    {
+      "question": "내부 서버(2.80)가 Web과 DNS를 함께 제공하고 클라이언트의 DNS도 2.80으로 지정되어 있다. 'permit tcp ... eq 80' 한 줄만 적용했을 때 사용자가 겪는 증상은?",
+      "options": [
+        "도메인 이름으로는 접속되지만 IP로는 접속되지 않는다",
+        "둘 다 정상 접속되지만 속도가 느려진다",
+        "브라우저에서 IP로는 접속되지만 도메인 이름으로는 접속되지 않는다",
+        "둘 다 접속되지 않으며 ping만 동작한다"
+      ],
+      "answer": 2,
+      "explanation": "TCP 80은 허용되었으나 DNS 질의(UDP 53)가 암묵적 deny에 걸립니다. 정책은 프로토콜 단위인데 사용자 경험은 서비스 단위라는 간극입니다."
+    },
+    {
+      "question": "established 옵션의 한계로 옳은 것은?",
+      "options": [
+        "TCP뿐 아니라 UDP 세션까지 추적하므로 장비 부하가 매우 크다",
+        "Inbound 방향에서는 동작하지 않는다",
+        "세션 상태를 기억하지 않고 TCP의 ACK/RST 플래그만 검사하므로 플래그를 위조한 패킷이 통과할 수 있다",
+        "3-Way Handshake가 끝나면 자동으로 해제되어 응답을 막는다"
+      ],
+      "answer": 2,
+      "explanation": "그래서 현대 방화벽은 세션 테이블에 5-Tuple을 기록하는 Stateful Inspection을 사용하며, Cisco에서는 Reflexive ACL·CBAC·ZBF로 발전했습니다."
+    },
+    {
+      "question": "Extended ACL에서 'deny tcp ... eq telnet' 아래에 permit tcp any any를 작성했을 때 발생하는 문제는?",
+      "options": [
+        "telnet까지 함께 허용되어 차단 정책이 무효가 된다",
+        "TCP만 허용되고 UDP와 ICMP는 암묵적 deny에 걸려 ping과 DNS까지 차단된다",
+        "First Match에 의해 deny 조건이 무시된다",
+        "문법 오류로 명령이 입력되지 않는다"
+      ],
+      "answer": 1,
+      "explanation": "ip는 TCP·UDP·ICMP를 모두 포함하는 밑바탕 프로토콜이므로, 나머지를 열 때는 permit ip any any여야 합니다."
+    },
+    {
+      "question": "Named ACL 101에 다음이 적용되어 있다. 여기에 추가 차단 조건을 넣으려고 번호를 지정하지 않고 입력하면?\n\n  10 deny tcp 192.168.2.0 0.0.0.255 192.168.1.0 0.0.0.255 eq telnet\n  20 permit ip any any",
+      "options": [
+        "번호 없이 입력하면 IOS가 명령을 거부한다",
+        "30번으로 맨 아래에 붙어 20번의 permit ip any any에 먼저 걸리므로 아무 효과가 없다",
+        "10번을 덮어쓰고 기존 조건이 사라진다",
+        "자동으로 15번이 부여되어 의도대로 동작한다"
+      ],
+      "answer": 1,
+      "explanation": "시퀀스 번호를 지정하지 않으면 맨 아래에 추가됩니다. 반드시 15처럼 permit 위쪽 번호를 명시해야 합니다."
+    },
+    {
+      "question": "운영 중인 라우터에서 Numbered ACL을 no access-list로 지운 뒤 다시 작성하려 한다. 이때의 위험은?",
+      "options": [
+        "삭제한 ACL 번호를 재사용할 수 없게 된다",
+        "라우팅 테이블이 초기화되어 재수렴이 필요하다",
+        "인터페이스 설정까지 함께 삭제되어 링크가 다운된다",
+        "ACL이 인터페이스에 걸려 있는 상태에서 리스트가 비면 암묵적 deny로 모든 트래픽이 차단된다"
+      ],
+      "answer": 3,
+      "explanation": "실무에서는 새 이름의 ACL을 미리 만들어 두고 인터페이스에서 갈아 끼우는 방식을 씁니다."
+    },
+    {
+      "question": "서버의 NIC Teaming에서 Active NIC이 죽어 Standby로 전환되었다. Gratuitous ARP 한 번으로 스위치의 MAC 테이블과 클라이언트의 ARP 캐시가 모두 갱신되는 이유는?",
+      "options": [
+        "스위치는 프레임의 Source MAC으로 학습하고, 클라이언트는 ARP 정보를 Dynamic하게 덮어쓰기 때문",
+        "클라이언트가 GARP를 받으면 즉시 ARP Request를 재전송하기 때문",
+        "스위치가 GARP를 수신하면 모든 포트의 MAC 학습을 초기화하기 때문",
+        "GARP가 스위치와 클라이언트에 각각 별도의 유니캐스트로 전송되기 때문"
+      ],
+      "answer": 0,
+      "explanation": "브로드캐스트 한 번으로 L2 학습과 L3 캐시 갱신이 동시에 일어납니다. 바로 이 '검증 없는 덮어쓰기'가 ARP Poisoning의 재료이기도 합니다."
+    },
+    {
+      "question": "ARP Spoofing 시나리오에서 공격자 C는 A의 ARP Request를 엿들어 A의 정보를 얻었지만, B의 MAC을 알기 위해 별도로 ARP Request를 던져야 했다. 그 이유는?",
+      "options": [
+        "B가 A에게 보낸 ARP Reply는 유니캐스트여서 C가 볼 수 없었기 때문",
+        "스위치가 B의 Reply를 C 포트로 플러딩하지 않도록 차단했기 때문",
+        "B가 ARP Reply를 암호화해서 전송했기 때문",
+        "B의 MAC이 A의 캐시에만 저장되고 프레임에는 포함되지 않기 때문"
+      ],
+      "answer": 0,
+      "explanation": "ARP Request는 브로드캐스트라 모두가 Sender IP/MAC을 볼 수 있지만, Reply는 유니캐스트로 요청자에게만 갑니다."
+    },
+    {
+      "question": "VTY ACL을 access-class 10 out으로 적용하고 'access-list 10 permit host 192.168.1.10'을 작성했다. 이 설정의 의미는?",
+      "options": [
+        "192.168.1.10이 이 라우터로 telnet 접속해 들어오는 것만 허용한다",
+        "192.168.1.10에서 오는 모든 트래픽을 라우터가 외부로 전달한다",
+        "이 라우터에서 192.168.1.10으로 telnet 접속해 나가는 것만 허용한다",
+        "라우터의 인터페이스 중 192.168.1.10과 같은 대역만 관리 접속을 받는다"
+      ],
+      "answer": 2,
+      "explanation": "VTY ACL은 in이면 조건 IP가 Source, out이면 Destination의 의미가 됩니다."
+    },
+    {
+      "question": "SSH로 원격 접속한 상태에서 VTY ACL을 설정하려 한다. 가장 중요한 사전 조치는?",
+      "options": [
+        "enable secret을 제거해 잠금 상태를 방지한다",
+        "line vty 0 4만 먼저 설정하고 나머지는 나중에 적용한다",
+        "access-class를 out 방향으로 먼저 적용해 둔다",
+        "자신의 접속 출발지 IP가 permit에 포함되는지 확인하고 콘솔 접근 수단을 확보한다"
+      ],
+      "answer": 3,
+      "explanation": "VTY ACL에도 암묵적 deny가 그대로 적용되므로, 자기 IP를 빠뜨리면 즉시 접속이 끊기고 다시 들어갈 수 없습니다. reload in 명령을 예약해 두는 것도 안전장치입니다."
+    },
+    {
+      "question": "192.168.16.0/20 네트워크를 ACL 조건으로 표현할 때 사용할 와일드카드 마스크는?",
+      "options": [
+        "0.0.15.255",
+        "0.0.255.255",
+        "255.255.240.0",
+        "0.0.0.255"
+      ],
+      "answer": 0,
+      "explanation": "/20은 서브넷 마스크 255.255.240.0이고, 255.255.255.255에서 빼면 0.0.15.255가 됩니다."
+    },
+    {
+      "question": "사무실에서 CCTV 영상이 간헐적으로 끊기고, 서버에서 arp -a를 확인하니 같은 게이트웨이 IP에 대해 시점마다 다른 MAC이 나타났다. 가장 유력한 원인과 다음 조치는?",
+      "options": [
+        "서버의 NIC Teaming이 반복 전환되는 것이며 Standby NIC을 제거한다",
+        "게이트웨이 IP와 겹치는 Rogue 공유기가 연결된 것이며, show mac address-table로 포트를 찾아 케이블을 추적한다",
+        "DNS 서버 장애이며 nslookup으로 이름 해석을 확인한다",
+        "백본 스위치의 MAC 테이블이 가득 찬 것이며 스위치를 재부팅한다"
+      ],
+      "answer": 1,
+      "explanation": "공유기의 기본 IP(192.168.X.1)가 우연히 내부 게이트웨이와 겹쳐 응답을 가로챈 사례입니다. 악의가 없어도 Rogue Device이며, 미사용 포트 차단·Port Security·DHCP Snooping·DAI가 대응책입니다."
+    }
+  ]
+}

@@ -1,0 +1,613 @@
+{
+  "title": "네트워크 보안 DAY5",
+  "subtitle": "DHCP 보안·ARP 공격·Traffic Control(ACL)",
+  "subject": "네트워크 보안",
+  "description": "SK Shieldus Rookies: 네트워크 보안 5일차 수업. DORA의 브로드캐스트 최적화, DHCP Spoofing/Starvation과 DHCP Snooping, DHCP Relay Agent, ARP Spoofing/Poisoning과 DAI, 그리고 Standard·Extended·Named·VTY Access Control List를 다룹니다.",
+  "questions": [
+    {
+      "question": "수정된 DHCP DORA 과정에서 L2(프레임) 관점의 주소 사용 순서로 옳은 것은?",
+      "options": [
+        "Broadcast → Unicast → Unicast → Unicast",
+        "Unicast → Broadcast → Unicast → Broadcast",
+        "Broadcast → Broadcast → Broadcast → Broadcast",
+        "Broadcast → Unicast → Broadcast → Unicast"
+      ],
+      "answer": 3,
+      "explanation": "Discover(BC) → Offer(UC) → Request(BC) → Ack(UC). 브로드캐스트를 50% 줄인 방식입니다."
+    },
+    {
+      "question": "책에 적힌 DHCP의 'BC-UC-BC-UC'는 어느 계층 관점의 설명인가?",
+      "options": [
+        "L2와 L3 모두 동일하게 BC-UC-BC-UC이다",
+        "L2(프레임)의 관점이며, L3에서는 네 단계 모두 브로드캐스트다",
+        "L3(패킷)의 관점이며, L2에서는 모두 유니캐스트다",
+        "L4(포트) 관점의 설명이다"
+      ],
+      "answer": 1,
+      "explanation": "L2는 BC-UC-BC-UC이지만, L3 목적지 IP는 네 단계 모두 255.255.255.255입니다."
+    },
+    {
+      "question": "DHCP Offer를 L2 유니캐스트로 보낼 수 있게 된 근본적인 이유는?",
+      "options": [
+        "서버가 ARP로 클라이언트의 MAC을 조회하기 때문",
+        "서버가 Discover 프레임에서 클라이언트의 Source MAC을 이미 알고 있기 때문",
+        "클라이언트가 Discover에 자신의 IP를 기록해 보내기 때문",
+        "스위치가 MAC 테이블을 서버에 알려 주기 때문"
+      ],
+      "answer": 1,
+      "explanation": "DHCP는 RARP를 기반으로 만들어져 MAC↔IP 바인딩 정보를 다룹니다. 서버는 Discover의 Source MAC을 알므로 유니캐스트 프레임 전송 조건이 성립합니다."
+    },
+    {
+      "question": "DHCP Request가 여전히 브로드캐스트로 전송되는 이유는?",
+      "options": [
+        "서버의 MAC 주소를 아직 모르기 때문",
+        "라우터를 통과시켜야 하기 때문",
+        "다른 DHCP 서버가 같은 IP를 중복 할당했는지 확인해야 하기 때문",
+        "클라이언트가 자신의 IP를 아직 받지 못했기 때문"
+      ],
+      "answer": 2,
+      "explanation": "Request의 목적은 이미 아는 서버가 아니라 '모르는 다른 서버들'에게 묻는 것이므로 브로드캐스트여야 합니다."
+    },
+    {
+      "question": "Stub Network의 정의로 옳은 것은?",
+      "options": [
+        "라우팅 프로토콜을 사용하지 않는 네트워크",
+        "외부 네트워크와 통신할 수 있는 통로가 하나뿐인 네트워크",
+        "브로드캐스트가 발생하지 않는 네트워크",
+        "VLAN이 하나만 존재하는 네트워크"
+      ],
+      "answer": 1,
+      "explanation": "통로가 하나이므로 경로 선택의 여지가 없고, Default Route 한 줄로 처리할 수 있습니다."
+    },
+    {
+      "question": "KT와 SKB 두 ISP에 동시에 연결된 기업망의 상태를 무엇이라 하는가?",
+      "options": [
+        "Backbone Network",
+        "Multihomed",
+        "Broadcast Domain",
+        "Stub Network"
+      ],
+      "answer": 1,
+      "explanation": "여러 ISP와 연결된 상태를 Multihomed라 하며, 이때는 Default Route로 표현할 수 없어 BGP 같은 동적 라우팅이 필요합니다."
+    },
+    {
+      "question": "Distance Vector 알고리즘의 대표 프로토콜과 그 대표적 문제점은?",
+      "options": [
+        "RIP이며 리소스를 많이 소모한다",
+        "OSPF이며 리소스를 많이 소모한다",
+        "RIP이며 L3 라우팅 루핑이 발생할 수 있다",
+        "BGP이며 수렴 속도가 느리다"
+      ],
+      "answer": 2,
+      "explanation": "이웃이 준 정보만 믿고 가는 '내비게이션' 방식이라 루핑이 생길 수 있습니다."
+    },
+    {
+      "question": "Link State 알고리즘(OSPF)의 특징으로 옳은 것은?",
+      "options": [
+        "전체 지도를 갖고 스스로 계산하므로 루핑이 없지만 리소스를 많이 요구한다",
+        "루핑이 발생하지만 리소스 소모가 적다",
+        "이웃의 라우팅 테이블만 받으므로 가볍고 루핑이 없다",
+        "AS 간 라우팅 전용으로만 사용된다"
+      ],
+      "answer": 0,
+      "explanation": "리소스 부담 때문에 Area 단위로 나누는 디자인이 중요합니다."
+    },
+    {
+      "question": "Native VLAN의 정의로 옳은 것은?",
+      "options": [
+        "사용하지 않는 포트를 모아 두는 VLAN",
+        "트렁크 구간에서 Tagged Frame만 처리하는 VLAN",
+        "트렁크 구간에서 발생하는 Untagged Frame을 처리하기 위한 VLAN",
+        "관리 목적으로만 사용하는 전용 VLAN"
+      ],
+      "answer": 2,
+      "explanation": "기본값은 VLAN 1이며, 기본값을 그대로 쓰면 Double Tagging 공격의 전제 조건이 됩니다."
+    },
+    {
+      "question": "Port Security의 본질을 가장 정확히 설명한 것은?",
+      "options": [
+        "특정 포트에서 브로드캐스트를 차단하는 것",
+        "특정 포트로 인식되는 MAC 주소의 개수를 제한하는 것",
+        "특정 포트로 들어오는 트래픽의 속도를 제한하는 것",
+        "특정 포트의 VLAN 소속을 고정하는 것"
+      ],
+      "answer": 1,
+      "explanation": "MAC Flooding은 한 포트에서 수만 개의 MAC이 인식될 수 있다는 점을 악용하므로, 개수 제한이 그 조건을 없앱니다."
+    },
+    {
+      "question": "Port Security에서 Sticky 방식을 권장하는 이유는?",
+      "options": [
+        "인식은 Dynamic하게 하되 그 정보를 Configuration에 Static하게 고정하기 때문",
+        "여러 개의 MAC을 자동으로 허용하기 때문",
+        "링크가 끊기면 학습한 MAC이 즉시 삭제되기 때문",
+        "MAC 주소를 관리자가 직접 입력할 수 있기 때문"
+      ],
+      "answer": 0,
+      "explanation": "케이블을 뽑고 다른 장비를 꽂아도 설정에 남아 있어 통신이 허용되지 않습니다."
+    },
+    {
+      "question": "Rogue Device의 정의로 가장 정확한 것은?",
+      "options": [
+        "무선 AP 기능을 가진 장비만 해당",
+        "DHCP 서버로 동작하도록 설정된 장비만 해당",
+        "반드시 공격 도구가 설치된 장비",
+        "악의적 행동 여부와 무관하게 허가되지 않은 시스템이 연결된 것"
+      ],
+      "answer": 3,
+      "explanation": "관리자가 모르는 장비가 망에 붙어 있다는 것 자체가 통제 실패입니다."
+    },
+    {
+      "question": "Rogue DHCP 서버의 Pool이 정상 서버와 결정적으로 다른 점은?",
+      "options": [
+        "Lease 기간을 매우 짧게 설정한다",
+        "IP 할당 범위가 정상 서버보다 훨씬 넓다",
+        "Default Gateway와 DNS를 자기 자신의 IP로 배포한다",
+        "서브넷 마스크를 잘못된 값으로 준다"
+      ],
+      "answer": 2,
+      "explanation": "그 두 줄만으로 클라이언트의 모든 외부 트래픽이 공격자를 경유하게 되어 MITM이 성립합니다."
+    },
+    {
+      "question": "DHCP Snooping을 구현하는 위치로 가장 적절한 곳은?",
+      "options": [
+        "서버가 연결되는 백본 스위치",
+        "인터넷과 연결되는 경계 라우터",
+        "DHCP 서버 자체",
+        "클라이언트(PC)가 연결되는 Access 스위치"
+      ],
+      "answer": 3,
+      "explanation": "Rogue Device가 붙을 수 있는 자리가 바로 사용자 포트이므로, 통제는 위협에 가장 가까운 곳에 둡니다."
+    },
+    {
+      "question": "DHCP Snooping에서 관리자가 실제로 정의하는 것은?",
+      "options": [
+        "Trusted와 Untrusted를 모두 일일이 정의해야 한다",
+        "Trusted Port만 정의하고, 나머지는 자동으로 Untrusted가 된다",
+        "포트가 아니라 MAC 주소 목록을 정의한다",
+        "Untrusted Port만 정의하고, 나머지는 자동으로 Trusted가 된다"
+      ],
+      "answer": 1,
+      "explanation": "기본값이 '불신'인 화이트리스트 설계입니다."
+    },
+    {
+      "question": "Untrusted 포트에서 DHCP Offer 메시지가 들어왔을 때 스위치의 동작은?",
+      "options": [
+        "정상 처리하되 로그만 남긴다",
+        "포트를 err-disabled 상태로 만든다",
+        "해당 메시지를 Drop한다",
+        "Trusted 포트로 전달한다"
+      ],
+      "answer": 2,
+      "explanation": "Offer/Ack은 서버만 보낼 수 있으므로, Untrusted에서 올라온 서버 메시지는 Rogue로 판정해 버립니다."
+    },
+    {
+      "question": "Access 스위치에서 DHCP Snooping의 Trust Port로 지정해야 하는 곳은?",
+      "options": [
+        "백본 스위치와 연결되는 업링크 포트(대개 Trunk)",
+        "DHCP 서버가 직접 꽂혀 있는 Access 포트",
+        "사용하지 않는 모든 포트",
+        "클라이언트 PC가 연결된 포트"
+      ],
+      "answer": 0,
+      "explanation": "Access 스위치에는 서버가 직접 붙어 있지 않으며, 정상 Offer/Ack은 반드시 업링크로 들어옵니다."
+    },
+    {
+      "question": "DHCP Snooping의 Rate Limiting이 대응하는 공격은?",
+      "options": [
+        "DHCP Spoofing 공격",
+        "MAC Flooding 공격",
+        "DHCP Starvation 공격",
+        "ARP Poisoning 공격"
+      ],
+      "answer": 2,
+      "explanation": "초당 받는 DHCP 메시지 수를 제한해 Discover 폭주를 차단합니다. Spoofing 대응은 Trust Port 지정입니다."
+    },
+    {
+      "question": "Rate Limit 위반으로 err-disabled 상태가 된 포트를 복구하는 방법은?",
+      "options": [
+        "케이블을 뽑았다가 다시 꽂는다",
+        "no shutdown만 실행한다",
+        "shutdown 명령을 준 뒤 no shutdown을 실행한다",
+        "clear counters 명령을 실행한다"
+      ],
+      "answer": 2,
+      "explanation": "err-disabled는 running-config에 shutdown이 없는 상태이므로, no shutdown만으로는 풀리지 않습니다."
+    },
+    {
+      "question": "DHCP가 기본적으로 요구하는 전제 조건은?",
+      "options": [
+        "서버가 클라이언트의 IP를 미리 알고 있어야 한다",
+        "클라이언트가 서버의 IP를 미리 알고 있어야 한다",
+        "클라이언트와 서버가 서로 다른 VLAN에 있어야 한다",
+        "클라이언트와 서버가 같은 브로드캐스트 도메인에 있어야 한다"
+      ],
+      "answer": 3,
+      "explanation": "클라이언트는 Local Broadcast로 서버를 찾는데, 브로드캐스트는 라우터를 넘지 못합니다."
+    },
+    {
+      "question": "DHCP Relay Agent가 수행하는 핵심 동작은?",
+      "options": [
+        "클라이언트의 브로드캐스트를 서버를 향한 유니캐스트로 변환해 전달한다",
+        "DHCP 서버의 Pool을 복제해서 보관한다",
+        "클라이언트에게 직접 IP를 할당한다",
+        "브로드캐스트를 그대로 다른 네트워크로 전달한다"
+      ],
+      "answer": 0,
+      "explanation": "변환해서 보내는 것이므로 '라우터는 브로드캐스트를 차단한다'는 원칙은 깨지지 않습니다."
+    },
+    {
+      "question": "라우터를 DHCP Relay Agent로 만드는 인터페이스 명령은?",
+      "options": [
+        "ip forward-address <DHCP서버IP>",
+        "ip dhcp relay <DHCP서버IP>",
+        "ip route 0.0.0.0 0.0.0.0 <DHCP서버IP>",
+        "ip helper-address <DHCP서버IP>"
+      ],
+      "answer": 3,
+      "explanation": "여기에 전역 설정으로 ip forward-protocol을 지정해 변환해서 넘길 프로토콜을 한정합니다."
+    },
+    {
+      "question": "Gratuitous ARP의 정의로 옳은 것은?",
+      "options": [
+        "라우터가 대신 응답해 주는 Proxy 형태의 Reply",
+        "요청(Request)이 없었는데도 보내는 Reply",
+        "IPv6에서만 사용되는 특수한 ARP",
+        "응답이 오지 않을 때 재전송하는 Request"
+      ],
+      "answer": 1,
+      "explanation": "NIC Teaming의 Failover 통지, IP 충돌 확인 등 정상 용도로 널리 쓰입니다."
+    },
+    {
+      "question": "ARP 공격에서 Spoofing과 Poisoning의 관계로 옳은 것은?",
+      "options": [
+        "둘은 완전히 같은 말이다",
+        "Poisoning이 먼저 일어나고 그 결과로 Spoofing이 발생한다",
+        "Spoofing은 L2, Poisoning은 L3에서 일어난다",
+        "Spoofing은 거짓 정보를 전달한 행위이고, Poisoning은 캐시가 오염된 결과다"
+      ],
+      "answer": 3,
+      "explanation": "행위(Spoofing) → 결과(Poisoning) → 목적(MITM)의 순서로 이어집니다."
+    },
+    {
+      "question": "DAI(Dynamic ARP Inspection)가 판정 근거로 사용하는 것은?",
+      "options": [
+        "DHCP Snooping이 만든 바인딩 테이블",
+        "Port Security의 Sticky MAC 목록",
+        "스위치의 MAC 주소 테이블",
+        "라우터의 ARP 캐시"
+      ],
+      "answer": 0,
+      "explanation": "그래서 교안 p.20에 'DHCP Snooping 요구'라고 명시되어 있으며, Snooping 없이는 DAI가 성립하지 않습니다."
+    },
+    {
+      "question": "ACL로 제어할 수 없는 트래픽은?",
+      "options": [
+        "라우터 자신이 생성해서 내보내는 라우팅 정보",
+        "라우터를 통과해 인터넷으로 나가는 트래픽",
+        "라우터를 목적지로 하는 관리 접속 트래픽",
+        "라우터를 통과하는 트래픽"
+      ],
+      "answer": 0,
+      "explanation": "라우터가 출발지인 트래픽은 ACL로 필터할 수 없으며, Distribute List나 Route Map을 사용합니다."
+    },
+    {
+      "question": "ACL의 First Match 특성 때문에 반드시 지켜야 하는 작성 원칙은?",
+      "options": [
+        "좁은 범위의 조건을 넓은 범위보다 위에 작성한다",
+        "permit 조건을 항상 deny보다 위에 작성한다",
+        "조건을 번호 순서와 무관하게 작성한다",
+        "넓은 범위의 조건을 좁은 범위보다 위에 작성한다"
+      ],
+      "answer": 0,
+      "explanation": "넓은 범위가 위에 있으면 좁은 조건은 영영 읽히지 않습니다."
+    },
+    {
+      "question": "ACL의 암묵적 deny(Implicit Deny)에 대한 설명으로 옳은 것은?",
+      "options": [
+        "show access-lists 명령으로 확인할 수 있다",
+        "Extended ACL에만 적용된다",
+        "permit 조건이 하나라도 있으면 적용되지 않는다",
+        "리스트 맨 아래에 보이지 않는 deny any가 이미 존재한다"
+      ],
+      "answer": 3,
+      "explanation": "그래서 deny 한 줄만 쓰고 permit을 빠뜨리면 의도하지 않은 트래픽까지 전부 차단됩니다."
+    },
+    {
+      "question": "하나의 인터페이스에 적용할 수 있는 ACL의 개수 기준은?",
+      "options": [
+        "프로토콜별, 방향별, 인터페이스별로 각각 하나씩",
+        "인터페이스당 총 하나",
+        "방향에 관계없이 인터페이스당 두 개",
+        "개수 제한이 없다"
+      ],
+      "answer": 0,
+      "explanation": "그래서 같은 방향에 정책을 나눠 걸 수 없고, 기존 ACL을 수정해야 합니다."
+    },
+    {
+      "question": "IPv4 Standard ACL에 사용할 수 있는 번호 범위는?",
+      "options": [
+        "1~99, 100~199",
+        "1~99, 1300~1999",
+        "100~199, 2000~2699",
+        "1300~1999, 2000~2699"
+      ],
+      "answer": 1,
+      "explanation": "원래 1~99만 있었으나 번호가 부족해 1300~1999가 추가되었습니다."
+    },
+    {
+      "question": "Extended ACL이 조건식으로 사용하는 5-Tuple에 포함되지 않는 것은?",
+      "options": [
+        "Destination IP Address",
+        "Protocol",
+        "Source MAC Address",
+        "Source Port"
+      ],
+      "answer": 2,
+      "explanation": "5-Tuple은 Source IP, Destination IP, Protocol, Source Port, Destination Port입니다."
+    },
+    {
+      "question": "Wildcard Mask에서 비트 값 0이 의미하는 것은?",
+      "options": [
+        "Don't Care — 어떤 값이 와도 상관없다",
+        "Exactly Match — IP 주소 비트와 반드시 일치해야 한다",
+        "네트워크 부분을 나타낸다",
+        "호스트 부분을 나타낸다"
+      ],
+      "answer": 1,
+      "explanation": "서브넷 마스크와 정반대입니다. 와일드카드는 0이 Exactly Match, 1이 Don't Care입니다."
+    },
+    {
+      "question": "서브넷 마스크 255.255.255.0에 대응하는 와일드카드 마스크는?",
+      "options": [
+        "255.255.255.255",
+        "0.0.0.255",
+        "255.255.255.0",
+        "0.0.0.0"
+      ],
+      "answer": 1,
+      "explanation": "255.255.255.255에서 서브넷 마스크를 빼면 와일드카드 마스크가 나옵니다."
+    },
+    {
+      "question": "Standard ACL을 '목적지에 가까운 곳, Outbound'에 적용하도록 권장하는 이유는?",
+      "options": [
+        "Outbound가 라우터 리소스를 덜 사용하기 때문",
+        "Inbound에는 Standard ACL을 적용할 수 없기 때문",
+        "Source만 볼 수 있어 출발지 가까이에서 걸면 그 출발지의 모든 통신이 차단되기 때문",
+        "목적지 주소를 조건으로 쓸 수 있기 때문"
+      ],
+      "answer": 2,
+      "explanation": "정확성을 위해 라우팅 리소스를 더 쓰는 것을 감수하는 디자인입니다."
+    },
+    {
+      "question": "동일한 조건의 ACL을 Inbound에 걸었을 때와 Outbound에 걸었을 때의 차이는?",
+      "options": [
+        "차단 결과 자체가 서로 달라진다",
+        "Inbound는 라우팅 전에 버리고, Outbound는 라우팅을 마친 뒤 버린다",
+        "Inbound는 Standard만, Outbound는 Extended만 적용된다",
+        "Inbound는 로그가 남고, Outbound는 남지 않는다"
+      ],
+      "answer": 1,
+      "explanation": "라우팅을 하면 무조건 리소스가 사용되므로, 효율만 보면 Inbound가 유리합니다."
+    },
+    {
+      "question": "ACL 실습 시 강사가 강조한 올바른 작업 순서는?",
+      "options": [
+        "ACL 적용 → IP 설정 → 라우팅 확인",
+        "IP 설정 → ACL 적용 → 라우팅 확인",
+        "IP 설정 → 라우팅으로 전체 통신 확인 → ACL 적용 및 테스트",
+        "라우팅 확인 → ACL 적용 → IP 설정"
+      ],
+      "answer": 2,
+      "explanation": "라우팅 확인을 건너뛰면 통신이 안 되는 원인이 ACL 때문인지 라우팅 때문인지 구분할 수 없습니다."
+    },
+    {
+      "question": "차단 대상이 아닌 PC가 인터넷 서버로 ping을 보냈는데 Request timed out이 발생했다. 가장 유력한 원인은?",
+      "options": [
+        "요청은 잘 나갔지만 돌아오는 응답이 ACL에 걸려 Drop되었다",
+        "인터넷 서버가 ICMP를 지원하지 않는다",
+        "라우팅 테이블에 경로가 없다",
+        "요청 자체가 출발 인터페이스에서 Drop되었다"
+      ],
+      "answer": 0,
+      "explanation": "통신은 양방향이고 돌아오는 트래픽도 같은 ACL을 통과합니다. ACL 설계에서 가장 흔한 실수입니다."
+    },
+    {
+      "question": "Destination host unreachable과 Request timed out의 차이로 옳은 것은?",
+      "options": [
+        "둘은 동일한 의미이며 OS에 따라 표현만 다르다",
+        "전자는 DNS 문제, 후자는 라우팅 문제를 뜻한다",
+        "전자는 L2 문제, 후자는 L3 문제를 뜻한다",
+        "전자는 중간 장비가 차단 사실을 알려 준 것이고, 후자는 응답이 오지 않아 기다리다 포기한 것이다"
+      ],
+      "answer": 3,
+      "explanation": "증상만으로도 원인의 위치를 좁힐 수 있습니다."
+    },
+    {
+      "question": "ACL로 차단할 때 ICMP Destination Unreachable 응답이 보안상 문제가 되는 이유는?",
+      "options": [
+        "암호화되지 않은 평문으로 전송되기 때문",
+        "출발지 IP가 위조되어 되돌아오기 때문",
+        "응답 패킷이 대량으로 발생해 DoS를 유발하기 때문",
+        "'관리 정책에 의해 금지됨'이라는 원인 코드가 포함되어 필터링 정책의 존재가 노출되기 때문"
+      ],
+      "answer": 3,
+      "explanation": "Code 13(Administratively Prohibited)이 실려 있어, 실무에서는 응답을 억제하는 Silent Drop 방식을 씁니다."
+    },
+    {
+      "question": "IPv4 Extended ACL의 번호 범위와 권장 적용 위치로 옳은 것은?",
+      "options": [
+        "100~199, 2000~2699이며 출발지에 가까운 Inbound",
+        "100~199, 2000~2699이며 목적지에 가까운 Outbound",
+        "1~99, 2000~2699이며 출발지에 가까운 Inbound",
+        "1~99, 1300~1999이며 목적지에 가까운 Outbound"
+      ],
+      "answer": 0,
+      "explanation": "Destination까지 볼 수 있으므로 출발지 가까이에서 걸어도 정확하고, 라우팅 전에 버려 리소스를 아낍니다."
+    },
+    {
+      "question": "Extended ACL의 established 옵션이 하는 일은?",
+      "options": [
+        "이미 형성된 TCP 커넥션의 되돌아오는 트래픽만 허용한다",
+        "UDP 세션의 상태를 추적한다",
+        "3-Way Handshake를 강제로 완료시킨다",
+        "세션이 끊기면 자동으로 ACL을 갱신한다"
+      ],
+      "answer": 0,
+      "explanation": "내부에서 시작한 연결의 응답만 허용하는 방화벽의 기본 동작을 ACL로 구현한 것입니다."
+    },
+    {
+      "question": "'내 PC에서 서버로는 핑이 되는데 서버에서 내 PC로는 안 된다'는 증상의 가장 유력한 원인은?",
+      "options": [
+        "PC의 서브넷 마스크가 잘못 설정되었기 때문",
+        "PC의 호스트 방화벽(Windows 방화벽)이 외부에서 시작된 요청을 차단하기 때문",
+        "스위치의 MAC 테이블이 가득 찼기 때문",
+        "라우터의 라우팅 테이블에 역방향 경로가 없기 때문"
+      ],
+      "answer": 1,
+      "explanation": "내가 시작한 통신의 응답은 허용되지만, 외부에서 그냥 들어오는 요청은 차단됩니다."
+    },
+    {
+      "question": "Telnet 대신 SSH를 사용해야 하는 이유는?",
+      "options": [
+        "Telnet은 IPv6를 지원하지 않기 때문",
+        "Telnet은 TCP를 사용하지 않기 때문",
+        "Telnet은 명령어와 응답이 Clear Text로 전송되어 캡처하면 그대로 노출되기 때문",
+        "Telnet은 동시 접속 세션을 하나만 지원하기 때문"
+      ],
+      "answer": 2,
+      "explanation": "Telnet은 TCP 23번, SSH는 TCP 22번을 사용하며 SSH는 암호화된 형태로 전송합니다."
+    },
+    {
+      "question": "비대칭키(공개키) 암호화 방식에 대한 설명으로 옳은 것은?",
+      "options": [
+        "공개키로 암호화한 데이터는 쌍을 이루는 개인키로만 복호화할 수 있다",
+        "개인키를 상대방에게 전달해야 통신이 가능하다",
+        "암호화와 복호화에 동일한 키를 사용한다",
+        "대칭키보다 속도가 빨라 대용량 전송에 적합하다"
+      ],
+      "answer": 0,
+      "explanation": "SSH가 이 방식을 사용하며, crypto key generate rsa로 키 쌍을 생성합니다."
+    },
+    {
+      "question": "L2 스위치에서 원격 관리용 IP를 설정하는 위치는?",
+      "options": [
+        "interface loopback 0",
+        "interface fastEthernet 0/1",
+        "interface vlan 1 (Management Interface)",
+        "line vty 0 15"
+      ],
+      "answer": 2,
+      "explanation": "물리 포트는 L2로 동작해 IP를 가질 수 없으므로, VLAN을 대표하는 논리 인터페이스에 설정합니다."
+    },
+    {
+      "question": "enable password와 enable secret이 모두 설정되어 있을 때의 동작은?",
+      "options": [
+        "둘 중 아무 값이나 입력하면 통과된다",
+        "설정 충돌로 둘 다 적용되지 않는다",
+        "enable password가 우선 적용된다",
+        "enable secret만 적용되고 enable password는 무시된다"
+      ],
+      "answer": 3,
+      "explanation": "secret은 해시로 저장되어 show run에서 확인할 수 없고, password는 평문 그대로 노출됩니다."
+    },
+    {
+      "question": "enable secret을 설정하지 않으면 원격 접속 시 발생하는 현상은?",
+      "options": [
+        "User Mode에서 Privileged Mode로 진입할 수 없다",
+        "패스워드 없이 곧바로 Privileged Mode로 들어간다",
+        "Telnet 접속 자체가 되지 않는다",
+        "vty 세션이 5초 후 자동 종료된다"
+      ],
+      "answer": 0,
+      "explanation": "특권 모드에 패스워드가 없는 장비를 원격에서 장악하지 못하게 하는 IOS의 안전장치입니다."
+    },
+    {
+      "question": "line vty 0 15를 한 번에 묶어 설정해야 하는 이유는?",
+      "options": [
+        "16개를 모두 열어야 SSH가 활성화되기 때문",
+        "라인마다 서로 다른 IP를 부여해야 하기 때문",
+        "0번 라인은 콘솔 전용으로 예약되어 있기 때문",
+        "접속자가 몇 번 라인으로 들어올지 지정할 수 없고 비어 있는 라인으로 들어가기 때문"
+      ],
+      "answer": 3,
+      "explanation": "일부만 설정하면 접속이 몰릴 때 어떤 라인으로 들어오느냐에 따라 동작이 달라집니다."
+    },
+    {
+      "question": "다른 네트워크의 PC에서 스위치로 ping이 되지 않았고 ACL을 모두 제거해도 동일했다. 원인은?",
+      "options": [
+        "PC의 서브넷 마스크가 잘못되었다",
+        "스위치의 VLAN 1 인터페이스가 shutdown 상태였다",
+        "스위치가 ICMP를 지원하지 않는다",
+        "스위치에 ip default-gateway가 설정되지 않아 응답을 보내지 못했다"
+      ],
+      "answer": 3,
+      "explanation": "핑은 도착했지만 스위치가 돌아가는 경로를 몰라 응답하지 못한 경우로, 증상은 Request timed out입니다."
+    },
+    {
+      "question": "Extended ACL에서 특정 조건만 막고 나머지를 모두 허용할 때 마지막 줄로 옳은 것은?",
+      "options": [
+        "permit any",
+        "permit any any",
+        "permit tcp any any",
+        "permit ip any any"
+      ],
+      "answer": 3,
+      "explanation": "permit tcp any any로 쓰면 UDP와 ICMP가 암묵적 deny에 걸려 핑과 DNS까지 차단됩니다."
+    },
+    {
+      "question": "Named ACL을 생성할 때 반드시 명시해야 하는 것은?",
+      "options": [
+        "적용 방향(in/out)",
+        "standard인지 extended인지 ACL의 종류",
+        "ACL을 적용할 인터페이스 이름",
+        "시퀀스 번호의 시작 값"
+      ],
+      "answer": 1,
+      "explanation": "숫자가 없어 종류를 유추할 수 없으므로 ip access-list standard/extended <이름> 형태로 명시합니다."
+    },
+    {
+      "question": "라우터 자신에 대한 Telnet 접근을 Extended ACL로 막기 어려운 이유는?",
+      "options": [
+        "라우터를 목적지로 하는 트래픽에는 ACL을 적용할 수 없기 때문",
+        "인터페이스마다 IP가 있어 어느 IP로든 접근이 가능하고, IP가 바뀌거나 늘면 전부 수정해야 하기 때문",
+        "Inbound 방향에는 Extended ACL을 걸 수 없기 때문",
+        "Extended ACL은 TCP 23번 포트를 조건으로 쓸 수 없기 때문"
+      ],
+      "answer": 1,
+      "explanation": "이 한계가 VTY ACL이 존재하는 이유입니다."
+    },
+    {
+      "question": "VTY ACL의 특징으로 옳은 것은?",
+      "options": [
+        "Standard ACL을 사용하며 ip access-group으로 적용한다",
+        "Named ACL만 사용할 수 있으며 인터페이스에 적용한다",
+        "Extended ACL을 사용하며 ip access-group으로 적용한다",
+        "Standard ACL을 사용하며 access-class 명령으로 vty 라인에 적용한다"
+      ],
+      "answer": 3,
+      "explanation": "인터페이스가 아니라 라인에 걸기 때문에 라우터의 IP를 전혀 언급하지 않아도 됩니다."
+    },
+    {
+      "question": "VTY ACL을 access-class 10 in으로 적용했을 때 ACL 조건의 IP가 의미하는 것은?",
+      "options": [
+        "허용할 vty 라인의 개수",
+        "라우터 자신의 인터페이스 주소",
+        "라우터로 접속해 들어오는 쪽의 Source 주소",
+        "라우터에서 접속해 나가는 쪽의 Destination 주소"
+      ],
+      "answer": 2,
+      "explanation": "out으로 적용하면 같은 조건이 Destination(라우터에서 어디로 나가는가)의 의미가 됩니다."
+    },
+    {
+      "question": "특정 인터페이스에 어떤 ACL이 어느 방향으로 적용되어 있는지 확인하는 명령은?",
+      "options": [
+        "show running-config | include access-list",
+        "show ip route",
+        "show ip interface <인터페이스>",
+        "show access-lists"
+      ],
+      "answer": 2,
+      "explanation": "show access-lists는 ACL의 내용만 보여 줍니다. 적용 여부는 Inbound/Outgoing access list 항목으로 확인합니다."
+    }
+  ]
+}
