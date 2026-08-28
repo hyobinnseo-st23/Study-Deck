@@ -1,0 +1,624 @@
+{
+  "title": "네트워크 보안 DAY7",
+  "subtitle": "IPsec VPN·SSL/TLS·SSH·FHRP(HSRP)·Device Monitoring",
+  "subject": "네트워크 보안",
+  "description": "SK Shieldus Rookies: 네트워크 보안 7일차 수업. VTY ACL·NAT·VPN 복습, IPsec 프레임워크와 암호 기초(대칭/비대칭키·MITM·CA·PKI), IPsec 구현 3단계와 NAT 충돌, SSL/TLS와 SSH, FHRP(HSRP) 개념과 구축 실습, ICMP Redirect·Proxy ARP·SNMP·Syslog·NTP를 다룹니다.",
+  "questions": [
+    {
+      "question": "VTY ACL이 일반 ACL과 달리 애플리케이션(Telnet/SSH)이나 라우터 IP를 조건식에 쓰지 않아도 되는 이유로 옳은 것은?",
+      "options": [
+        "원격 접속은 어떤 방식이든 결국 VTY 라인을 거치므로 그 지점 한 곳만 통제하면 되기 때문",
+        "VTY ACL이 Extended ACL이라 포트를 자동으로 인식하기 때문",
+        "라우터가 자신의 IP를 조건식에 자동으로 삽입해 주기 때문",
+        "VTY ACL은 인터페이스가 아니라 라우팅 테이블에 적용되기 때문"
+      ],
+      "answer": 0,
+      "explanation": "VTY ACL은 Standard ACL을 line vty에 access-class로 적용합니다. 접속 방식이나 목적지 IP와 무관하게 원격 접속이 통과하는 VTY 라인 한 곳을 막는 구조라 조건식이 단순합니다."
+    },
+    {
+      "question": "`access-class 1 out`을 적용했을 때 조건식(Standard ACL)이 의미하는 것은?",
+      "options": [
+        "허용할 애플리케이션의 포트 번호",
+        "이 라우터의 인터페이스 IP",
+        "이 라우터에서 다른 장비로 나가는 원격 접속의 목적지(Destination)",
+        "이 라우터로 들어오는 접속의 출발지(Source)"
+      ],
+      "answer": 2,
+      "explanation": "VTY ACL은 Standard ACL임에도 방향에 따라 의미가 달라집니다. in이면 Source(누가 접속해 오는가), out이면 Destination(어디로 접속해 나가는가)입니다."
+    },
+    {
+      "question": "NAT를 분류하는 두 개의 축을 올바르게 짝지은 것은?",
+      "options": [
+        "변환 대상(SNAT/DNAT)과 프로토콜(TCP/UDP)",
+        "매핑 방식(Static/Dynamic)과 방향(Inside/Outside)",
+        "포트 사용 여부(NAT/PAT)와 계층(L3/L4)",
+        "변환 대상(SNAT/DNAT)과 매핑 방식(Static/Dynamic)"
+      ],
+      "answer": 3,
+      "explanation": "SNAT·DNAT는 '무엇의 주소를 바꾸는가', Static·Dynamic은 '어떻게 매핑하는가'를 나타내는 별개의 축입니다."
+    },
+    {
+      "question": "Static NAT가 Dynamic NAT보다 보안상 불리한 이유로 옳은 것은?",
+      "options": [
+        "공인 IP를 여러 개 소모해 관리가 어렵기 때문",
+        "포트 번호를 사용하지 않아 세션 추적이 불가능하기 때문",
+        "1:1 고정 매핑이 항상 NAT 테이블에 존재해 외부에서 내부로 접근할 통로가 열려 있다",
+        "변환 속도가 느려 DoS 공격에 취약하기 때문"
+      ],
+      "answer": 2,
+      "explanation": "Static NAT는 내부 서비스를 외부에 제공하기 위한 고정 테이블을 유지합니다. Dynamic NAT는 평소 테이블이 비어 있어 외부에서 먼저 들어올 수 없습니다."
+    },
+    {
+      "question": "\"PAT를 결합하면 Dynamic NAT가 된다\"는 설명이 틀린 이유는?",
+      "options": [
+        "Static/Dynamic은 매핑 고정 여부를 나타내는 별개의 축이며 Static NAT에도 PAT를 결합할 수 있기 때문",
+        "PAT는 NAT와 전혀 무관한 기술이기 때문",
+        "Dynamic NAT는 포트 번호를 사용할 수 없기 때문",
+        "PAT는 Static NAT에만 결합할 수 있기 때문"
+      ],
+      "answer": 0,
+      "explanation": "Static + PAT는 포트 포워딩(Static PAT), Dynamic + PAT는 NAT Overload입니다. PAT 결합 여부와 Static/Dynamic은 서로 독립적입니다."
+    },
+    {
+      "question": "VPN을 구성하는 두 가지 요소와 각각이 해결하는 문제를 옳게 짝지은 것은?",
+      "options": [
+        "암호화는 사설 IP 통신 불가를, 터널링은 도청을 해결한다",
+        "암호화는 공용망에서의 도청을, 터널링은 사설 IP 통신 불가를 해결한다",
+        "암호화는 대역폭 부족을, 터널링은 인증 문제를 해결한다",
+        "암호화는 라우팅 문제를, 터널링은 무결성 문제를 해결한다"
+      ],
+      "answer": 1,
+      "explanation": "공용망이라 남이 볼 수 있는 문제는 암호화가, 인터넷이 사설 IP를 라우팅하지 않는 문제는 터널링이 해결합니다."
+    },
+    {
+      "question": "실무에서 GRE over IPsec 조합을 쓰는 결정적인 이유는?",
+      "options": [
+        "IPsec이 터널 인터페이스를 만들지 못하기 때문",
+        "GRE가 NAT를 자동으로 우회해 주기 때문",
+        "GRE가 멀티캐스트를 캡슐화해 주어 터널 위에서 OSPF·EIGRP 같은 동적 라우팅이 동작하기 때문",
+        "GRE가 IPsec보다 암호화 성능이 좋기 때문"
+      ],
+      "answer": 2,
+      "explanation": "OSPF(224.0.0.5), EIGRP(224.0.0.10)는 멀티캐스트를 씁니다. 순수 IPsec 터널로는 이를 나를 수 없어 정적 라우팅만 가능해집니다."
+    },
+    {
+      "question": "서울-부산 사이가 전용선으로 연결되어 있음에도 VPN 장비를 두는 이유는?",
+      "options": [
+        "전용선은 라우팅 프로토콜을 지원하지 않기 때문",
+        "전용선도 Tapping(도청)으로 데이터를 빼낼 수 있어 경로 독점이 데이터 보호를 의미하지 않기 때문",
+        "전용선은 대역폭이 부족해 압축이 필요하기 때문",
+        "전용선에서는 사설 IP를 사용할 수 없기 때문"
+      ],
+      "answer": 1,
+      "explanation": "전용선은 경로를 독점할 뿐 데이터의 기밀성을 보장하지 않습니다. 광케이블도 미세 굽힘으로 신호 복제가 가능합니다."
+    },
+    {
+      "question": "교안 7권 p.3의 \"MD5 : 128bit 공유키\" 표기에서 128bit가 실제로 의미하는 것은?",
+      "options": [
+        "블록 암호의 블록 크기",
+        "해시 함수가 출력하는 다이제스트의 길이",
+        "RSA 개인키의 길이",
+        "송수신자가 공유하는 대칭키의 길이"
+      ],
+      "answer": 1,
+      "explanation": "해시 함수 자체는 키를 쓰지 않습니다. MD5 128bit, SHA-1 160bit는 출력 해시값의 길이이며, 키가 등장하는 것은 HMAC입니다."
+    },
+    {
+      "question": "\"IPsec은 프레임워크다\"라는 말의 의미로 가장 적절한 것은?",
+      "options": [
+        "여러 표준 알고리즘을 제시하고 그중에서 골라 조합해 쓰도록 한 체계",
+        "하드웨어 가속을 필수로 요구하는 규격",
+        "암호화 알고리즘을 AES 하나로 고정한 규격",
+        "IPv6 전용으로 설계된 보안 프로토콜"
+      ],
+      "answer": 0,
+      "explanation": "IPsec은 암호화·무결성·인증 각각에 대해 여러 표준을 제시하고 조합을 선택하게 합니다. 그 흔적이 transform-set 명령입니다."
+    },
+    {
+      "question": "대칭키 방식의 가장 큰 약점은 무엇인가?",
+      "options": [
+        "키를 공유하는 과정에서 노출될 수 있고 대상이 늘수록 키 관리가 어려워진다",
+        "대량 데이터 암호화 속도가 느리다",
+        "알고리즘이 표준화되어 있지 않다",
+        "복호화가 불가능하다"
+      ],
+      "answer": 0,
+      "explanation": "대칭키는 빠르고 대량 데이터에 최적이지만 키 배포·관리가 어렵습니다. N명이면 N(N-1)/2개의 키가 필요합니다."
+    },
+    {
+      "question": "공개키 교환 단계에서 성립하는 MITM 공격의 핵심은 무엇인가?",
+      "options": [
+        "공격자가 암호 알고리즘을 무차별 대입으로 해독하는 것",
+        "공격자가 자신의 퍼블릭키를 상대의 퍼블릭키인 것처럼 건네어 양쪽을 모두 속이는 것",
+        "공격자가 인증서의 유효기간을 조작하는 것",
+        "공격자가 프라이빗키를 훔쳐 내는 것"
+      ],
+      "answer": 1,
+      "explanation": "암호 자체를 깨는 것이 아니라 키 교환 단계에 끼어드는 공격입니다. 양쪽 모두 정상 통신으로 착각합니다."
+    },
+    {
+      "question": "CA(Certificate Authority)가 발행하는 인증서에 포함되지 않는 것은?",
+      "options": [
+        "인증서 주체의 퍼블릭키",
+        "인증서 주체에 대한 정보",
+        "CA의 전자 서명",
+        "인증서 주체의 프라이빗키"
+      ],
+      "answer": 3,
+      "explanation": "인증서에는 주체 정보, 주체의 퍼블릭키, 발급 기관 정보, 유효기간, CA의 전자 서명이 들어갑니다. 프라이빗키는 절대 포함되지 않습니다."
+    },
+    {
+      "question": "전자 서명(Digital Signature)의 동작 방향으로 옳은 것은?",
+      "options": [
+        "상대의 퍼블릭키로 암호화하고 상대가 프라이빗키로 복호화한다",
+        "양쪽이 공유한 대칭키로 암호화하고 같은 키로 검증한다",
+        "자신의 프라이빗키로 암호화하고 상대는 그 퍼블릭키로 검증한다",
+        "해시값을 그대로 붙여 보내고 수신 측이 재계산해 비교한다"
+      ],
+      "answer": 2,
+      "explanation": "기밀성이 목적일 때는 상대의 퍼블릭키로 암호화하고, 인증이 목적일 때는 자신의 프라이빗키로 암호화합니다. 방향이 반대입니다."
+    },
+    {
+      "question": "순수 해시가 아니라 HMAC을 사용하는 이유로 옳은 것은?",
+      "options": [
+        "대량 데이터 처리 속도가 빨라지기 때문",
+        "키를 모르면 올바른 해시값을 만들 수 없어 해시값 자체의 위조를 막을 수 있기 때문",
+        "해시값의 길이를 늘릴 수 있기 때문",
+        "복호화가 가능해지기 때문"
+      ],
+      "answer": 1,
+      "explanation": "순수 해시는 누구나 계산할 수 있어 데이터와 해시값을 함께 바꿔치기할 수 있습니다. HMAC은 공유키를 넣어 이를 막습니다."
+    },
+    {
+      "question": "하이브리드 암호화(TLS·IKE 등)에서 비대칭키와 대칭키의 역할 분담으로 옳은 것은?",
+      "options": [
+        "둘을 번갈아 사용해 패킷마다 다른 방식으로 암호화한다",
+        "대칭키로 비대칭키를 교환하고 데이터는 비대칭키로 암호화한다",
+        "비대칭키로 데이터를 암호화하고 대칭키로 무결성을 검증한다",
+        "비대칭키로 대칭키를 안전하게 교환하고, 실제 데이터는 대칭키로 암호화한다"
+      ],
+      "answer": 3,
+      "explanation": "짧은 키 교환에는 느려도 되는 비대칭키를, 대량 데이터에는 빠른 대칭키를 씁니다. 서로의 약점을 보완하는 구조입니다."
+    },
+    {
+      "question": "AH(Authentication Header)가 제공하지 않는 보안 서비스는?",
+      "options": [
+        "무결성",
+        "기밀성(암호화)",
+        "재전송 방지",
+        "인증"
+      ],
+      "answer": 1,
+      "explanation": "교안 p.6대로 AH는 기밀성이 필요 없거나 허용되지 않을 때 사용하며 인증과 무결성만 제공합니다. 암호화는 ESP가 담당합니다."
+    },
+    {
+      "question": "AH가 NAT-T로도 NAT를 통과할 수 없는 이유는?",
+      "options": [
+        "AH가 IPv6 전용 프로토콜이기 때문",
+        "AH는 IP 헤더 자체까지 무결성 검증 범위에 포함하는데 NAT가 그 헤더를 변경하기 때문",
+        "AH가 암호화를 하지 않아 검사가 불가능하기 때문",
+        "AH가 UDP 4500 포트를 사용하지 않기 때문"
+      ],
+      "answer": 1,
+      "explanation": "NAT는 IP 헤더를 바꾸는 행위이고 AH는 그 헤더까지 검증하므로 근본적으로 양립할 수 없습니다. NAT 환경에서는 ESP만 사용 가능합니다."
+    },
+    {
+      "question": "IPsec의 Transport 모드와 Tunnel 모드의 결정적 차이는?",
+      "options": [
+        "Tunnel 모드는 새 IP 헤더를 붙여 원본 헤더까지 감추고, Transport 모드는 원본 IP 헤더를 그대로 쓴다",
+        "Tunnel 모드는 UDP만, Transport 모드는 TCP만 처리한다",
+        "Transport 모드는 오버헤드가 더 크다",
+        "Transport 모드만 암호화를 지원한다"
+      ],
+      "answer": 0,
+      "explanation": "Transport 모드는 새 헤더가 없어 오버헤드가 작고(교안의 '패킷 사이즈') Remote-Access VPN에, Tunnel 모드는 Site-to-Site VPN에 쓰입니다."
+    },
+    {
+      "question": "IPsec의 IKE Phase 1과 Phase 2의 관계를 옳게 설명한 것은?",
+      "options": [
+        "Phase 1은 데이터 암호화를, Phase 2는 인증을 담당한다",
+        "Phase 1은 IPv4용, Phase 2는 IPv6용이다",
+        "Phase 1은 협상 자체를 보호하는 터널을, Phase 2는 실제 데이터를 보호하는 터널을 만든다",
+        "Phase 2가 먼저 수행된 뒤 Phase 1이 이를 검증한다"
+      ],
+      "answer": 2,
+      "explanation": "암호화 방식을 합의하는 과정이 평문으로 오가면 안 되므로, Phase 1(ISAKMP 터널)로 협상을 보호하고 그 안에서 Phase 2를 협상합니다."
+    },
+    {
+      "question": "Crypto ACL(암호화 대상 정의 ACL)에서 `deny`가 의미하는 것은?",
+      "options": [
+        "그 트래픽을 우선 처리한다",
+        "그 트래픽에 대해 NAT를 수행한다",
+        "그 트래픽을 폐기한다",
+        "그 트래픽을 암호화하지 않는다(차단하지 않음)"
+      ],
+      "answer": 3,
+      "explanation": "일반 ACL의 deny는 차단이지만 Crypto ACL의 deny는 '암호화 제외'입니다. 패킷을 버리지 않습니다."
+    },
+    {
+      "question": "GRE와 비교했을 때 IPsec 설정의 구조적 차이로 옳은 것은?",
+      "options": [
+        "IPsec은 tunnel source/destination 명령을 사용한다",
+        "IPsec은 터널 인터페이스를 반드시 두 개 만들어야 한다",
+        "IPsec은 터널 인터페이스를 만들지 않고 물리 인터페이스끼리 Peer로 지정한다",
+        "IPsec은 라우팅 설정이 필요 없다"
+      ],
+      "answer": 2,
+      "explanation": "GRE는 interface tunnel 0을 만들지만 IPsec은 만들지 않습니다. 그래서 라우팅의 Next Hop도 상대 터널 IP가 아니라 상대 공인 IP가 됩니다."
+    },
+    {
+      "question": "Cisco IOS 이미지 이름에 포함된 `k9`이 의미하는 것은?",
+      "options": [
+        "9번째 마이너 릴리스",
+        "스위칭 전용 기능 세트",
+        "강력한 암호화(Strong Crypto) 기능이 포함된 이미지",
+        "무선 기능이 포함된 이미지"
+      ],
+      "answer": 2,
+      "explanation": "k9이 없는 IOS에서는 crypto isakmp 같은 보안 관련 명령을 사용할 수 없습니다. 암호 기술 수출 통제 때문에 별도로 표기됩니다."
+    },
+    {
+      "question": "6일차 랩에 IPsec을 적용했을 때 Destination Unreachable이 발생한 근본 원인은?",
+      "options": [
+        "GRE 터널 인터페이스가 남아 있었기 때문",
+        "Crypto ACL의 순번을 잘못 지정했기 때문",
+        "IKE Phase 1의 PSK가 서로 달랐기 때문",
+        "기존 PAT 설정이 먼저 적용되어 출발지 주소가 바뀌면서 Crypto ACL에 매칭되지 않았기 때문"
+      ],
+      "answer": 3,
+      "explanation": "NAT가 192.168.1.10을 1.1.1.1로 바꾸면 source 192.168.1.0을 조건으로 하는 Crypto ACL에 매칭되지 않아 암호화 없이 공인망으로 나갑니다."
+    },
+    {
+      "question": "같은 NAT 설정인데 GRE에서는 문제가 없었고 IPsec에서 충돌한 이유는?",
+      "options": [
+        "GRE 트래픽은 ACL 검사를 받지 않기 때문",
+        "GRE에서는 라우팅이 Tunnel0을 가리켜 ip nat outside가 걸린 인터페이스를 거치지 않았기 때문",
+        "GRE는 NAT 테이블을 사용하지 않기 때문",
+        "GRE가 NAT를 자동으로 비활성화하기 때문"
+      ],
+      "answer": 1,
+      "explanation": "GRE는 가상 인터페이스를 만들고 그 인터페이스에는 nat outside가 없어 NAT를 우회했습니다. IPsec은 물리 인터페이스를 그대로 씁니다."
+    },
+    {
+      "question": "실장비에서 VPN 대상 트래픽을 NAT 변환에서 제외할 때 사용하는 정석적인 방법은?",
+      "options": [
+        "Crypto ACL에 deny 항목을 추가하는 것",
+        "route-map을 사용해 목적지에 따라 NAT 적용 여부를 나누는 것",
+        "Static NAT로 전환하는 것",
+        "ip nat inside/outside 지정을 모두 제거하는 것"
+      ],
+      "answer": 1,
+      "explanation": "출발지는 같지만 목적지가 공인망이냐 사설망이냐에 따라 NAT 적용을 나눌 수 있으며, 이를 위해 route-map을 씁니다. 패킷트레이서는 이를 지원하지 않습니다."
+    },
+    {
+      "question": "IPsec 적용 후 traceroute에서 중간 홉이 Request timed out으로 나오는 이유는?",
+      "options": [
+        "traceroute가 UDP를 쓰는데 IPsec은 TCP만 나르기 때문",
+        "중간 라우터의 TTL 처리가 비활성화되기 때문",
+        "중간 라우터는 암호화된 안쪽의 원본 출발지를 알 수 없어 응답이 원 발신자에게 도달하지 못하기 때문",
+        "IPsec이 ICMP를 전면 차단하기 때문"
+      ],
+      "answer": 2,
+      "explanation": "겉 헤더의 출발지가 라우터 공인 IP이므로 ICMP Time Exceeded는 라우터로 돌아가고, 원본 단말은 응답을 받지 못합니다."
+    },
+    {
+      "question": "SSL Handshake에서 Pre-Master Secret에 대한 설명으로 옳은 것은?",
+      "options": [
+        "그 자체가 데이터를 암호화하는 대칭키다",
+        "서버가 생성해 클라이언트에게 평문으로 전달한다",
+        "실제 암호화에 쓰이는 키가 아니라 세션키를 만들기 위한 재료다",
+        "인증서에 포함되어 함께 전달된다"
+      ],
+      "answer": 2,
+      "explanation": "클라이언트가 만든 랜덤 값을 서버 공개키로 암호화해 보내고, 양쪽이 이를 재료로 같은 세션키를 각자 계산합니다."
+    },
+    {
+      "question": "SSL/TLS가 세션마다 새로운 세션키를 생성하는 이유는?",
+      "options": [
+        "인증서 발급 비용을 절감하기 위해",
+        "키 하나가 유출되어도 피해가 그 세션으로 국한되고 MITM 노출을 줄일 수 있기 때문",
+        "클라이언트마다 다른 알고리즘을 쓰기 위해",
+        "서버의 CPU 부하를 줄이기 위해"
+      ],
+      "answer": 1,
+      "explanation": "같은 키를 오래 쓰지 않는다는 원칙으로, IPsec의 lifetime과 동일한 사고방식입니다."
+    },
+    {
+      "question": "Cisco 장비에서 `crypto key generate rsa` 명령을 실행하기 전에 반드시 설정해야 하는 것은?",
+      "options": [
+        "ntp server 주소",
+        "logging 서버 주소",
+        "ip domain-name(도메인 이름)",
+        "ip default-gateway"
+      ],
+      "answer": 2,
+      "explanation": "키 이름이 '호스트명.도메인명' 형태로 만들어지므로 도메인이 설정되어 있지 않으면 키 생성이 거부됩니다."
+    },
+    {
+      "question": "VTY 라인에서 `transport input`을 설정하지 않았을 때의 기본 동작은?",
+      "options": [
+        "모든 원격 접속이 차단된다",
+        "SSH 접속만 허용된다",
+        "콘솔 접속만 허용된다",
+        "Telnet 접속이 허용된다"
+      ],
+      "answer": 3,
+      "explanation": "기본값이 Telnet이므로 SSH만 허용하려면 `transport input ssh`를 명시적으로 설정해야 합니다."
+    },
+    {
+      "question": "FHRP(First Hop Redundancy Protocol)가 이중화하는 대상은?",
+      "options": [
+        "단말의 Default Gateway 역할을 하는 장비",
+        "백본 스위치 간의 트렁크 링크",
+        "DNS 서버",
+        "ISP와 연결되는 WAN 회선"
+      ],
+      "answer": 0,
+      "explanation": "FHRP는 단말이 만나는 첫 번째 L3 장비, 즉 Default Gateway를 이중화하는 기술의 총칭입니다."
+    },
+    {
+      "question": "라우터 뒤에 방화벽이 L3(Routed) 모드로 놓이고 그 아래 스위치와 단말이 연결된 구성에서, 단말의 First Hop 장비는?",
+      "options": [
+        "방화벽",
+        "ISP 라우터",
+        "라우터",
+        "L2 스위치"
+      ],
+      "answer": 0,
+      "explanation": "L3 모드 방화벽은 자신을 기준으로 네트워크를 둘로 나누므로 단말이 만나는 첫 번째 L3 장비가 됩니다. L2(Transparent) 모드라면 라우터가 First Hop입니다."
+    },
+    {
+      "question": "강의에서 정의한 '이중화'의 의미로 가장 정확한 것은?",
+      "options": [
+        "사용자가 장애가 발생했다는 사실을 인지하지 못하게 하는 것",
+        "동일한 장비를 두 대 이상 구매해 배치하는 것",
+        "장애 발생 시 관리자가 신속히 백업으로 전환하는 것",
+        "장애 로그를 남겨 원인을 추적할 수 있게 하는 것"
+      ],
+      "answer": 0,
+      "explanation": "사용자에게 게이트웨이 변경 같은 조치를 요구하는 순간 그것은 이미 이중화가 아닙니다."
+    },
+    {
+      "question": "HSRP에서 페일오버가 일어나도 단말이 아무것도 느끼지 못하는 결정적인 이유는?",
+      "options": [
+        "라우터가 단말에게 ICMP Redirect를 보내 주기 때문",
+        "단말이 3초마다 ARP를 다시 수행하기 때문",
+        "가상 IP와 함께 가상 MAC 주소도 새 Active가 이어받아 단말의 ARP 캐시를 바꿀 필요가 없기 때문",
+        "스위치가 MAC 테이블을 자동으로 갱신해 주기 때문"
+      ],
+      "answer": 2,
+      "explanation": "IP만 옮기고 MAC이 바뀌면 ARP 캐시가 만료될 때까지 통신이 끊깁니다. 가상 MAC이 이어져야 무중단이 성립합니다."
+    },
+    {
+      "question": "HSRP의 기본 Hello time과 Hold time으로 옳은 것은?",
+      "options": [
+        "Hello 5초 / Hold 15초",
+        "Hello 10초 / Hold 30초",
+        "Hello 1초 / Hold 3초",
+        "Hello 3초 / Hold 10초"
+      ],
+      "answer": 3,
+      "explanation": "Active가 3초마다 Hello를 보내고, 10초 동안 수신되지 않으면 Standby가 Active로 전환합니다."
+    },
+    {
+      "question": "HSRP에서 priority를 지정하지 않았을 때 Active를 결정하는 기준은?",
+      "options": [
+        "MAC 주소가 더 낮은 쪽이 Active가 된다",
+        "인터페이스 IP가 더 높은 쪽이 Active가 된다",
+        "먼저 부팅한 쪽이 Active가 된다",
+        "인터페이스 IP가 더 낮은 쪽이 Active가 된다"
+      ],
+      "answer": 1,
+      "explanation": "priority 기본값은 100으로 동일하므로 다음 기준인 IP를 비교하고, 더 높은 IP가 Active가 됩니다."
+    },
+    {
+      "question": "`standby 1 preempt` 옵션이 하는 일은?",
+      "options": [
+        "Hello 주기를 밀리초 단위로 단축한다",
+        "Standby 라우터가 Hello를 보내지 않게 한다",
+        "복구된 라우터가 우선순위 비교를 통해 Active 역할을 되찾아온다",
+        "가상 IP를 자동으로 생성한다"
+      ],
+      "answer": 2,
+      "explanation": "preempt가 없으면 복구되어도 Standby로 남습니다. MHSRP 부하 분산 구성에서는 원래 배치로 되돌리기 위해 필수입니다."
+    },
+    {
+      "question": "MHSRP(Multigroup HSRP)로 부하를 분산하는 방식은?",
+      "options": [
+        "VLAN마다 별도의 그룹을 만들고 각 그룹의 Active를 서로 다른 장비에 배치한다",
+        "Hello 패킷을 번갈아 보내며 트래픽을 나눈다",
+        "가상 IP 하나에 여러 개의 가상 MAC을 배분한다",
+        "하나의 그룹에서 두 장비가 동시에 Active로 동작한다"
+      ],
+      "answer": 0,
+      "explanation": "가상 MAC을 여러 개 배분해 같은 VLAN 안에서 분산하는 것은 GLBP의 방식입니다. MHSRP는 그룹을 나눕니다."
+    },
+    {
+      "question": "백본 장비로 2960이 아니라 3560(Multilayer Switch)을 사용해야 하는 이유는?",
+      "options": [
+        "2960은 VLAN을 두 개 이상 만들 수 없기 때문",
+        "3560만 트렁크를 지원하기 때문",
+        "3560만 STP를 지원하기 때문",
+        "interface vlan(SVI)으로 각 VLAN의 게이트웨이가 될 수 있어야 HSRP를 걸 대상이 생기기 때문"
+      ],
+      "answer": 3,
+      "explanation": "L2 스위치는 VLAN마다 IP를 부여해 라우팅할 수 없습니다. First Hop 장비가 되려면 L3 스위치여야 합니다."
+    },
+    {
+      "question": "3560 스위치에서 SVI에 IP를 설정했는데도 VLAN 간 라우팅이 되지 않는다면 가장 먼저 확인할 것은?",
+      "options": [
+        "전역 설정에 `ip routing`이 들어가 있는지",
+        "VLAN 이름이 올바르게 지정되었는지",
+        "트렁크가 dot1q로 캡슐화되어 있는지",
+        "각 SVI에 `no shutdown`이 되어 있는지"
+      ],
+      "answer": 0,
+      "explanation": "3560은 기본 상태에서 L2로 동작합니다. `ip routing`으로 라우팅 엔진을 켜야 VLAN 간 라우팅과 라우팅 프로토콜이 동작합니다."
+    },
+    {
+      "question": "3560에서 `switchport mode trunk` 명령이 거부될 때 먼저 실행해야 하는 명령은?",
+      "options": [
+        "no switchport",
+        "switchport mode access",
+        "vlan database",
+        "switchport trunk encapsulation dot1q"
+      ],
+      "answer": 3,
+      "explanation": "3560은 ISL과 802.1Q를 모두 지원하므로 태깅 방식을 먼저 지정해야 합니다. 2960은 dot1q만 지원해 이 과정이 없습니다."
+    },
+    {
+      "question": "스위치 A(RED,BLUE) - 스위치 B(RED만) - 스위치 C(BLUE만)가 모두 트렁크로 연결되어 있을 때, A의 BLUE 단말과 C의 BLUE 단말은 통신할 수 있는가?",
+      "options": [
+        "통신할 수 없다 — 경유하는 B에 BLUE VLAN이 없어 프레임이 폐기된다",
+        "통신할 수 있다 — B가 태그를 제거하고 다시 붙여 준다",
+        "통신할 수 있다 — 트렁크는 모든 VLAN을 자동으로 전달한다",
+        "통신할 수 없다 — 트렁크가 두 개 이상 연결되면 루프가 발생하기 때문"
+      ],
+      "answer": 0,
+      "explanation": "트렁크는 그 스위치에 존재하는 VLAN만 나릅니다. 경유하는 모든 스위치에 해당 VLAN이 만들어져 있어야 합니다."
+    },
+    {
+      "question": "SVI(interface vlan N)가 `no shutdown`을 했는데도 down 상태로 남아 있는 가장 흔한 원인은?",
+      "options": [
+        "IP 주소가 중복되었기 때문",
+        "VLAN 이름을 지정하지 않았기 때문",
+        "ip routing이 꺼져 있기 때문",
+        "해당 VLAN에 속한 포트가 하나도 up 되어 있지 않기 때문"
+      ],
+      "answer": 3,
+      "explanation": "SVI는 그 VLAN을 쓰는 포트가 up이거나 트렁크로 통과 중이어야 up 상태가 됩니다."
+    },
+    {
+      "question": "HSRP 설정 전 단계에서 Server(GW 192.168.1.1)는 지사와 통신되는데 PC A(GW 192.168.2.1)는 통신되지 않았다. 이 결과가 알려 주는 것은?",
+      "options": [
+        "지사 라우터의 인터페이스가 down 상태다",
+        "라우팅은 정상적으로 완성되었고 문제는 A의 게이트웨이가 실재하지 않는다는 점 하나뿐이다",
+        "VLAN 2의 트렁크 설정이 잘못되었다",
+        "RIP 설정이 백본 스위치에서 누락되었다"
+      ],
+      "answer": 1,
+      "explanation": "서버가 지사까지 도달했다는 것은 경로가 완성되었다는 뜻이므로, 남은 원인은 가상 IP가 아직 만들어지지 않았다는 것입니다."
+    },
+    {
+      "question": "장애가 발생했을 때는 ping이 유실되지 않았는데 복구 시점에 오히려 1개가 유실된 이유는?",
+      "options": [
+        "RIP 경로가 초기화되었기 때문",
+        "preempt가 설정되어 있어 Active 역할을 되찾는 전환이 한 번 더 일어났기 때문",
+        "복구된 인터페이스가 STP 수렴을 다시 거치기 때문",
+        "가상 MAC 주소가 새로 생성되었기 때문"
+      ],
+      "answer": 1,
+      "explanation": "preempt는 역할을 되돌리기 위해 전환을 한 번 더 유발합니다. 되돌릴 이유가 없다면 굳이 손실을 감수할 필요가 없습니다."
+    },
+    {
+      "question": "ICMP Redirect 메시지의 역할은?",
+      "options": [
+        "단말이 라우터에게 경로를 요청하는 것",
+        "라우터가 단말에게 IP 주소를 할당해 주는 것",
+        "같은 세그먼트에 더 나은 다음 홉이 있음을 라우터가 단말에게 알려 주는 것",
+        "라우터 간에 라우팅 테이블을 교환하는 것"
+      ],
+      "answer": 2,
+      "explanation": "A→R1→R2→B처럼 비효율적인 경로가 생기면 R1이 A에게 R2로 직접 보내라고 알려 주고, A의 라우팅 테이블에 경로가 추가됩니다."
+    },
+    {
+      "question": "HSRP를 설정하면 해당 인터페이스의 ICMP Redirect가 기본적으로 비활성화되는 이유는?",
+      "options": [
+        "단말이 임의로 경로를 바꾸면 관리자가 설계한 VLAN별 부하 분산이 무너지기 때문",
+        "Redirect 메시지가 Hello 패킷과 충돌하기 때문",
+        "Redirect가 가상 MAC 주소를 노출시키기 때문",
+        "Redirect는 IPv6에서만 동작하기 때문"
+      ],
+      "answer": 0,
+      "explanation": "또한 Redirect가 가상 IP가 아닌 실제 IP를 가리키면 그 장비가 죽었을 때 경로가 함께 죽어 이중화의 의미가 사라집니다."
+    },
+    {
+      "question": "HSRP Interface Tracking이 필요한 이유로 옳은 것은?",
+      "options": [
+        "Hello 패킷이 유실되는 것을 방지하기 위해",
+        "가상 IP가 중복되는 것을 방지하기 위해",
+        "STP 수렴 시간을 단축하기 위해",
+        "HSRP는 SVI 상태만 감시하므로 업링크가 끊겨도 Active를 유지해 경로가 우회되거나 블랙홀이 생기기 때문"
+      ],
+      "answer": 3,
+      "explanation": "장비가 살아 있다는 것과 서비스할 수 있다는 것은 다릅니다. Tracking은 그 간극을 priority에 반영합니다."
+    },
+    {
+      "question": "Tracking을 걸었는데도 Active 역할이 넘어가지 않는다면 확인해야 할 것은?",
+      "options": [
+        "Hello time을 1초로 낮췄는지",
+        "가상 MAC 주소가 중복되지 않는지",
+        "SVI에 no shutdown이 되어 있는지",
+        "낮아진 priority가 상대보다 실제로 낮은지, 그리고 상대에 preempt가 설정되어 있는지"
+      ],
+      "answer": 3,
+      "explanation": "priority 200에서 10만 내려가면 190으로 여전히 높습니다. 또한 상대가 preempt로 가져오겠다고 선언해야 실제로 역할이 이관됩니다."
+    },
+    {
+      "question": "Proxy ARP가 활성화된 라우터의 동작으로 옳은 것은?",
+      "options": [
+        "자신이 아닌 IP에 대한 ARP 요청이라도 그 대역으로 가는 경로가 있으면 자신의 MAC으로 대신 응답한다",
+        "모든 ARP 요청을 차단해 ARP 스푸핑을 방지한다",
+        "ARP 요청을 다른 세그먼트로 브로드캐스트한다",
+        "단말의 ARP 캐시를 주기적으로 삭제한다"
+      ],
+      "answer": 0,
+      "explanation": "라우팅 테이블에 해당 대역으로 가는 경로가 있으면 라우터가 대리 응답합니다. 그 결과 다른 네트워크 IP가 단말의 ARP 캐시에 들어옵니다."
+    },
+    {
+      "question": "Proxy ARP의 가장 위험한 부작용은 무엇인가?",
+      "options": [
+        "라우팅 테이블을 자동으로 변경한다",
+        "ARP 캐시를 초기화해 통신을 끊는다",
+        "브로드캐스트 도메인을 강제로 분할한다",
+        "서브넷마스크 오설정 같은 잘못된 구성을 조용히 덮어 주어 문제가 드러나지 않게 한다"
+      ],
+      "answer": 3,
+      "explanation": "설정이 틀렸는데도 통신이 되어 버려, 나중에 Proxy ARP를 끄거나 규모가 커질 때 원인 불명의 장애로 터집니다. `no ip proxy-arp`가 권장됩니다."
+    },
+    {
+      "question": "SNMP 메시지 중 장비가 관리자에게 먼저 보내는 것은?",
+      "options": [
+        "Set",
+        "Get",
+        "Walk",
+        "Trap"
+      ],
+      "answer": 3,
+      "explanation": "Get은 조회, Set은 설정 변경으로 모두 관리자가 요청하는 것이고, Trap만 장비가 이벤트 발생 시 능동적으로 알립니다."
+    },
+    {
+      "question": "SNMP v1/v2c의 보안 문제로 옳은 것은?",
+      "options": [
+        "Community String이 평문으로 전송되고 기본값(public/private)이 널리 알려져 있다",
+        "암호화는 되지만 인증이 없다",
+        "UDP를 사용해 메시지가 반드시 유실된다",
+        "읽기 전용만 지원해 관리가 불가능하다"
+      ],
+      "answer": 0,
+      "explanation": "교안 p.27 그대로 v1/v2c는 평문 Community String으로 접근 제어하며 RO/RW 두 유형이 있습니다. 인증과 암호화를 지원하는 v3이 현재 표준입니다."
+    },
+    {
+      "question": "Syslog가 사용하는 포트와 심각도 수준의 방향으로 옳은 것은?",
+      "options": [
+        "UDP 514를 사용하며 숫자가 클수록 심각하다(7=emergency)",
+        "UDP 514를 사용하며 숫자가 작을수록 심각하다(0=emergency)",
+        "UDP 161을 사용하며 숫자가 클수록 심각하다",
+        "TCP 514를 사용하며 숫자가 작을수록 심각하다"
+      ],
+      "answer": 1,
+      "explanation": "0 emergency부터 7 debugging까지이며 숫자가 작을수록 위급합니다. UDP 161은 SNMP입니다."
+    },
+    {
+      "question": "NTP가 네트워크 보안에서 중요한 이유로 가장 적절한 것은?",
+      "options": [
+        "NTP가 장비의 접근 권한을 관리하기 때문",
+        "시간 동기화 자체가 트래픽을 암호화해 주기 때문",
+        "여러 장비의 로그를 시간 순서로 대조해야 인과 관계를 파악할 수 있고, 인증서 유효기간 판정의 기준이 되기 때문",
+        "NTP가 로그를 자동으로 백업해 주기 때문"
+      ],
+      "answer": 2,
+      "explanation": "장비 시계가 어긋나면 로그의 선후 관계를 알 수 없고, 유효한 인증서를 만료로 판정하거나 그 반대의 일이 생깁니다."
+    }
+  ]
+}

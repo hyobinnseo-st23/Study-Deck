@@ -1,0 +1,250 @@
+{
+  "title": "네트워크 보안 DAY7 심화",
+  "subtitle": "시나리오 판단·설정 결과 예측·디버깅·설계 트레이드오프",
+  "subject": "네트워크 보안",
+  "description": "SK Shieldus Rookies: 네트워크 보안 7일차 심화 문제. IPsec 설정 디버깅, NAT·VPN·HSRP·STP 간 상호작용, Interface Tracking과 preempt 설계, Proxy ARP·ICMP Redirect의 함정, 로그·시간 동기화 운영 리스크를 판단형으로 다룹니다.",
+  "questions": [
+    {
+      "question": "교안 7권 p.11을 그대로 옮겨 R1에는 `crypto ipsec transform-set MYSET esp-aes esp-sha`, R2에는 `crypto ipsec transform-set MYSET esp-aes esp-sha-hmac`을 입력했다. 예상되는 결과는?",
+      "options": [
+        "무결성 알고리즘 조합이 일치하지 않아 IKE Phase 2 협상이 실패하고 데이터 터널이 올라오지 않는다",
+        "Phase 1까지 실패해 ISAKMP SA조차 생성되지 않는다",
+        "터널은 형성되지만 무결성 검증 없이 암호화만 적용된다",
+        "이름이 MYSET으로 같으므로 정상적으로 터널이 형성된다"
+      ],
+      "answer": 0,
+      "explanation": "transform-set은 양쪽이 정확히 일치해야 합니다. 실제 IOS 문법은 esp-sha-hmac이며 교안 R1 줄이 오기입니다. Phase 1은 별도 협상이므로 영향을 받지 않습니다."
+    },
+    {
+      "question": "`show crypto isakmp sa`에는 QM_IDLE 상태가 보이는데 `show crypto ipsec sa`에는 아무것도 없다. 가장 먼저 점검해야 할 항목은?",
+      "options": [
+        "peer 주소가 상대 공인 IP로 지정되어 있는지",
+        "isakmp policy의 hash·encryption·group이 일치하는지",
+        "transform-set 불일치와 양쪽 Crypto ACL이 거울상인지 여부",
+        "PSK 문자열이 양쪽에서 일치하는지"
+      ],
+      "answer": 2,
+      "explanation": "ISAKMP SA가 생성되었다는 것은 Phase 1이 성공했다는 뜻이므로 PSK·policy·peer는 이미 정상입니다. 남은 원인은 Phase 2 요소인 transform-set과 Crypto ACL입니다."
+    },
+    {
+      "question": "양쪽 라우터의 Crypto ACL을 거울상이 아니라 완전히 동일하게 (양쪽 모두 `permit ip 192.168.1.0 0.0.0.255 192.168.2.0 0.0.0.255`) 설정했다. 결과는?",
+      "options": [
+        "설정이 동일하므로 오히려 협상이 더 안정적으로 이루어진다",
+        "Phase 1부터 실패해 터널이 전혀 형성되지 않는다",
+        "본사→지사 방향만 암호화되고 반대 방향은 평문으로 흐른다",
+        "지사 쪽에서는 자기 트래픽이 조건에 걸리지 않아 Phase 2 SA 협상이 성립하지 않는다"
+      ],
+      "answer": 3,
+      "explanation": "지사 입장에서 출발지는 192.168.2.0입니다. Source/Destination이 뒤바뀐 거울상이어야 양쪽 모두 조건에 매칭됩니다."
+    },
+    {
+      "question": "6일차 랩에서 `no interface tunnel 0`만 실행하고 `ip route 192.168.2.0 255.255.255.0 10.0.0.2`는 남겨 둔 채 IPsec을 설정했다. 예상되는 문제는?",
+      "options": [
+        "IPsec이 GRE 경로를 그대로 재사용해 정상 동작한다",
+        "Next Hop 10.0.0.2를 해석할 수 없어 해당 경로가 무효화되고, 트래픽이 crypto map이 걸린 인터페이스로 나가지 않는다",
+        "라우팅 루프가 발생해 TTL 초과 메시지가 반복된다",
+        "Next Hop이 무시되고 자동으로 상대 공인 IP로 대체된다"
+      ],
+      "answer": 1,
+      "explanation": "터널 인터페이스가 사라지면 10.0.0.2로 가는 방법이 없어 재귀 조회에 실패합니다. crypto ACL에 매칭될 기회 자체가 생기지 않습니다."
+    },
+    {
+      "question": "IPsec 설정을 모두 마쳤는데 `crypto map`을 인터넷 쪽 f0/1이 아니라 내부 쪽 f0/0에 적용했다. 결과는?",
+      "options": [
+        "내부망으로 나가는 트래픽에만 crypto map이 평가되어 VPN 트래픽은 암호화 없이 f0/1로 빠져나간다",
+        "명령 입력 단계에서 오류가 발생해 설정이 거부된다",
+        "적용 인터페이스와 무관하게 Crypto ACL 조건만 맞으면 암호화된다",
+        "양방향 모두 적용되므로 정상 동작한다"
+      ],
+      "answer": 0,
+      "explanation": "crypto map은 해당 인터페이스로 나가는 트래픽에 대해서만 평가됩니다. 터널이 형성되는 인터페이스, 즉 인터넷 쪽에 걸어야 합니다."
+    },
+    {
+      "question": "A(192.168.2.10)에서 지사로 `ping -t`를 걸어 둔 상태에서 BB1의 `interface vlan 2`를 shutdown했더니 패킷 손실이 전혀 없었다. 이 결과를 실장비 환경에 그대로 일반화하면 안 되는 이유는?",
+      "options": [
+        "실장비에서는 preempt가 기본 활성이라 전환이 더 느리기 때문",
+        "shutdown은 인터페이스 다운이 즉시 감지되지만 전원 차단·케이블 절단 같은 실제 장애는 Hold time 10초를 기다려야 하기 때문",
+        "패킷트레이서는 손실을 계산하지 않기 때문",
+        "실장비에서는 가상 MAC이 매번 새로 생성되기 때문"
+      ],
+      "answer": 1,
+      "explanation": "명시적 shutdown은 즉시 역할을 포기하지만, 통보 없이 죽는 실제 장애에서는 Hello 3회 미수신(10초)을 기다린 뒤 전환됩니다."
+    },
+    {
+      "question": "BB1에 `standby 2 priority 200`, `standby 2 track f0/2`(감소값 10)를 설정하고 BB2는 기본값 100이다. BB1의 f0/2 업링크가 다운되면?",
+      "options": [
+        "track 설정만으로 인터페이스와 무관하게 Standby로 전환된다",
+        "priority가 0이 되어 즉시 BB2로 역할이 넘어간다",
+        "priority가 190으로만 내려가 여전히 100보다 높으므로 BB1이 Active를 유지하고 트래픽이 계속 우회한다",
+        "BB1의 SVI도 함께 down되어 자동으로 전환된다"
+      ],
+      "answer": 2,
+      "explanation": "Tracking의 감소값은 상대보다 낮아지도록 계산해야 합니다. 200에서 10만 빼면 190이라 아무 일도 일어나지 않습니다."
+    },
+    {
+      "question": "BB1(priority 200, preempt 없음)과 BB2(priority 100)로 HSRP를 구성했다. 정전 후 BB2가 먼저 부팅되고 BB1이 나중에 부팅되었다면?",
+      "options": [
+        "두 장비 모두 Active가 되어 가상 IP가 중복 응답한다",
+        "BB1이 Hold time 10초 후 자동으로 Active가 된다",
+        "BB2가 Active를 유지하고 BB1은 priority가 더 높은데도 Standby로 남는다",
+        "BB1이 부팅 즉시 priority 비교로 Active를 가져온다"
+      ],
+      "answer": 2,
+      "explanation": "preempt가 없으면 우선순위가 높아도 이미 Active인 장비의 역할을 빼앗지 않습니다. 설계한 배치로 복원하려면 preempt가 필요합니다."
+    },
+    {
+      "question": "두 백본에 HSRP를 설정했는데 한쪽은 HSRP v1, 다른 쪽은 v2로 동작하고 있다. 예상되는 증상은?",
+      "options": [
+        "서로를 인식하지 못해 양쪽 모두 Active가 되고, 같은 가상 IP에 두 장비가 응답하며 통신이 간헐적으로 끊긴다",
+        "가상 IP가 생성되지 않아 단말이 즉시 통신 불가가 된다",
+        "버전이 낮은 쪽이 자동으로 Standby가 된다",
+        "Hello 주기가 자동으로 v1 기준인 3초로 통일된다"
+      ],
+      "answer": 0,
+      "explanation": "v1과 v2는 멀티캐스트 주소와 가상 MAC 형식이 달라 서로의 Hello를 인식하지 못합니다. 양쪽 모두 자신을 Active로 판단하는 상태가 됩니다."
+    },
+    {
+      "question": "VLAN 2·3을 만들고 액세스 스위치와 백본 사이를 모두 트렁크로 연결했는데 VLAN 3 단말만 통신이 되지 않는다. 가장 유력한 원인은?",
+      "options": [
+        "STP가 VLAN 3 포트만 Blocking으로 두었기 때문",
+        "트렁크 캡슐화가 ISL로 설정되어 있기 때문",
+        "VLAN 3의 SVI에 no shutdown이 되어 있지 않기 때문",
+        "경로상의 어떤 스위치에 VLAN 3이 생성되어 있지 않아 그 지점에서 프레임이 폐기되고 있다"
+      ],
+      "answer": 3,
+      "explanation": "트렁크는 그 스위치에 존재하는 VLAN만 나릅니다. `show interfaces trunk`의 'Vlans allowed and active' 줄로 확인할 수 있습니다."
+    },
+    {
+      "question": "3560에서 `interface vlan 2/3`에 IP를 부여하고 `router rip`으로 network를 선언했는데 다른 라우터의 라우팅 테이블에 2·3번 대역이 전혀 나타나지 않는다. 원인은?",
+      "options": [
+        "SVI에 no shutdown이 빠졌기 때문",
+        "RIP 대신 RIPv2를 선언하지 않았기 때문",
+        "network 명령에 서브넷마스크를 함께 적지 않았기 때문",
+        "전역 설정에 `ip routing`이 없어 장비가 여전히 L2로 동작하고 있다"
+      ],
+      "answer": 3,
+      "explanation": "3560은 기본이 L2 동작이라 `ip routing` 없이는 라우팅 엔진이 켜지지 않고, SVI에 IP가 붙어도 광고되지 않습니다."
+    },
+    {
+      "question": "본사와 지사가 각각 사설 대역을 쓰고, 지사가 늘어날 때마다 라우팅을 자동으로 학습시키고 싶다. 설계 선택으로 가장 적절한 것은?",
+      "options": [
+        "순수 IPsec Tunnel 모드만 사용하고 지사마다 정적 경로를 추가한다",
+        "IPsec Transport 모드를 사용해 오버헤드를 줄인다",
+        "GRE로 터널을 만들고 그 위에 IPsec을 적용해 동적 라우팅 프로토콜이 터널을 통과하게 한다",
+        "GRE만 사용하고 암호화는 애플리케이션 계층에 맡긴다"
+      ],
+      "answer": 2,
+      "explanation": "OSPF·EIGRP는 멀티캐스트를 쓰는데 순수 IPsec은 이를 나르지 못합니다. GRE가 캡슐화해 주어야 터널 위에서 동적 라우팅이 동작합니다."
+    },
+    {
+      "question": "IPsec의 `lifetime`을 기본값 86400초에서 훨씬 짧게 조정하려 한다. 이 결정의 트레이드오프로 옳은 것은?",
+      "options": [
+        "보안성과 성능이 모두 향상되므로 짧을수록 무조건 유리하다",
+        "lifetime은 Phase 1에만 적용되므로 데이터 보안과는 무관하다",
+        "같은 키를 유지하는 시간이 줄어 분석 시간을 주지 않지만, 재협상이 잦아져 장비 부하와 순간적인 지연이 늘어난다",
+        "재협상 부하는 줄지만 키 노출 위험은 커진다"
+      ],
+      "answer": 2,
+      "explanation": "짧은 lifetime은 공격자가 분석할 시간을 줄이지만 재협상 비용이 발생합니다. 보안과 성능의 전형적인 교환 관계입니다."
+    },
+    {
+      "question": "HSRP의 Hello/Hold 타이머를 기본값(3초/10초)에서 밀리초 단위로 낮추려 한다. 고려해야 할 위험으로 가장 적절한 것은?",
+      "options": [
+        "가상 MAC 주소가 매번 새로 생성되어 단말의 ARP 캐시가 갱신된다",
+        "일시적인 CPU 부하나 링크 지연에도 Hello가 밀려 불필요한 페일오버(flapping)가 반복될 수 있다",
+        "Hold time이 짧아지면 Active와 Standby가 동시에 Active가 된다",
+        "preempt 설정이 무효화되어 역할이 복원되지 않는다"
+      ],
+      "answer": 1,
+      "explanation": "전환 시간은 짧아지지만 판정이 예민해집니다. 순간적인 부하에도 역할이 오가면 오히려 서비스가 불안정해집니다."
+    },
+    {
+      "question": "MHSRP로 VLAN 2는 BB1, VLAN 3은 BB2를 Active로 배치했다. 설계를 완성하기 위해 추가로 반드시 맞춰야 할 것은?",
+      "options": [
+        "양쪽 백본의 priority를 모두 200으로 맞추는 것",
+        "VLAN별 STP Root를 해당 VLAN의 HSRP Active와 같은 장비로 정렬하는 것",
+        "두 VLAN의 가상 IP를 동일한 주소로 통일하는 것",
+        "두 백본 사이에 직접 링크를 추가해 Hello 경로를 단축하는 것"
+      ],
+      "answer": 1,
+      "explanation": "HSRP Active와 STP Root가 어긋나면 트래픽이 한쪽으로 올라갔다 반대편으로 건너가는 비효율 경로가 만들어집니다."
+    },
+    {
+      "question": "HSRP가 동작 중인 인터페이스에서 `standby redirects`로 ICMP Redirect를 다시 활성화할 때, 리다이렉트가 실제 라우터 IP가 아니라 가상 IP를 가리켜야 하는 이유는?",
+      "options": [
+        "가상 IP만이 ARP 응답을 받을 수 있기 때문",
+        "실제 IP를 사용하면 Hello 패킷과 충돌하기 때문",
+        "실제 IP는 단말의 라우팅 테이블에 기록될 수 없기 때문",
+        "실제 IP를 가리키면 그 장비가 죽었을 때 단말의 경로가 함께 죽어 이중화 효과가 사라지기 때문"
+      ],
+      "answer": 3,
+      "explanation": "리다이렉트로 박힌 경로는 HSRP의 보호를 받지 못합니다. 가상 IP를 가리켜야 페일오버 시에도 경로가 유지됩니다."
+    },
+    {
+      "question": "사용자 PC의 서브넷마스크가 /24여야 하는데 /8로 잘못 설정되어 있다. 그럼에도 외부 통신이 정상으로 보인다면 의심해야 할 라우터 설정은?",
+      "options": [
+        "인터페이스의 Proxy ARP가 활성화되어 라우터가 대신 응답하고 있는 상황",
+        "DHCP Snooping이 바인딩 테이블로 보정하고 있는 상황",
+        "NAT Overload가 출발지 주소를 정정하고 있는 상황",
+        "ICMP Redirect가 활성화되어 경로를 자동 보정하고 있는 상황"
+      ],
+      "answer": 0,
+      "explanation": "잘못된 마스크 때문에 단말이 목적지에게 직접 ARP를 보내도 Proxy ARP가 대신 응답해 통신이 되어 버립니다. 오설정이 은폐되는 전형적 사례입니다."
+    },
+    {
+      "question": "Site-to-Site IPsec VPN 구축 후 ping은 정상인데 웹 페이지 로딩과 파일 전송만 실패한다. 가장 유력한 원인과 대응은?",
+      "options": [
+        "Tunnel 모드의 캡슐화 오버헤드로 MTU를 초과해 큰 패킷이 깨지는 것이며 `ip tcp adjust-mss`로 완화한다",
+        "transform-set이 ESP 대신 AH로 되어 있으므로 ESP로 변경한다",
+        "Crypto ACL에 HTTP 포트가 빠져 있으므로 포트를 추가한다",
+        "PSK 문자열이 짧아 협상이 지연되는 것이므로 키를 늘린다"
+      ],
+      "answer": 0,
+      "explanation": "ping은 작은 패킷이라 통과하고 큰 패킷만 단편화 문제로 실패합니다. VPN 구축 후 '느리다·특정 사이트만 안 된다'는 민원의 단골 원인입니다."
+    },
+    {
+      "question": "장비의 로그를 로컬 버퍼에만 저장해 온 조직에서 침해사고가 발생했다. 가장 먼저 문제가 되는 지점은?",
+      "options": [
+        "로그의 심각도 수준을 구분할 수 없다는 점",
+        "로그가 UDP로 전송되어 유실되었을 수 있다는 점",
+        "버퍼 크기 한계로 과거 로그가 덮어써졌거나 장비를 장악한 공격자가 로그를 지웠을 수 있다는 점",
+        "SNMP Trap이 전달되지 않았다는 점"
+      ],
+      "answer": 2,
+      "explanation": "로컬 버퍼는 크기가 고정되어 순환 기록되며, 장비가 장악되면 함께 지워집니다. 원격 Syslog 서버로 실시간 전송해야 하는 이유입니다."
+    },
+    {
+      "question": "장비의 시계가 실제보다 1년 뒤로 어긋나 있다. 로그 분석 외에 발생할 수 있는 보안 문제는?",
+      "options": [
+        "NAT 테이블의 엔트리가 즉시 삭제된다",
+        "대칭키의 길이가 자동으로 축소된다",
+        "HSRP의 Hello 주기가 어긋나 페일오버가 실패한다",
+        "유효한 인증서를 만료된 것으로, 또는 만료된 인증서를 유효한 것으로 잘못 판정할 수 있다"
+      ],
+      "answer": 3,
+      "explanation": "인증서에는 유효기간이 들어 있고 그 판정 기준이 장비 시계입니다. Kerberos 같은 인증 프로토콜도 시간 오차가 크면 실패합니다."
+    },
+    {
+      "question": "운영 중인 라우터에서 `snmp-server community public RW`가 발견되었다. 이 설정이 만드는 최악의 시나리오는?",
+      "options": [
+        "널리 알려진 기본 문자열로 누구나 접근해 장비 설정을 변경할 수 있어 네트워크 전체가 장악될 수 있다",
+        "SNMP Trap이 전송되지 않아 장애를 인지하지 못한다",
+        "SNMP가 UDP를 사용해 설정 명령이 유실된다",
+        "MIB 조회 시 CPU 사용률이 급증해 장비가 재부팅된다"
+      ],
+      "answer": 0,
+      "explanation": "public/private은 기본값으로 널리 알려져 있고 v1/v2c는 평문 전송입니다. RW까지 열려 있으면 조회를 넘어 설정 변경이 가능합니다."
+    },
+    {
+      "question": "SSH를 적용하면서 `crypto key generate rsa`에서 512bit를 선택하고 `line vty 0 15`에 `transport input ssh`와 `no login`을 설정했다. 실장비에서 예상되는 문제 두 가지는?",
+      "options": [
+        "512bit는 정상이며 `no login` 때문에 Telnet이 함께 허용된다",
+        "512bit로는 SSHv2를 쓸 수 없어 취약한 SSHv1로 동작하고, SSH는 사용자 이름 인증을 요구하므로 `no login`으로는 로그인이 성립하지 않는다",
+        "512bit는 정상이며 `transport input ssh` 때문에 콘솔 접속이 차단된다",
+        "512bit는 접속 속도만 느릴 뿐이고, `no login`은 패스워드 없이 접속되게 해 준다"
+      ],
+      "answer": 1,
+      "explanation": "SSHv2는 모듈러스 768bit 이상을 요구합니다. 또 SSH는 username 기반 인증이 전제이므로 `login local`과 `username` 설정이 필요합니다."
+    }
+  ]
+}
