@@ -1,0 +1,965 @@
+{
+  "title": "애플리케이션 보안 DAY2",
+  "subtitle": "Shodan·Nmap·Metasploit·리버스셸·NSE·웹셸",
+  "subject": "애플리케이션 보안",
+  "description": "SK Shieldus Rookies: 애플리케이션 보안 2일차 수업. Shodan을 통한 장비·포트 정보 수집, Nmap 포트 스캔과 3-way handshake, searchsploit·Metasploit을 활용한 vsftpd 백도어 침투, msfvenom 리버스 셸과 meterpreter, NSE 스크립트, 익명 FTP와 웹셸 업로드까지 정보 수집에서 침투로 이어지는 전 과정을 다룹니다.",
+  "questions": [
+    {
+      "question": "Shodan이 수집하는 대상으로 가장 정확한 것은?",
+      "options": [
+        "도메인의 whois 등록 정보",
+        "SNS 사용자의 게시글",
+        "웹 페이지의 HTML 콘텐츠와 키워드",
+        "인터넷에 연결된 장비·시스템의 배너(메타데이터) 정보"
+      ],
+      "answer": 3,
+      "explanation": "Shodan은 구글과 달리 웹 콘텐츠가 아니라, 포트에 접속해 얻은 배너(서비스·버전·OS 등 메타데이터)를 수집·색인합니다."
+    },
+    {
+      "question": "구글과 Shodan의 데이터 수집 방식 차이로 옳은 것은?",
+      "options": [
+        "둘 다 HTML을 크롤링한다",
+        "구글은 포트를 스캔하고 Shodan은 HTML을 크롤링한다",
+        "구글은 HTML을 크롤링하고, Shodan은 포트를 스캔해 배너를 수집한다",
+        "둘 다 포트를 스캔한다"
+      ],
+      "answer": 2,
+      "explanation": "구글(Googlebot)은 웹 HTML을 크롤링하고, Shodan은 인터넷 전역의 포트를 스캔해 배너 정보를 수집합니다."
+    },
+    {
+      "question": "배너(Banner) 정보에 대한 설명으로 옳은 것은?",
+      "options": [
+        "방화벽이 차단할 때 보내는 경고문",
+        "웹 페이지 상단의 광고 이미지",
+        "서비스가 연결 시 자동으로 내려보내는 자기소개 문자열",
+        "사용자가 직접 입력하는 로그인 정보"
+      ],
+      "answer": 2,
+      "explanation": "배너는 SSH·FTP·HTTP 등 서비스가 접속 시 규약상 자동으로 보내는 문자열로, 서비스 종류·버전·OS가 드러납니다."
+    },
+    {
+      "question": "Shodan의 Academic Upgrade 대상 이메일로 옳은 것은?",
+      "options": [
+        "임시(일회용) 이메일",
+        "회사 도메인 이메일",
+        ".edu, .ac.uk, ac.kr 같은 학술 이메일",
+        "gmail.com 등 일반 이메일"
+      ],
+      "answer": 2,
+      "explanation": "Shodan은 .edu·.ac.uk·ac.kr 같은 학술 이메일로 가입하면 무료로 계정을 업그레이드해 줍니다."
+    },
+    {
+      "question": "무료 Shodan 계정에서 사용할 수 없는 메뉴는?",
+      "options": [
+        "검색(Search)",
+        "호스트 상세 페이지",
+        "Explore 카테고리 열람",
+        "Maps와 Images"
+      ],
+      "answer": 3,
+      "explanation": "Maps와 Images는 유료/아카데믹 계정에서만 사용 가능하며, 무료 계정에서는 보이지 않습니다."
+    },
+    {
+      "question": "Shodan 실습에서 강사가 반복해서 경고한 절대 금지 행위는?",
+      "options": [
+        "검색 결과에 나온 IP 주소에 직접 접속하는 것",
+        "검색어를 입력하는 것",
+        "호스트 상세 페이지를 여는 것",
+        "스크린샷을 확인하는 것"
+      ],
+      "answer": 0,
+      "explanation": "검색은 공개 색인 열람이라 괜찮지만, 결과의 IP에 직접 접속하면 대상 로그에 흔적이 남고 법적 문제가 될 수 있습니다."
+    },
+    {
+      "question": "2018년 멕시코 원격의료 업체에서 인증 없이 노출되어 약 237만 명의 개인정보가 유출된 데이터베이스는?",
+      "options": [
+        "Redis",
+        "MongoDB",
+        "Oracle",
+        "MySQL"
+      ],
+      "answer": 1,
+      "explanation": "인증 없이 열려 있던 MongoDB가 Shodan으로 발견되어 환자 약 237만 명의 정보가 노출된 사례입니다."
+    },
+    {
+      "question": "2017년 프린터 해킹 사건에서 공격자가 노출된 프린터에 전송한 것은?",
+      "options": [
+        "펌웨어 업데이트",
+        "랜섬웨어 실행 파일",
+        "정상 문서 출력 요청",
+        "비트코인을 요구하는 임의 인쇄 명령"
+      ],
+      "answer": 3,
+      "explanation": "공격자는 Shodan 등으로 노출된 프린터를 찾아 임의 인쇄 명령을 보내 비트코인을 요구하는 메시지를 출력시켰습니다."
+    },
+    {
+      "question": "Shodan 필터 중 특정 국가의 장비만 검색하는 옵션은?",
+      "options": [
+        "city",
+        "port",
+        "country",
+        "org"
+      ],
+      "answer": 2,
+      "explanation": "country:\"KR\" 처럼 국가 코드로 해당 국가 소재 장비를 필터링합니다. city는 도시, org는 기관, port는 포트입니다."
+    },
+    {
+      "question": "Shodan 필터 `has_screenshot:true`의 용도로 옳은 것은?",
+      "options": [
+        "스크린샷이 포함된 결과만 검색",
+        "SSL 인증서가 있는 장비만 검색",
+        "IPv6 사용 장비만 검색",
+        "취약점이 있는 장비만 검색"
+      ],
+      "answer": 0,
+      "explanation": "has_screenshot:true는 웹캠·RDP 등 스크린샷이 수집된 결과만 필터링해, 실제 사용 여부를 화면으로 확인하게 해 줍니다."
+    },
+    {
+      "question": "강사가 강조한 \"노출 ≠ 취약\" 원칙에 부합하는 판단은?",
+      "options": [
+        "스크린샷이 있으면 무조건 취약하다",
+        "포트가 닫혀 있으면 무조건 안전하다",
+        "포트가 열려 있어도 인증·버전 등을 확인해야 취약 여부를 판단할 수 있다",
+        "포트가 열려 있으면 무조건 취약하다"
+      ],
+      "answer": 2,
+      "explanation": "포트 개방·익명 로그인 가능 등은 그 자체로 취약이 아니며, 의도된 개방인지·인증·버전 취약점 여부를 확인해야 판단이 섭니다."
+    },
+    {
+      "question": "Minecraft 서버가 Shodan에 노출된 것이 그 자체로 취약점이 아닌 이유는?",
+      "options": [
+        "서버가 암호화되어 있어서",
+        "공개를 목적으로 만든 서버이므로 의도된 노출이다",
+        "Shodan이 게임 서버를 색인하지 못해서",
+        "포트가 닫혀 있어서"
+      ],
+      "answer": 1,
+      "explanation": "누구나 참여하도록 공개한 게임 서버가 공개되어 있는 것은 의도된 것이므로, 그 자체로는 취약점이 아닙니다."
+    },
+    {
+      "question": "Log4Shell(CVE-2021-44228)이 특히 심각했던 이유로 옳은 것은?",
+      "options": [
+        "공격에 관리자 권한이 필요했다",
+        "특정 OS에서만 동작했다",
+        "네트워크 접근이 불가능했다",
+        "로그에 남는 문자열만으로 인증 없이 원격 코드 실행이 가능했다"
+      ],
+      "answer": 3,
+      "explanation": "공격 문자열이 로그로 기록되기만 하면 Log4j가 이를 해석해 원격 코드 실행이 일어나, 공격 표면이 사실상 앱 전체였습니다."
+    },
+    {
+      "question": "OSINT(수동적 수집)와 Nmap(능동적 수집)의 가장 큰 차이는?",
+      "options": [
+        "둘 다 대상과 직접 통신하지 않는다",
+        "OSINT가 대상 서버에 직접 접속한다",
+        "Nmap은 대상에 직접 패킷을 보내 로그에 흔적을 남긴다",
+        "Nmap은 로그에 흔적을 전혀 남기지 않는다"
+      ],
+      "answer": 2,
+      "explanation": "OSINT는 제3자가 모은 정보를 조회하지만, Nmap은 대상에 직접 패킷을 보내므로 대상 로그에 흔적이 남고 탐지될 수 있습니다."
+    },
+    {
+      "question": "네트워크에서 '포트(Port)'를 가장 잘 설명한 것은?",
+      "options": [
+        "서버의 물리적 주소",
+        "방화벽의 다른 이름",
+        "서비스로 통하는 통로(문)",
+        "암호화 키의 종류"
+      ],
+      "answer": 2,
+      "explanation": "IP가 건물 주소라면 포트는 그 건물의 어느 문인지를 정하는 서비스 통로입니다."
+    },
+    {
+      "question": "HTTP와 HTTPS의 기본 포트 번호로 옳은 것은?",
+      "options": [
+        "21과 22",
+        "80과 443",
+        "23과 25",
+        "3306과 5432"
+      ],
+      "answer": 1,
+      "explanation": "HTTP는 80번, HTTPS는 443번을 기본으로 사용합니다."
+    },
+    {
+      "question": "옵션 없이 `nmap <IP>` 만 실행했을 때 스캔되는 포트 범위는?",
+      "options": [
+        "가장 흔히 쓰이는 상위 1000개 포트",
+        "1~1023 포트만",
+        "열려 있는 포트만",
+        "전체 65535개 포트"
+      ],
+      "answer": 0,
+      "explanation": "옵션이 없으면 전체가 아니라 자주 쓰이는 상위 1000개 포트만 스캔합니다."
+    },
+    {
+      "question": "전체 포트(1~65535)를 모두 스캔하는 Nmap 옵션은?",
+      "options": [
+        "-A",
+        "-p-",
+        "-sV",
+        "-p 1000"
+      ],
+      "answer": 1,
+      "explanation": "-p- 는 1~65535 전체 포트를 스캔합니다. 소문자 p에 대시를 붙인 형태입니다."
+    },
+    {
+      "question": "TCP 3-way handshake의 올바른 순서는?",
+      "options": [
+        "SYN+ACK → SYN → ACK",
+        "ACK → SYN → SYN+ACK",
+        "SYN → SYN+ACK → ACK",
+        "SYN → ACK → SYN+ACK"
+      ],
+      "answer": 2,
+      "explanation": "클라이언트 SYN → 서버 SYN+ACK → 클라이언트 ACK 순으로 연결이 성립됩니다."
+    },
+    {
+      "question": "포트가 닫혀 있을 때 서버가 SYN에 대해 보내는 응답은?",
+      "options": [
+        "RST(ACK)",
+        "응답 없음",
+        "SYN+ACK",
+        "ACK"
+      ],
+      "answer": 0,
+      "explanation": "닫힌 포트는 RST(ACK)로 연결을 거부합니다. 응답이 아예 없으면 filtered로 판정합니다."
+    },
+    {
+      "question": "Connect 스캔(-sT)과 SYN 스캔(-sS)의 차이로 옳은 것은?",
+      "options": [
+        "-sS는 ACK를 생략하는 half-open 방식이고 -sT는 완전한 3-way를 맺는다",
+        "둘 다 완전한 연결을 맺는다",
+        "-sS가 연결을 완전히 맺고 -sT가 생략한다",
+        "둘 다 half-open 방식이다"
+      ],
+      "answer": 0,
+      "explanation": "-sS(SYN)는 SYN+ACK까지만 받고 ACK를 보내지 않는 half-open, -sT(Connect)는 3단계를 끝까지 맺습니다."
+    },
+    {
+      "question": "SYN 스캔(-sS)에 root 권한이 필요한 이유로 옳은 것은?",
+      "options": [
+        "커널을 재컴파일하기 때문",
+        "패킷을 직접 조립하는 raw socket을 사용하기 때문",
+        "방화벽을 수정하기 때문",
+        "포트를 1023 이하로 열기 때문"
+      ],
+      "answer": 1,
+      "explanation": "ACK를 일부러 생략하는 비정상 패킷을 raw socket으로 직접 만들어야 하므로 root 권한이 필요합니다."
+    },
+    {
+      "question": "Nmap 스캔 상태값 'filtered'의 의미로 옳은 것은?",
+      "options": [
+        "서비스 버전을 알 수 없는 상태",
+        "서비스가 정상 응답하는 상태",
+        "방화벽 등에 차단되어 open/closed 판단이 불가한 상태",
+        "포트가 확실히 닫힌 상태"
+      ],
+      "answer": 2,
+      "explanation": "filtered는 응답이 없거나 ICMP 도달불가가 와서 방화벽에 막힌 것으로 보이며, open인지 closed인지 판단할 수 없습니다."
+    },
+    {
+      "question": "IANA 기준 Well-Known Port의 범위는?",
+      "options": [
+        "1024 ~ 49151",
+        "49152 ~ 65535",
+        "1 ~ 100",
+        "0 ~ 1023"
+      ],
+      "answer": 3,
+      "explanation": "Well-Known 포트는 0~1023, Registered는 1024~49151, Dynamic/Private는 49152~65535입니다."
+    },
+    {
+      "question": "Nmap 스캔 시 출발지 포트가 매번 다른 임의 값(예: 46392)인 이유는?",
+      "options": [
+        "방화벽이 강제하기 때문",
+        "공격자가 수동으로 지정하기 때문",
+        "서버가 지정해 주기 때문",
+        "OS가 동적 포트 범위에서 임의로 할당하기 때문"
+      ],
+      "answer": 3,
+      "explanation": "출발지 포트는 OS가 동적/사설 포트 범위(49152~65535 부근)에서 매번 임의로 할당합니다."
+    },
+    {
+      "question": "다음 중 평문(비암호화) 프로토콜로만 묶인 것은?",
+      "options": [
+        "HTTPS(443)·Telnet(23)",
+        "SSH(22)·HTTPS(443)",
+        "SSH(22)·FTP(21)",
+        "FTP(21)·Telnet(23)·HTTP(80)"
+      ],
+      "answer": 3,
+      "explanation": "FTP·Telnet·HTTP는 평문 전송이고, SSH·HTTPS는 암호화됩니다. 그래서 SSH가 Telnet을, HTTPS가 HTTP를 대체했습니다."
+    },
+    {
+      "question": "열린 포트가 많을수록 커지는 개념으로, 공격 가능 지점의 총량을 뜻하는 용어는?",
+      "options": [
+        "배너",
+        "공격 표면(Attack Surface)",
+        "페이로드",
+        "핸드셰이크"
+      ],
+      "answer": 1,
+      "explanation": "열린 포트(문)가 많을수록 공격자가 노릴 수 있는 지점이 늘어나며, 이를 공격 표면(Attack Surface)이라 합니다."
+    },
+    {
+      "question": "서비스 버전 정보를 탐지하는 Nmap 옵션은?",
+      "options": [
+        "-O",
+        "-oX",
+        "-sS",
+        "-sV"
+      ],
+      "answer": 3,
+      "explanation": "-sV는 열린 포트에서 실행 중인 서비스의 제품명·버전을 탐지합니다."
+    },
+    {
+      "question": "운영체제(OS)를 탐지하는 Nmap 옵션은?",
+      "options": [
+        "-O",
+        "-p-",
+        "-sV",
+        "-sC"
+      ],
+      "answer": 0,
+      "explanation": "-O(대문자)는 패킷 지문을 대조해 OS를 추정(fingerprinting)합니다. 추정이므로 오탐이 있을 수 있습니다."
+    },
+    {
+      "question": "-A 옵션이 한 번에 수행하는 작업으로 옳은 것은?",
+      "options": [
+        "포트 스캔만",
+        "XML 저장만",
+        "OS 탐지만",
+        "버전 탐지 + OS 탐지 + NSE 기본 스크립트 + traceroute"
+      ],
+      "answer": 3,
+      "explanation": "-A는 -sV, -O, NSE default 스크립트, traceroute를 한꺼번에 수행해 정보량이 많지만 무겁습니다."
+    },
+    {
+      "question": "강사가 -A 옵션을 실무에서 잘 쓰지 않는다고 한 이유로 옳은 것은?",
+      "options": [
+        "결과가 부정확해서",
+        "무료 버전에서 막혀 있어서",
+        "default 스크립트를 전부 돌려 운영 서버에 영향을 줄 수 있어서",
+        "시간이 전혀 걸리지 않아서"
+      ],
+      "answer": 2,
+      "explanation": "-A는 default 카테고리 스크립트를 모두 실행하므로, 침습성이 낮더라도 운영 서버에 영향을 줄 수 있어 실무에선 필요한 것만 골라 씁니다."
+    },
+    {
+      "question": "스캔 속도를 조절하는 Nmap 타이밍 옵션의 기본값은?",
+      "options": [
+        "-T5",
+        "-T1",
+        "-T3",
+        "-T0"
+      ],
+      "answer": 2,
+      "explanation": "-T0~T5 중 기본값은 -T3이며, 숫자가 낮을수록 느리고 은밀(탐지 회피)합니다."
+    },
+    {
+      "question": "--source-port 53 처럼 출발지 포트를 53으로 위장하는 이유는?",
+      "options": [
+        "암호화가 자동 적용되어서",
+        "방화벽이 DNS(53) 트래픽을 신뢰해 통과시키는 경우가 많아서",
+        "53번만 스캔이 허용되어서",
+        "53번이 가장 빠른 포트라서"
+      ],
+      "answer": 1,
+      "explanation": "많은 방화벽이 DNS(53)를 신뢰하므로, 출발지 포트를 53으로 위장하면 정상 DNS로 오인되어 통과할 수 있습니다."
+    },
+    {
+      "question": "Nmap 결과를 XML로 저장하는 옵션은?",
+      "options": [
+        "-oG",
+        "-oN",
+        "-oX",
+        "-A"
+      ],
+      "answer": 2,
+      "explanation": "-oX는 XML로 저장합니다. XML은 다른 도구(searchsploit 등)가 파싱해 이어서 활용하기 좋습니다."
+    },
+    {
+      "question": "XML 결과를 사람이 보기 좋은 HTML 보고서로 변환하는 도구는?",
+      "options": [
+        "xsltproc",
+        "wget",
+        "searchsploit",
+        "msfconsole"
+      ],
+      "answer": 0,
+      "explanation": "xsltproc는 XSLT 스타일시트를 적용해 Nmap XML을 HTML 표로 변환합니다."
+    },
+    {
+      "question": "searchsploit에 대한 설명으로 옳은 것은?",
+      "options": [
+        "포트 스캔 도구",
+        "실시간 온라인 취약점 스캐너",
+        "웹서버 실행 도구",
+        "Exploit-DB의 오프라인(로컬) 버전 검색 도구"
+      ],
+      "answer": 3,
+      "explanation": "searchsploit은 Exploit-DB 데이터를 로컬에 두고 인터넷 없이 검색하는 도구입니다. -u로 최신화합니다."
+    },
+    {
+      "question": "Nmap XML 결과로 취약점을 자동 검색하는 searchsploit 옵션은?",
+      "options": [
+        "--nmap (대시 2개)",
+        "--auto",
+        "--xml (대시 1개)",
+        "--scan"
+      ],
+      "answer": 0,
+      "explanation": "searchsploit --nmap <파일.xml> 은 XML에서 각 제품·버전을 자동 추출해 검색합니다. 대시가 두 개입니다."
+    },
+    {
+      "question": "Metasploitable에서 발견된 vsftpd 백도어 취약점의 버전은?",
+      "options": [
+        "OpenSSH 4.7",
+        "ProFTPD 1.3.1",
+        "vsftpd 3.0.3",
+        "vsftpd 2.3.4"
+      ],
+      "answer": 3,
+      "explanation": "vsftpd 2.3.4에는 배포 서버 해킹으로 심어진 백도어(CVE-2011-2523)가 존재합니다."
+    },
+    {
+      "question": "msfconsole에서 검색된 공격 모듈을 선택하는 명령은?",
+      "options": [
+        "exploit",
+        "use",
+        "set",
+        "show"
+      ],
+      "answer": 1,
+      "explanation": "use <모듈번호 또는 이름> 으로 모듈을 선택합니다. 넘버링은 반드시 직전 search 결과 기준으로 입력해야 합니다."
+    },
+    {
+      "question": "Metasploit 모듈에서 공격 대상(피해자) IP를 지정하는 옵션은?",
+      "options": [
+        "LPORT",
+        "LHOST",
+        "CHOST",
+        "RHOSTS"
+      ],
+      "answer": 3,
+      "explanation": "RHOSTS(R=Remote)는 공격 대상 IP입니다. Metasploitable 등 피해자 IP를 넣으며, 공격자(Kali) IP가 아닙니다."
+    },
+    {
+      "question": "침투 성공 후 `id` 명령 결과가 `uid=0(root)`로 나왔을 때의 의미는?",
+      "options": [
+        "방화벽에 차단되었다",
+        "최고 권한(root)을 획득해 추가 권한 상승이 필요 없다",
+        "일반 사용자 권한이라 권한 상승이 필요하다",
+        "로그인에 실패했다"
+      ],
+      "answer": 1,
+      "explanation": "uid=0은 root(최고 권한)이므로 더 이상 권한 상승이 필요 없습니다. 낮은 권한이면 권한 상승 단계가 남습니다."
+    },
+    {
+      "question": "vsftpd 2.3.4 백도어를 여는 트리거로 옳은 것은?",
+      "options": [
+        "비밀번호를 비워 전송",
+        "포트 6200을 먼저 여는 것",
+        "anonymous로 로그인",
+        "사용자명 끝에 :) (해피 페이스)를 붙여 전송"
+      ],
+      "answer": 3,
+      "explanation": "USER 필드의 사용자명 끝에 :)(해피 페이스)를 넣으면 6200 포트에 백도어 셸이 열립니다."
+    },
+    {
+      "question": "vsftpd 백도어가 열어 주는 셸이 대기하는 포트는?",
+      "options": [
+        "21",
+        "8000",
+        "5555",
+        "6200"
+      ],
+      "answer": 3,
+      "explanation": "해피 페이스 트리거 후 6200번 포트에 백도어 셸이 열리고, 여기에 접속하면 root 셸을 얻습니다."
+    },
+    {
+      "question": "Wireshark의 Follow TCP Stream에서 빨간색으로 표시되는 데이터는?",
+      "options": [
+        "방화벽이 차단한 데이터",
+        "클라이언트가 서버로 보낸 데이터(공격이 일어난 부분)",
+        "암호화된 데이터",
+        "서버가 클라이언트로 보낸 데이터"
+      ],
+      "answer": 1,
+      "explanation": "빨간색은 클라이언트→서버(내가 보낸 것), 파란색은 서버→클라이언트입니다. 공격 입력은 빨간색에서 확인합니다."
+    },
+    {
+      "question": "도구(msfconsole) 없이 telnet으로 vsftpd 백도어를 재현할 때, 6200 접속 전에 반드시 해야 하는 것은?",
+      "options": [
+        "21번 포트에 USER 이름:) 과 PASS를 먼저 전송한다",
+        "6200 포트를 먼저 스캔한다",
+        "웹서버를 실행한다",
+        "chmod로 권한을 준다"
+      ],
+      "answer": 0,
+      "explanation": "먼저 21번 FTP에 해피 페이스가 든 USER와 PASS를 보내 6200 백도어를 연 뒤, 6200에 접속해야 합니다."
+    },
+    {
+      "question": "Bind 셸이 실무 환경에서 어려운 근본적인 이유는?",
+      "options": [
+        "공격자 권한이 부족해서",
+        "방화벽이 피해자로 들어오는 인바운드 연결을 대부분 차단하기 때문",
+        "속도가 너무 느려서",
+        "암호화가 불가능해서"
+      ],
+      "answer": 1,
+      "explanation": "방화벽은 인바운드를 엄격히 막으므로, 공격자가 피해자의 포트로 직접 접속하는 bind 방식은 통하기 어렵습니다."
+    },
+    {
+      "question": "Reverse 셸이 방화벽을 우회할 수 있는 원리로 옳은 것은?",
+      "options": [
+        "피해자가 공격자에게 나가는(아웃바운드) 연결을 맺고, 아웃바운드는 대개 허용되기 때문",
+        "포트를 암호화하기 때문",
+        "공격자가 방화벽을 해킹하기 때문",
+        "피해자 권한이 높기 때문"
+      ],
+      "answer": 0,
+      "explanation": "방화벽은 인바운드는 막아도 아웃바운드는 관대하므로, 피해자가 먼저 공격자에게 나가 붙는 리버스 방식이 통합니다."
+    },
+    {
+      "question": "리버스 셸 페이로드를 생성하는 도구는?",
+      "options": [
+        "nmap",
+        "searchsploit",
+        "msfvenom",
+        "xsltproc"
+      ],
+      "answer": 2,
+      "explanation": "msfvenom은 -p로 페이로드 종류, LHOST/LPORT, -f로 출력 형식을 지정해 공격 파일을 생성합니다."
+    },
+    {
+      "question": "리버스 셸 페이로드 생성 시 LHOST에 넣어야 하는 IP는?",
+      "options": [
+        "DNS 서버 IP",
+        "피해자(Metasploitable)의 IP",
+        "게이트웨이 IP",
+        "공격자(Kali)의 IP"
+      ],
+      "answer": 3,
+      "explanation": "LHOST는 피해자가 돌아올 주소, 즉 공격자(Kali) 자신의 IP입니다. 피해자 IP를 넣으면 안 됩니다."
+    },
+    {
+      "question": "ELF 파일에 대한 설명으로 옳은 것은?",
+      "options": [
+        "리눅스/유닉스의 실행 파일 형식",
+        "압축 파일 형식",
+        "이미지 파일 형식",
+        "윈도우 실행 파일 형식"
+      ],
+      "answer": 0,
+      "explanation": "ELF는 리눅스의 실행 파일 형식으로, 윈도우의 PE(.exe), macOS의 Mach-O에 대응합니다. 대상 OS에 맞춰야 합니다."
+    },
+    {
+      "question": "Kali에서 파일을 대상에 전달하기 위해 임시 웹서버를 여는 명령은?",
+      "options": [
+        "wget",
+        "msfconsole",
+        "python -m http.server",
+        "nmap -sV"
+      ],
+      "answer": 2,
+      "explanation": "python -m http.server는 현재 디렉터리를 기본 8000 포트로 공개합니다. 그 디렉터리의 파일을 대상이 다운로드할 수 있습니다."
+    },
+    {
+      "question": "python -m http.server로 연 파일에 접속하려면 브라우저에 입력할 IP는?",
+      "options": [
+        "피해자 Metasploitable의 IP",
+        "bee-box의 IP",
+        "웹서버를 실행한 Kali의 IP",
+        "라우터의 IP"
+      ],
+      "answer": 2,
+      "explanation": "웹서버를 켠 주체가 Kali이므로, 파일은 Kali IP:8000에서 받습니다. 다른 IP로 접속하면 실패합니다."
+    },
+    {
+      "question": "침투한 셸에서 파일을 다운로드할 때 /tmp 디렉터리를 정석으로 쓰는 이유는?",
+      "options": [
+        "누구나 읽고 쓸 수 있어 낮은 권한에서도 파일 작업이 가능하기 때문",
+        "웹으로 공개되기 때문",
+        "자동 백업되기 때문",
+        "root만 접근 가능하기 때문"
+      ],
+      "answer": 0,
+      "explanation": "/tmp는 기본적으로 모든 사용자가 읽고 쓸 수 있어, 낮은 권한으로 침투했을 때도 파일 다운로드·실행이 가능합니다."
+    },
+    {
+      "question": "리눅스 권한 표기 -rw-------(600)에서 소유자에게 없는 권한은?",
+      "options": [
+        "실행(x)",
+        "쓰기(w)",
+        "모두 있음",
+        "읽기(r)"
+      ],
+      "answer": 0,
+      "explanation": "600은 소유자에게 읽기(4)+쓰기(2)=6만 있고 실행(1)이 없어, ELF 실행 파일을 그대로는 돌릴 수 없습니다."
+    },
+    {
+      "question": "chmod 777 backdoor.elf 를 실행하는 목적은?",
+      "options": [
+        "파일을 압축하기 위해",
+        "실행 권한(x)을 부여해 파일을 실행 가능하게 만들기 위해",
+        "파일을 암호화하기 위해",
+        "파일을 삭제하기 위해"
+      ],
+      "answer": 1,
+      "explanation": "다운로드된 ELF는 600이라 실행이 안 되므로, chmod로 실행 권한을 부여해야 합니다. 단 777은 실무에선 과도한 권한입니다."
+    },
+    {
+      "question": "리버스 셸 연결을 받기 위해 Kali에서 사용하는 Metasploit 모듈은?",
+      "options": [
+        "post/linux",
+        "auxiliary/scanner",
+        "exploit/unix/ftp/vsftpd_234_backdoor",
+        "exploit/multi/handler"
+      ],
+      "answer": 3,
+      "explanation": "multi/handler는 취약점을 찌르지 않고, 미리 만든 페이로드가 접속해 오길 기다리는 범용 리스너입니다."
+    },
+    {
+      "question": "리버스 셸이 연결되려면 msfvenom과 multi/handler에서 반드시 일치해야 하는 값은?",
+      "options": [
+        "RHOSTS만",
+        "LHOST · LPORT · PAYLOAD",
+        "OS 종류만",
+        "포트 번호만"
+      ],
+      "answer": 1,
+      "explanation": "페이로드가 돌아올 주소·포트·종류(LHOST/LPORT/PAYLOAD)가 리스너와 정확히 같아야 세션이 성립합니다."
+    },
+    {
+      "question": "meterpreter가 일반 셸보다 강력한 점으로 옳은 것은?",
+      "options": [
+        "download·upload·webcam_stream 등 기능이 내장되어 있다",
+        "방화벽을 자동으로 끈다",
+        "root 권한을 자동으로 준다",
+        "암호를 자동으로 해독한다"
+      ],
+      "answer": 0,
+      "explanation": "meterpreter는 파일 업/다운로드, 화면 캡처, 웹캠 스트리밍 등 강력한 기능을 명령 하나로 제공합니다."
+    },
+    {
+      "question": "meterpreter에서 대상 파일을 실제로 Kali로 가져오는(탈취) 명령은?",
+      "options": [
+        "upload",
+        "download",
+        "dir",
+        "cat"
+      ],
+      "answer": 1,
+      "explanation": "cat은 내용을 화면에 보여줄 뿐이고, download가 파일을 실제로 공격자 쪽으로 복사(탈취)합니다."
+    },
+    {
+      "question": "리버스 셸이 연결돼도 피해자 쪽에서 5555 포트를 스캔하면 열려 있지 않은 이유는?",
+      "options": [
+        "5555가 예약된 포트라서",
+        "5555는 공격자(Kali)가 열고, 피해자는 임의 동적 포트로 나가는 연결만 맺기 때문",
+        "피해자가 방화벽으로 5555를 막아서",
+        "스캔 도구의 오류 때문"
+      ],
+      "answer": 1,
+      "explanation": "리스너 5555는 공격자가 엽니다. 피해자는 동적 포트로 나가는 연결을 맺을 뿐이라, 피해자 측 5555는 열려 있지 않습니다."
+    },
+    {
+      "question": "NSE(Nmap Scripting Engine) 스크립트를 작성하는 언어는?",
+      "options": [
+        "Python",
+        "Bash",
+        "Lua",
+        "Ruby"
+      ],
+      "answer": 2,
+      "explanation": "NSE 스크립트는 Lua로 작성됩니다. (Metasploit 모듈은 Ruby)"
+    },
+    {
+      "question": "NSE 스크립트가 저장되는 기본 경로는?",
+      "options": [
+        "/usr/share/nmap/scripts",
+        "/etc/nmap",
+        "/usr/share/webshells",
+        "/tmp"
+      ],
+      "answer": 0,
+      "explanation": "모든 .nse 스크립트는 /usr/share/nmap/scripts에 있으며, 목록은 script.db로 관리됩니다."
+    },
+    {
+      "question": "기본(default) 카테고리 NSE 스크립트를 실행하는 옵션으로, --script=default 와 동일한 것은?",
+      "options": [
+        "-sV",
+        "-sS",
+        "-sU",
+        "-sC"
+      ],
+      "answer": 3,
+      "explanation": "-sC는 default 카테고리 스크립트를 실행하며, 이는 -A에도 포함됩니다."
+    },
+    {
+      "question": "운영 서버에 절대 함부로 돌리면 안 되는 NSE 카테고리로만 묶인 것은?",
+      "options": [
+        "dos · brute · exploit",
+        "external · banner",
+        "version · auth",
+        "safe · discovery"
+      ],
+      "answer": 0,
+      "explanation": "dos(서버 다운)·brute(계정 잠금)·exploit(실제 공격)·fuzzer·intrusive는 서비스 장애 위험이 있어 운영 서버에 금물입니다."
+    },
+    {
+      "question": "여러 NSE 스크립트를 한 번에 지정하는 올바른 문법은?",
+      "options": [
+        "--script ftp-anon,ftp-syst (쉼표, 확장자 제외)",
+        "--script ftp-anon or ftp-syst.nse",
+        "--script ftp-anon.nse.ftp-syst.nse",
+        "--scripts=ftp-*.nse"
+      ],
+      "answer": 0,
+      "explanation": "쉼표로 구분하고 .nse 확장자는 뺍니다. or 같은 표현식은 카테고리/속성 필터링에 씁니다."
+    },
+    {
+      "question": "익명 FTP 접근 가능 여부를 확인하는 NSE 스크립트로, auth 카테고리에 속하는 것은?",
+      "options": [
+        "http-title",
+        "ftp-anon",
+        "smb-os-discovery",
+        "ftp-brute"
+      ],
+      "answer": 1,
+      "explanation": "ftp-anon은 익명 로그인 가능 여부만 확인하므로 auth입니다. 자격증명을 대입하면 brute로 분류됩니다."
+    },
+    {
+      "question": "위험한 NSE 스크립트를 꼭 써야 할 때 강사가 제시한 안전 절차는?",
+      "options": [
+        "야간에 몰래 실행",
+        "백업 없이 실행",
+        "운영 서버에 바로 실행",
+        "담당자 승인 후 운영과 동일한 개발 서버에서 실행"
+      ],
+      "answer": 3,
+      "explanation": "dos/exploit 등은 운영 서버에 위험하므로, 사전 승인을 받고 운영과 동일한 개발 서버를 준비해 그곳에서만 실행합니다."
+    },
+    {
+      "question": "ftp-vsftpd-backdoor 스크립트가 보고한 vsftpd 백도어의 CVE 번호는?",
+      "options": [
+        "CVE-2017-0144",
+        "CVE-2011-2523",
+        "CVE-2021-44228",
+        "CVE-2019-0708"
+      ],
+      "answer": 1,
+      "explanation": "vsftpd 2.3.4 백도어는 CVE-2011-2523이며, 스크립트가 실제로 트리거해 id=root까지 확인해 줍니다."
+    },
+    {
+      "question": "FTP 접속 후 파일 목록 조회 / 읽기 / 업로드 명령의 조합으로 옳은 것은?",
+      "options": [
+        "list / download / send",
+        "show / read / write",
+        "ls / cat / echo",
+        "dir / get / put"
+      ],
+      "answer": 3,
+      "explanation": "FTP에서 dir(목록), get(읽기·다운로드), put(업로드·쓰기)을 사용합니다."
+    },
+    {
+      "question": "Metasploitable의 익명 FTP에서 put(쓰기)이 거부(550)된 이유는?",
+      "options": [
+        "anonymous 계정에 쓰기 권한이 부여되지 않았기 때문",
+        "서버가 다운되어서",
+        "포트가 닫혀서",
+        "비밀번호가 틀려서"
+      ],
+      "answer": 0,
+      "explanation": "익명 로그인은 됐지만 anonymous에 쓰기 권한이 없어 put이 550(Permission denied)로 거부됐습니다."
+    },
+    {
+      "question": "\"익명 FTP 로그인이 된다\"는 사실만으로 취약 여부를 단정할 수 없는 이유는?",
+      "options": [
+        "읽기/쓰기 권한 범위를 확인해야 실제 위험도를 판단할 수 있어서",
+        "FTP는 점검 대상이 아니어서",
+        "익명 로그인은 항상 취약해서",
+        "익명 로그인은 항상 안전해서"
+      ],
+      "answer": 0,
+      "explanation": "Metasploitable은 익명 로그인+쓰기 불가라 위험이 낮았고, bee-box는 쓰기까지 가능해 심각했습니다. 권한 범위 확인이 관건입니다."
+    },
+    {
+      "question": "bee-box의 FTP 서비스에서 확인된 버전은?",
+      "options": [
+        "vsftpd 2.3.4",
+        "OpenSSH 4.7",
+        "ProFTPD 1.3.1",
+        "Apache 2.2.8"
+      ],
+      "answer": 2,
+      "explanation": "bee-box의 21번 포트에서는 ProFTPD 1.3.1이 동작했고, 이 버전 자체에는 마땅한 공개 취약점이 없었습니다."
+    },
+    {
+      "question": "searchsploit에서 정확한 버전으로 결과가 없을 때 강사가 권한 검색 요령은?",
+      "options": [
+        "버전을 한 단계씩 넓혀(예: 1.3.1 → 1.3) 인접 취약점을 확인한다",
+        "포트를 바꿔 스캔한다",
+        "다른 서버를 스캔한다",
+        "즉시 취약점 없음으로 결론짓는다"
+      ],
+      "answer": 0,
+      "explanation": "정확한 버전으로 안 나오면 버전을 넓혀 인접 취약 버전을 보고, 우리 버전이 그 구간에 드는지 판단합니다."
+    },
+    {
+      "question": "bee-box에서 웹셸 공격이 성립한 두 취약점의 결합으로 옳은 것은?",
+      "options": [
+        "포트 개방 + 방화벽 부재",
+        "OS 노출 + 커널 취약점",
+        "약한 비밀번호 + SQL 인젝션",
+        "익명 FTP 쓰기 가능 + 업로드 경로가 웹으로 공개됨"
+      ],
+      "answer": 3,
+      "explanation": "익명으로 파일을 쓸 수 있고(A), 그 업로드 위치가 웹 공개 경로(/bWAPP/documents)라는 점(B)이 결합해 웹셸 실행이 가능했습니다."
+    },
+    {
+      "question": "웹셸(Web Shell)에 대한 설명으로 옳은 것은?",
+      "options": [
+        "브라우저 확장 프로그램",
+        "웹서버 로그 파일",
+        "방화벽 설정 파일",
+        "HTTP 요청으로 서버 명령을 실행하게 하는 스크립트 파일"
+      ],
+      "answer": 3,
+      "explanation": "웹셸은 .php 등으로 작성되어 브라우저 요청으로 서버 명령을 실행합니다. 악용 소지가 커 악성 파일로 분류됩니다."
+    },
+    {
+      "question": "업로드할 웹셸의 언어를 대상 서버와 맞춰야 하는 이유는?",
+      "options": [
+        "서버가 해석하는 언어라야 코드가 실행되기 때문(PHP 서버엔 PHP 웹셸)",
+        "파일 크기를 줄이기 위해",
+        "백신을 우회하기 위해",
+        "암호화를 위해"
+      ],
+      "answer": 0,
+      "explanation": "PHP 서버에 JSP 웹셸을 올리면 실행되지 않고 텍스트로만 보입니다. 서버 사이드 언어와 일치해야 실행됩니다."
+    },
+    {
+      "question": "Kali에 기본 내장된 웹셸들이 저장된 경로는?",
+      "options": [
+        "/usr/share/webshells",
+        "/var/www/html",
+        "/usr/share/nmap/scripts",
+        "/tmp"
+      ],
+      "answer": 0,
+      "explanation": "/usr/share/webshells 아래에 php·jsp·asp·aspx 등 언어별 웹셸이 내장되어 있습니다."
+    },
+    {
+      "question": "웹셸 URL의 ?cmd=cat+/etc/passwd 에서 '+'가 의미하는 것은?",
+      "options": [
+        "문자열 연결",
+        "URL 인코딩된 공백",
+        "더하기 연산",
+        "줄바꿈"
+      ],
+      "answer": 1,
+      "explanation": "URL에서는 공백을 +나 %20으로 인코딩합니다. 여기서 +는 cat과 /etc/passwd 사이의 공백을 뜻합니다."
+    },
+    {
+      "question": "웹셸로 `?cmd=id`를 실행했을 때 나온 www-data 권한의 의미는?",
+      "options": [
+        "로그인 실패 상태다",
+        "웹서버 실행 권한이라 root가 아니며 권한 상승이 필요하다",
+        "방화벽 계정이다",
+        "최고 관리자 권한이다"
+      ],
+      "answer": 1,
+      "explanation": "www-data는 웹서버가 쓰는 낮은 권한 계정입니다. 완전 장악을 위해서는 별도의 권한 상승이 필요합니다."
+    },
+    {
+      "question": "웹셸(브라우저 방식)을 meterpreter로 업그레이드하려는 이유로 옳은 것은?",
+      "options": [
+        "웹셸이 삭제되기 때문",
+        "대화형 세션·파일 전송 등으로 더 편하고 강력하게 조종하기 위해",
+        "방화벽을 끄기 위해",
+        "권한이 자동으로 root가 되기 때문"
+      ],
+      "answer": 1,
+      "explanation": "웹셸은 브라우저로만 결과를 받아 불편하므로, 리버스 셸을 심어 meterpreter 세션으로 지속·강력한 제어를 확보합니다."
+    },
+    {
+      "question": "웹셸 cmd에 넣는 원커맨드에서 세 명령(다운로드·권한부여·실행)을 잇는 데 강사가 사용한 연산자는?",
+      "options": [
+        "> (리다이렉트)",
+        "| (파이프)",
+        "&& (성공 시)",
+        "; (세미콜론)"
+      ],
+      "answer": 3,
+      "explanation": "강사는 세미콜론(;)으로 세 명령을 순차 실행되도록 이었습니다. wget ...; chmod ...; 실행 형태입니다."
+    },
+    {
+      "question": "wget으로 대화형 이동 없이 저장 경로를 직접 지정하는 옵션은?",
+      "options": [
+        "-P",
+        "-q",
+        "-O /tmp/backdoor.elf",
+        "-c"
+      ],
+      "answer": 2,
+      "explanation": "-O 옵션으로 저장 파일 경로를 직접 지정하면 cd 없이 원하는 위치(/tmp)에 저장할 수 있습니다."
+    },
+    {
+      "question": "URL 인코딩에서 공백을 나타내는 가장 정석적인 표기는?",
+      "options": [
+        "%0A",
+        "%2F",
+        "%20",
+        "%3A"
+      ],
+      "answer": 2,
+      "explanation": "공백은 %20(또는 +)로 인코딩합니다. %2F는 /, %3A는 : 입니다."
+    },
+    {
+      "question": "meterpreter 세션에서 일반 리눅스 셸로 전환하는 명령은?",
+      "options": [
+        "bash",
+        "cmd",
+        "shell",
+        "terminal"
+      ],
+      "answer": 2,
+      "explanation": "meterpreter에서 shell을 입력하면 일반 셸로 전환되고, exit를 한 번 입력하면 meterpreter로 복귀합니다."
+    },
+    {
+      "question": "www-data 같은 낮은 권한에서 root로 올라가기 위해 강사가 제시한 경로로 옳은 것은?",
+      "options": [
+        "포트를 바꾸기",
+        "커널 버전 확인 → 권한 상승 exploit(주로 C) 컴파일·실행",
+        "방화벽을 끄기",
+        "웹셸을 다시 업로드"
+      ],
+      "answer": 1,
+      "explanation": "sysinfo로 커널 버전을 확인하고, 해당 커널의 권한 상승(privilege escalation) exploit(대개 C 소스)을 컴파일·실행해 root를 얻습니다."
+    },
+    {
+      "question": "vsftpd 2.3.4 백도어가 공식이 아닌 악성 코드로 밝혀진 경위로 옳은 것은?",
+      "options": [
+        "사용자가 잘못 설정했다",
+        "개발자가 실수로 버그를 남겼다",
+        "배포 서버가 해킹되어 소스에 백도어가 몰래 삽입·배포되었다",
+        "방화벽이 오작동했다"
+      ],
+      "answer": 2,
+      "explanation": "2011년 vsftpd 배포 서버가 해킹되어 백도어가 삽입된 채 배포된 소프트웨어 공급망 공격 사례입니다."
+    },
+    {
+      "question": "2일차 실습 전체를 관통하는 정보 수집→침투의 흐름으로 옳은 것은?",
+      "options": [
+        "취약점 검색 → 정보 수집 → 포트 스캔",
+        "포트 스캔 → 침투 → 정보 수집",
+        "정보 수집 → 포트 스캔 → 취약점 검색 → 침투 → 지속 연결(리버스 셸)",
+        "침투 → 정보 수집 → 포트 스캔"
+      ],
+      "answer": 2,
+      "explanation": "OSINT/정보 수집으로 표적을 파악하고, Nmap 포트 스캔·버전 확인, searchsploit로 취약점 검색, msfconsole로 침투, 리버스 셸로 지속 연결하는 순서입니다."
+    }
+  ]
+}

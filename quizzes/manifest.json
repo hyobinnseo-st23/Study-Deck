@@ -3,6 +3,8 @@
     "quizzes":  [
                     "app-security-day1.json",
                     "app-security-day1-advanced.json",
+                    "app-security-day2.json",
+                    "app-security-day2-advanced.json",
                     "machine-leaning-day1.json",
                     "machine-leaning-day1-advanced.json",
                     "machine-leaning-day2.json",
