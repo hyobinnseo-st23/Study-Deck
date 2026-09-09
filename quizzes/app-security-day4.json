@@ -1,7 +1,7 @@
 {
   "title": "애플리케이션 보안 DAY4",
   "subtitle": "부적절한 인증·인가(IDOR·결제/적립금 조작) · XSS(Stored/Reflected·BeEF·세션 하이재킹)",
-  "subject": "Application Security",
+  "subject": "애플리케이션 보안",
   "description": "SK Shieldus Rookies: 애플리케이션 보안 4일차. 인증/인가 취약점과 XSS의 개념 회상 문제입니다.",
   "questions": [
     { "question": "인증(Authentication)의 핵심 의미로 옳은 것은?", "options": ["사용자가 누구인지 확인(로그인)하는 것","데이터의 무결성을 검증하는 것","사용자가 무엇을 할 수 있는지 결정하는 것","세션을 서버에 저장하는 것"], "answer": 0, "explanation": "인증은 '너 누구냐'를 확인하는 절차로, 대표적으로 로그인이 이에 해당합니다." },
