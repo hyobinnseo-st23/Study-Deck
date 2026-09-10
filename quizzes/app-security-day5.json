@@ -1,0 +1,690 @@
+{
+  "title": "애플리케이션 보안 DAY5",
+  "subtitle": "XSS(관리자 세션 탈취·HttpOnly/Secure·시스템 침투) · SQL Injection(UNION·information_schema·Blind·sqlmap)",
+  "subject": "애플리케이션 보안",
+  "description": "SK Shieldus Rookies: 애플리케이션 보안 5일차. XSS를 이용한 관리자 세션 탈취와 내부 경로 접근, HttpOnly/Secure 쿠키 속성, BeEF+msfvenom 시스템 침투, 그리고 SQL Injection 6단계(싱글쿼터·참거짓·ORDER BY·UNION)·information_schema 데이터 추출·SHA1 해시·숫자형/Blind SQLi·sqlmap 자동화를 다룹니다.",
+  "questions": [
+    {
+      "question": "관리자 권한 탈취 시나리오에서 공격자가 BeEF hook 스크립트를 삽입한 위치는?",
+      "options": [
+        "로그인 페이지",
+        "상품 결제 창",
+        "회원가입 폼",
+        "1:1 문의 게시판"
+      ],
+      "answer": 3,
+      "explanation": "관리자가 반드시 조회하는 1:1 문의 게시판에 hook 스크립트를 심어, 관리자가 조회하는 순간 후킹되도록 했습니다."
+    },
+    {
+      "question": "관리자가 공격자의 1:1 문의 글을 조회하는 순간 일어나는 일은?",
+      "options": [
+        "관리자 계정이 자동 삭제된다",
+        "서버가 즉시 공격을 차단한다",
+        "삽입된 스크립트가 실행되어 관리자 브라우저가 BeEF에 후킹된다",
+        "관리자 비밀번호가 초기화된다"
+      ],
+      "answer": 2,
+      "explanation": "저장형 XSS가 실행되며 관리자 브라우저가 공격자의 BeEF Online Browsers에 등록됩니다."
+    },
+    {
+      "question": "BeEF에서 후킹된 브라우저의 세션 쿠키를 가져오는 명령은?",
+      "options": [
+        "Get Form Values",
+        "Get System Info",
+        "Get Cookie",
+        "Get Page HREFs"
+      ],
+      "answer": 2,
+      "explanation": "Get Cookie로 PHPSESSID 등 세션 값을 실시간으로 획득합니다."
+    },
+    {
+      "question": "GMShop 관리자 페이지가 세션을 검증하는 방식으로 옳은 것은?",
+      "options": [
+        "MAC 주소로만 검증한다",
+        "브라우저 종류가 다르면 차단한다",
+        "같은 IP에서 로그인한 사용자만 접근을 허용하고, 다른 IP에서 중복 로그인하면 양쪽 세션을 모두 종료한다",
+        "접속 국가가 다르면 차단한다"
+      ],
+      "answer": 2,
+      "explanation": "동일 IP 검증 + 중복 로그인 차단(양쪽 종료) + 3분 유휴 만료가 로그인 페이지에서 이뤄집니다."
+    },
+    {
+      "question": "관리자 페이지에서 3분간 아무 동작이 없을 때 발생하는 일은?",
+      "options": [
+        "비밀번호 재입력 알림만 뜬다",
+        "IP가 영구 차단된다",
+        "아무 일도 일어나지 않는다",
+        "세션이 만료되어 자동 로그아웃된다"
+      ],
+      "answer": 3,
+      "explanation": "3분 유휴 시간 제한으로 세션이 만료됩니다. 실습 중 자주 걸리는 함정입니다."
+    },
+    {
+      "question": "GMShop 관리자 세션 ID의 취약한 특성은?",
+      "options": [
+        "로그인할 때마다 재발급되지 않고 기존 값이 계속 재사용된다",
+        "로그인마다 매번 새로 발급된다",
+        "5분마다 자동으로 변경된다",
+        "접속 시각을 포함해 매번 달라진다"
+      ],
+      "answer": 0,
+      "explanation": "세션 ID가 고정되어, 한 번 탈취한 값이 재로그인 후에도 계속 유효합니다."
+    },
+    {
+      "question": "로그인 성공 직후 세션 ID를 새로 발급해 세션 고정/재사용을 막는 PHP 함수는?",
+      "options": [
+        "setcookie()",
+        "session_regenerate_id()",
+        "session_start()",
+        "session_destroy()"
+      ],
+      "answer": 1,
+      "explanation": "로그인 직후 session_regenerate_id(true)로 세션을 재생성하는 것이 표준 대응입니다."
+    },
+    {
+      "question": "BeEF에서 현재 스크립트가 실행 중인 페이지의 모든 링크(href)를 수집하는 명령은?",
+      "options": [
+        "Get Clipboard",
+        "Get Cookie",
+        "Get Geolocation",
+        "Get Page HREFs"
+      ],
+      "answer": 3,
+      "explanation": "Get Page HREFs로 관리자 페이지 내부 경로(member_list.php 등)를 수집합니다."
+    },
+    {
+      "question": "공격자가 탈취한 관리자 세션으로 로그인 페이지가 아닌 내부 기능 경로에 직접 접근했더니 성공한 이유는?",
+      "options": [
+        "내부 기능은 인증이 전혀 필요 없어서",
+        "방화벽이 꺼져 있어서",
+        "중복 로그인/IP 검증이 로그인 페이지에만 있고 내부 기능 페이지에는 없어서",
+        "세션이 관리자 권한을 무시해서"
+      ],
+      "answer": 2,
+      "explanation": "접근제어가 입구(로그인 페이지)에만 있어, 경로를 알면 세션으로 내부에 직접 진입됩니다."
+    },
+    {
+      "question": "접근제어(인가)에 대한 올바른 원칙은?",
+      "options": [
+        "보호가 필요한 모든 페이지에서 매번 권한을 검증해야 한다",
+        "클라이언트(브라우저)에서 검증하면 된다",
+        "로그인 페이지에서 한 번만 검증하면 충분하다",
+        "관리자 계정만 검증하면 된다"
+      ],
+      "answer": 0,
+      "explanation": "입구만 검사하면 내부 직접 접근에 뚫립니다. 모든 페이지에서 권한 체크가 필요합니다."
+    },
+    {
+      "question": "관리자 페이지 노출 취약점의 판단 기준으로 옳은 것은?",
+      "options": [
+        "관리자 페이지에 로그인 폼이 있으면 취약",
+        "관리자 페이지가 존재하기만 하면 취약",
+        "admin, adm, administrator, manager 등 유추하기 쉬운 URL로 관리자 페이지에 접근 가능하면 취약",
+        "관리자 페이지가 HTTPS를 쓰면 취약"
+      ],
+      "answer": 2,
+      "explanation": "유추 쉬운 URL/계정으로 관리자 페이지가 노출되면 취약으로 판단합니다."
+    },
+    {
+      "question": "관리자 페이지 노출의 근본적인 대응책은?",
+      "options": [
+        "관리자 URL을 자주 바꾼다",
+        "외부(비허용 IP)에서 관리자 페이지에 접근할 수 없도록 접근제어를 건다",
+        "관리자 비밀번호를 아주 길게 만든다",
+        "관리자 페이지를 HTTP로만 제공한다"
+      ],
+      "answer": 1,
+      "explanation": "경로를 숨기는 것만으로는 XSS·정보수집에 뚫리므로 접근제어가 근본 대응입니다."
+    },
+    {
+      "question": "HttpOnly 속성이 적용된 쿠키의 특징은?",
+      "options": [
+        "서버가 절대 변경할 수 없다",
+        "HTTPS에서만 전송된다",
+        "만료 시간이 사라진다",
+        "자바스크립트(document.cookie)로 읽을 수 없다"
+      ],
+      "answer": 3,
+      "explanation": "HttpOnly는 JS의 쿠키 접근을 차단해, XSS가 발생해도 세션 탈취를 막습니다."
+    },
+    {
+      "question": "세션 쿠키에 HttpOnly=true가 걸려 있을 때 XSS 취약점에 대한 올바른 설명은?",
+      "options": [
+        "알림창조차 띄울 수 없다",
+        "스크립트가 아예 실행되지 않는다",
+        "XSS 취약점 자체는 여전히 존재하며 세션 탈취만 어려워진다(위험도가 낮아진다)",
+        "XSS 취약점이 완전히 사라진다"
+      ],
+      "answer": 2,
+      "explanation": "보안 속성은 취약점을 없애는 게 아니라 위험도(영향도)를 낮춥니다."
+    },
+    {
+      "question": "Secure 속성이 적용된 쿠키의 특징은?",
+      "options": [
+        "자바스크립트로 읽을 수 없다",
+        "서버 메모리에만 저장된다",
+        "HTTPS(암호화) 통신에서만 전송되고 HTTP 요청에는 실리지 않는다",
+        "세션이 만료되지 않는다"
+      ],
+      "answer": 2,
+      "explanation": "Secure는 평문 HTTP로의 쿠키 전송을 막아 스니핑에 의한 세션 탈취를 완화합니다."
+    },
+    {
+      "question": "HttpOnly와 Secure가 각각 대응하는 공격을 옳게 짝지은 것은?",
+      "options": [
+        "HttpOnly=스니핑, Secure=XSS",
+        "HttpOnly=XSS를 통한 세션 탈취, Secure=스니핑을 통한 세션 탈취",
+        "둘 다 CSRF",
+        "둘 다 SQL Injection"
+      ],
+      "answer": 1,
+      "explanation": "HttpOnly는 JS 접근 차단(XSS 완화), Secure는 평문 전송 차단(스니핑 완화)입니다."
+    },
+    {
+      "question": "BeEF의 Autorun 규칙이 처음에 동작하지 않는 흔한 원인은?",
+      "options": [
+        "이전 후킹의 캐시 데이터가 남아 있어서",
+        "BeEF 버전이 낮아서",
+        "피해자가 크롬을 써서",
+        "Kali의 방화벽 때문에"
+      ],
+      "answer": 0,
+      "explanation": "좀비(후킹 세션)를 삭제하고 재후킹해 캐시를 비우면 Autorun이 동작합니다."
+    },
+    {
+      "question": "msfvenom으로 Windows 대상 리버스 셸을 만들 때 LHOST에 지정하는 값은?",
+      "options": [
+        "웹 서버의 IP 주소",
+        "공격자(Kali)의 IP 주소",
+        "게이트웨이 IP 주소",
+        "피해자(Windows)의 IP 주소"
+      ],
+      "answer": 1,
+      "explanation": "리버스 연결이므로 악성코드가 돌아올 주소, 즉 공격자 IP를 LHOST에 넣습니다."
+    },
+    {
+      "question": "msfvenom에서 Windows 실행 파일로 출력하기 위한 포맷 옵션은?",
+      "options": [
+        "-f raw",
+        "-f elf",
+        "-f exe",
+        "-f python"
+      ],
+      "answer": 2,
+      "explanation": "Windows 실행 파일은 -f exe로 지정합니다."
+    },
+    {
+      "question": "악성코드를 피해자에게 배포하기 위해 Kali에서 실행한 간단한 웹 서버 명령은?",
+      "options": [
+        "python3 -m http.server 8000",
+        "ftp -s 21",
+        "apache2ctl start",
+        "nginx -s reload"
+      ],
+      "answer": 0,
+      "explanation": "파이썬 내장 HTTP 서버로 exe를 배포하고, 피해자가 8000 포트로 접근해 받습니다."
+    },
+    {
+      "question": "msfvenom(악성코드)과 msfconsole(핸들러)가 반드시 일치해야 하는 값들은?",
+      "options": [
+        "payload, LHOST, LPORT",
+        "LHOST, 파일 크기, 아이콘",
+        "payload, 파일명, 포맷",
+        "대상 OS 버전, 언어, 시간대"
+      ],
+      "answer": 0,
+      "explanation": "세 값이 모두 일치해야 리버스 연결이 성립합니다."
+    },
+    {
+      "question": "피해자가 악성코드를 실행해 연결되면 열리는 원격 제어 세션은?",
+      "options": [
+        "Telnet 세션",
+        "meterpreter 세션",
+        "RDP 세션",
+        "SSH 세션"
+      ],
+      "answer": 1,
+      "explanation": "Windows meterpreter reverse_tcp 페이로드가 실행되어 meterpreter 세션이 연결됩니다."
+    },
+    {
+      "question": "meterpreter에서 피해자 화면을 실시간으로 중계받는 명령은?",
+      "options": [
+        "sysinfo",
+        "screenshot",
+        "screenshare",
+        "webcam_snap"
+      ],
+      "answer": 2,
+      "explanation": "screenshot은 1회 캡처, screenshare는 실시간 화면 중계입니다."
+    },
+    {
+      "question": "meterpreter에서 피해자의 키 입력을 수집하는 명령 쌍은?",
+      "options": [
+        "keylog_on / keylog_off",
+        "capture_keys / show_keys",
+        "key_start / key_read",
+        "keyscan_start / keyscan_dump"
+      ],
+      "answer": 3,
+      "explanation": "keyscan_start로 키로거를 켜고 keyscan_dump로 수집된 입력을 확인합니다."
+    },
+    {
+      "question": "다운로드 이력·평판이 없는 실행 파일을 위험으로 경고하는 Windows의 평판 기반 보호 기능은?",
+      "options": [
+        "UAC",
+        "BitLocker",
+        "Defender Firewall",
+        "SmartScreen"
+      ],
+      "answer": 3,
+      "explanation": "SmartScreen은 평판이 없는 파일을 위험으로 표시하지만, 사용자가 무시하면 무력화됩니다."
+    },
+    {
+      "question": "Reflected XSS의 특징은?",
+      "options": [
+        "서버 재부팅 시에만 실행된다",
+        "서버 DB에 저장되어 조회할 때마다 실행된다",
+        "클라이언트 로컬에만 영구 저장된다",
+        "입력값이 서버에 저장되지 않고 응답에 그대로 반사되어 실행된다"
+      ],
+      "answer": 3,
+      "explanation": "반사형으로, 요청에 담긴 스크립트가 응답에 되돌아와 1회 실행됩니다."
+    },
+    {
+      "question": "Stored XSS와 비교한 Reflected XSS의 공격 성립 조건은?",
+      "options": [
+        "관리자 권한이 필요하다",
+        "스크립트가 담긴 링크를 피해자가 클릭하도록 유도해야 한다",
+        "피해자가 로그인만 하면 자동 실행된다",
+        "서버를 재시작해야 한다"
+      ],
+      "answer": 1,
+      "explanation": "Reflected는 서버에 남지 않아 악성 링크 클릭 유도(피싱 등)가 필요합니다."
+    },
+    {
+      "question": "Reflected XSS 점검에서 요청을 반복 전송하며 응답 반사를 확인하는 Burp 기능은?",
+      "options": [
+        "Decoder",
+        "Comparer",
+        "Intruder",
+        "Repeater"
+      ],
+      "answer": 3,
+      "explanation": "Repeater로 입력을 보내 응답에 그대로 반사되는지 확인합니다."
+    },
+    {
+      "question": "브라우저가 < 문자를 서버로 전송할 때 자동으로 변환하는 형태는?",
+      "options": [
+        "%3C (URL 인코딩)",
+        "U+003C",
+        "&lt; (HTML 엔티티)",
+        "0x3C (16진수 표기)"
+      ],
+      "answer": 0,
+      "explanation": "브라우저는 특수문자를 URL 인코딩합니다(< → %3C). 응답에 디코딩되어 반사되면 취약입니다."
+    },
+    {
+      "question": "XSS의 근본적 대응인 출력값 인코딩의 목적은?",
+      "options": [
+        "입력 길이를 제한한다",
+        "HTTPS를 강제한다",
+        "쿠키를 암호화한다",
+        "특수문자를 HTML 엔티티로 치환해 브라우저가 태그가 아닌 문자로 인식하게 한다"
+      ],
+      "answer": 3,
+      "explanation": "< 를 &lt; 등으로 치환하면 태그로 해석되지 않아 스크립트가 실행되지 않습니다."
+    },
+    {
+      "question": "XSS 대응에서 엔티티 치환을 적용할 수 있는 두 시점으로 옳은 것은?",
+      "options": [
+        "로그인 시점, 로그아웃 시점",
+        "컴파일 시점, 배포 시점",
+        "DB에 저장하는 시점, 또는 사용자에게 출력하는 시점",
+        "요청 헤더, 응답 헤더"
+      ],
+      "answer": 2,
+      "explanation": "저장 시(보통 백엔드) 또는 출력 시(보통 프론트) 치환하며, 공통 목표는 태그로 해석되지 않게 하는 것입니다."
+    },
+    {
+      "question": "XSS 필터 우회 기법으로 언급된 것은?",
+      "options": [
+        "포트 스캔",
+        "레인보우 테이블",
+        "대문자 사용, 주석 삽입, a 태그의 onmouseover 이벤트 핸들러",
+        "세션 재사용"
+      ],
+      "answer": 2,
+      "explanation": "OWASP XSS Filter Evasion의 대표 우회 기법들입니다."
+    },
+    {
+      "question": "SQL Injection 취약점의 정의로 옳은 것은?",
+      "options": [
+        "파일 업로드로 웹셸을 올리는 취약점",
+        "사용자 입력을 검증 없이 DB 쿼리 일부로 인식해 정보 노출·인증 우회가 일어나는 취약점",
+        "브라우저에서 스크립트가 실행되는 취약점",
+        "서버 메모리를 덮어쓰는 취약점"
+      ],
+      "answer": 1,
+      "explanation": "입력이 쿼리로 해석되는 것이 핵심입니다."
+    },
+    {
+      "question": "SQL Injection으로 가능한 공격 유형으로 옳은 것은?",
+      "options": [
+        "데이터 유출, 세션 고정, CSRF",
+        "인증 우회, DDoS, 랜섬웨어 배포",
+        "인증 우회, 데이터 조작·유출, 시스템 명령 실행",
+        "버퍼 오버플로우, 권한 상승, 포트 스캔"
+      ],
+      "answer": 2,
+      "explanation": "교안은 인증 우회·데이터 조작/유출·시스템 명령 실행(웹셸)을 공격 유형으로 제시합니다."
+    },
+    {
+      "question": "SQL Injection의 OWASP Top 10 2025 분류는?",
+      "options": [
+        "A05:2025-Injection",
+        "A07:2025-Authentication Failures",
+        "A01:2025-Broken Access Control",
+        "A03:2025-Software Supply Chain Failures"
+      ],
+      "answer": 0,
+      "explanation": "교안 p.1 도식에서 A03:2021-Injection이 A05:2025-Injection으로 표시됩니다."
+    },
+    {
+      "question": "SQL Injection 점검의 올바른 첫 단계는?",
+      "options": [
+        "곧바로 UNION SELECT",
+        "곧바로 싱글쿼터 삽입",
+        "곧바로 sqlmap 실행",
+        "기능 파악(정상 동작 관찰)과 SQL 쿼리문 추측"
+      ],
+      "answer": 3,
+      "explanation": "성급한 싱글쿼터보다 기능 파악 → 쿼리 추측이 먼저입니다."
+    },
+    {
+      "question": "검색창에 싱글쿼터(')를 넣었더니 SQL 문법 에러가 나고 MySQL이 노출됐다. 이것이 의미하는 것은?",
+      "options": [
+        "입력이 쿼리로 실행되고 있어 SQL Injection 가능성이 있다",
+        "DB가 다운되었다",
+        "싱글쿼터가 금지 문자다",
+        "서버가 안전하게 처리하고 있다"
+      ],
+      "answer": 0,
+      "explanation": "문법이 깨져 에러가 나면 입력이 쿼리에 삽입된 것이며, 에러에서 DBMS(MySQL)도 식별됩니다."
+    },
+    {
+      "question": "WHERE title='man'은 결과가 없지만 웹 검색에서 man으로 여러 영화가 나온 이유는?",
+      "options": [
+        "정렬 순서 때문",
+        "캐시 때문",
+        "대소문자를 무시하기 때문",
+        "웹이 완전일치(=)가 아니라 부분일치 LIKE '%man%'를 사용했기 때문"
+      ],
+      "answer": 3,
+      "explanation": "LIKE '%…%'는 부분일치라 man이 포함된 모든 제목을 반환합니다."
+    },
+    {
+      "question": "MySQL에서 # 기호의 역할은?",
+      "options": [
+        "와일드카드로 동작한다",
+        "그 뒤의 내용을 주석 처리해 SQL로 실행되지 않게 한다",
+        "문자열을 연결한다",
+        "컬럼을 구분한다"
+      ],
+      "answer": 1,
+      "explanation": "# 뒤는 주석이 되어, 추측한 쿼리 뒤에 붙는 부분을 무력화할 수 있습니다."
+    },
+    {
+      "question": "' AND 1=1#(참)과 ' AND 1=2#(거짓)의 결과가 다르면 알 수 있는 것은?",
+      "options": [
+        "DB가 MySQL이 아니다",
+        "서버가 안전하게 처리한다",
+        "컬럼이 정확히 2개다",
+        "입력이 SQL 쿼리로 실행되고 있어 SQL Injection이 가능하다"
+      ],
+      "answer": 3,
+      "explanation": "참/거짓 결과 차이가 SQL Injection 증명의 완결점입니다."
+    },
+    {
+      "question": "AND 연산에서 결과가 참이 되는 경우는?",
+      "options": [
+        "둘 다 거짓일 때",
+        "양쪽이 모두 참일 때만",
+        "하나라도 참이면",
+        "하나라도 거짓이면"
+      ],
+      "answer": 1,
+      "explanation": "AND는 양쪽이 모두 참이어야 참입니다."
+    },
+    {
+      "question": "UNION SELECT를 사용하기 전에 ORDER BY로 먼저 알아내야 하는 것은?",
+      "options": [
+        "테이블 이름",
+        "DB 버전",
+        "사용자 권한",
+        "결과 테이블의 컬럼 개수"
+      ],
+      "answer": 3,
+      "explanation": "UNION은 양쪽 컬럼 수가 같아야 하므로 ORDER BY n#로 컬럼 수를 먼저 확정합니다."
+    },
+    {
+      "question": "' ORDER BY 7#은 정상인데 ' ORDER BY 8#에서 에러가 났다. 컬럼 개수는?",
+      "options": [
+        "8개",
+        "15개",
+        "6개",
+        "7개"
+      ],
+      "answer": 3,
+      "explanation": "정상 정렬되는 마지막 번호(7)가 컬럼 개수입니다."
+    },
+    {
+      "question": "UNION SELECT로 MySQL 버전·현재 사용자·현재 DB명을 얻는 함수를 옳게 짝지은 것은?",
+      "options": [
+        "@@user, @@db, @@ver",
+        "@@version(버전), user()(사용자), database()(DB명)",
+        "getversion(), whoami(), showdb()",
+        "version()(사용자), user()(DB명), db()(버전)"
+      ],
+      "answer": 1,
+      "explanation": "@@version·user()·database()를 UNION 출력 자리에 넣어 정보를 추출합니다."
+    },
+    {
+      "question": "Burp Intruder로 SQLi 컬럼 개수를 자동 탐색할 때 경계 판단에 사용하는 값은?",
+      "options": [
+        "응답 길이(Length)의 변화",
+        "상태 코드(Status)의 변화",
+        "요청 시간(Time)",
+        "쿠키 개수"
+      ],
+      "answer": 0,
+      "explanation": "정상 응답들의 Length가 같다가 달라지며 에러가 나는 지점으로 컬럼 경계를 찾습니다."
+    },
+    {
+      "question": "MySQL에서 모든 테이블·컬럼 이름 등 메타데이터를 담고 있는 기본 내장 데이터베이스는?",
+      "options": [
+        "sys_catalog",
+        "information_schema",
+        "performance_schema",
+        "mysql.user"
+      ],
+      "answer": 1,
+      "explanation": "information_schema는 설치 시 항상 존재하며 tables·columns에 메타정보를 담습니다."
+    },
+    {
+      "question": "information_schema에서 특정 DB(bWAPP)의 테이블 목록만 추리려고 걸어야 하는 조건 컬럼은?",
+      "options": [
+        "table_schema='bWAPP'",
+        "column_name='bWAPP'",
+        "table_name='bWAPP'",
+        "db_name='bWAPP'"
+      ],
+      "answer": 0,
+      "explanation": "table_schema는 데이터베이스 이름을 의미하므로 이를 조건으로 걸어 해당 DB의 테이블을 추립니다."
+    },
+    {
+      "question": "추출한 비밀번호가 SHA1로 해시되어 있었다. 이에 대한 올바른 평가는?",
+      "options": [
+        "SHA1은 대칭키 암호다",
+        "SHA1이면 절대 안전하다",
+        "SHA1은 취약한 알고리즘이라 레인보우 테이블 등으로 복호화될 수 있다",
+        "해시는 원천적으로 복원이 불가능하다"
+      ],
+      "answer": 2,
+      "explanation": "암호화됐다고 안전한 것이 아니며, SHA1은 취약해 최소 SHA-2 이상이 권고됩니다."
+    },
+    {
+      "question": "같은 비밀번호라도 사용자마다 다른 해시가 나오게 해 레인보우 테이블을 무력화하는 값은?",
+      "options": [
+        "체크섬",
+        "세션 ID",
+        "시드(seed) 정수",
+        "솔트(salt)"
+      ],
+      "answer": 3,
+      "explanation": "사용자별 솔트를 조합해 해시하면 같은 비번도 다른 해시가 됩니다."
+    },
+    {
+      "question": "비밀번호 저장에 권고되는 방식은?",
+      "options": [
+        "bcrypt·scrypt·Argon2 같은 느린 해시 + 솔트",
+        "MD5 단독",
+        "Base64 인코딩",
+        "SHA1 + 공통 솔트"
+      ],
+      "answer": 0,
+      "explanation": "비밀번호는 느린 해시 + 솔트로 저장해야 하며, SHA1·MD5·빠른 해시는 부적합합니다."
+    },
+    {
+      "question": "입력이 숫자형 파라미터(movie=2)로 들어가는 SQLi에서 참/거짓을 삽입할 때 특징은?",
+      "options": [
+        "주석이 반드시 두 개 필요하다",
+        "UNION을 절대 쓸 수 없다",
+        "문자열이 아니므로 싱글쿼터로 닫을 필요가 없다",
+        "반드시 싱글쿼터로 닫아야 한다"
+      ],
+      "answer": 2,
+      "explanation": "숫자형은 닫을 따옴표가 없어 바로 조건을 붙입니다(예: movie=3 AND 1=1)."
+    },
+    {
+      "question": "URL 주소창에서 SQL 주석 #을 서버로 제대로 전달하려면?",
+      "options": [
+        "그냥 #를 쓰면 항상 전달된다",
+        "# 앞에 공백을 넣는다",
+        "%23으로 URL 인코딩해야 한다",
+        "대문자 #로 쓴다"
+      ],
+      "answer": 2,
+      "explanation": "URL에서 #은 프래그먼트라 전송되지 않으므로 %23으로 인코딩합니다."
+    },
+    {
+      "question": "결과가 한 줄만 출력되는 기능에서 여러 행을 하나씩 꺼낼 때 사용하는 절은?",
+      "options": [
+        "LIMIT 시작,개수 (예: LIMIT 1,1)",
+        "ROWNUM=1",
+        "FETCH FIRST 1",
+        "TOP 1"
+      ],
+      "answer": 0,
+      "explanation": "LIMIT offset,count로 줄을 순회하며 한 줄씩 추출합니다."
+    },
+    {
+      "question": "Blind(Boolean-based) SQL Injection의 특징은?",
+      "options": [
+        "데이터가 직접 출력되지 않고 참/거짓(존재/부재) 응답만으로 알아내야 한다",
+        "UNION으로 쉽게 추출된다",
+        "시간 지연으로만 판단한다",
+        "에러 메시지에 데이터가 그대로 나온다"
+      ],
+      "answer": 0,
+      "explanation": "Blind는 결과를 직접 못 보므로 참/거짓 질문을 반복해 데이터를 복원합니다."
+    },
+    {
+      "question": "Blind SQLi에서 문자열의 길이를 알아내는 함수는?",
+      "options": [
+        "ASCII()",
+        "LENGTH()",
+        "COUNT()",
+        "SUBSTRING()"
+      ],
+      "answer": 1,
+      "explanation": "LENGTH(database())로 이름 길이를 먼저 확인합니다."
+    },
+    {
+      "question": "Blind SQLi에서 문자열의 한 글자만 잘라내는 함수는?",
+      "options": [
+        "REPLACE()",
+        "CONCAT()",
+        "LENGTH()",
+        "SUBSTRING(문자열, 시작, 1)"
+      ],
+      "answer": 3,
+      "explanation": "SUBSTRING은 시작 위치(1부터), 길이(1)로 한 글자를 추출합니다."
+    },
+    {
+      "question": "Blind SQLi에서 글자를 숫자로 바꿔 크다/작다 이진 탐색으로 빠르게 찾게 해 주는 함수는?",
+      "options": [
+        "CHAR()",
+        "ASCII()",
+        "LENGTH()",
+        "BIN()"
+      ],
+      "answer": 1,
+      "explanation": "ASCII로 문자를 코드값(a=97, b=98)으로 바꿔 이진 탐색으로 범위를 좁힙니다."
+    },
+    {
+      "question": "참/거짓 구문을 만들 때 OR 연산자를 실무에서 지양하는 이유는?",
+      "options": [
+        "한쪽만 참이어도 조건 전체가 참이 되어 대량 데이터가 조회되며 DB에 과부하를 줄 수 있어서",
+        "OR는 항상 문법 오류를 일으켜서",
+        "OR는 MySQL에서 지원되지 않아서",
+        "OR는 항상 거짓이라서"
+      ],
+      "answer": 0,
+      "explanation": "OR 남용은 전체 조회를 유발해 DB 다운 위험이 있어, 참/거짓은 AND로 좁혀 만듭니다."
+    },
+    {
+      "question": "sqlmap에 대한 설명으로 옳은 것은?",
+      "options": [
+        "네트워크 포트 스캐너다",
+        "SQL Injection 탐지·악용과 DB 장악을 자동화하는 파이썬 기반 오픈소스 도구다",
+        "해시 복호화 전용 도구다",
+        "방화벽 로그 분석 도구다"
+      ],
+      "answer": 1,
+      "explanation": "sqlmap은 SQLi를 자동화하는 오픈소스 침투 테스트 도구입니다."
+    },
+    {
+      "question": "sqlmap으로 로그인이 필요한 검색 기능을 점검할 때 반드시 넘겨야 하는 옵션은?",
+      "options": [
+        "--random-agent",
+        "--cookie (로그인 세션 쿠키값)",
+        "--data (POST 전용)",
+        "--proxy"
+      ],
+      "answer": 1,
+      "explanation": "로그인 상태가 필요하므로 로그인 쿠키값을 --cookie로 넘겨야 합니다."
+    },
+    {
+      "question": "sqlmap에서 데이터베이스 목록을 열거하는 옵션은?",
+      "options": [
+        "--dump",
+        "--columns",
+        "--dbs",
+        "--tables"
+      ],
+      "answer": 2,
+      "explanation": "--dbs로 DB 목록, -D <db> --tables로 테이블, -T <table> --dump로 덤프합니다."
+    },
+    {
+      "question": "sqlmap 같은 자동화 도구 사용에 대한 실무 원칙으로 옳은 것은?",
+      "options": [
+        "사람이 먼저 수동으로 취약점을 증명하고, 담당자 승인을 받은 뒤 도구를 사용한다",
+        "승인 없이 자동으로 실행한다",
+        "발견 즉시 모든 파라미터에 도구를 돌린다",
+        "증명 없이 바로 전체 덤프한다"
+      ],
+      "answer": 0,
+      "explanation": "무작정 도구를 돌리지 않고, 수동 증명 후 협의·승인하에 사용합니다."
+    }
+  ]
+}
