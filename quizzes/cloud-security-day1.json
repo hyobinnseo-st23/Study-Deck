@@ -1,0 +1,1020 @@
+{
+  "title": "클라우드 보안 DAY1",
+  "subtitle": "클라우드 개념 · AWS 글로벌 인프라 · EC2",
+  "subject": "Cloud Security",
+  "description": "SK Shieldus Rookies: 클라우드 보안 1일차 수업. 클라우드 컴퓨팅의 정의와 온프레미스 비교, 서비스 모델(IaaS/PaaS/SaaS)과 책임 공유 모델, AWS 글로벌 인프라(리전·가용 영역), 계정과 접근 도구(콘솔/CLI/SDK), 그리고 EC2 전반(AMI, 인스턴스 유형, 수명 주기, User Data, SSH 연결, 보안 그룹, 요금제)을 다룹니다.",
+  "questions": [
+    {
+      "question": "AWS의 정식 명칭과 성격으로 옳은 것은?",
+      "options": [
+        "Amazon Web Server — 아마존이 판매하는 서버 하드웨어",
+        "Amazon Web Services — 아마존이 제공하는 클라우드 컴퓨팅 서비스",
+        "Amazon Wide Storage — 아마존의 대용량 저장 서비스",
+        "Advanced Web Service — 웹 호스팅 전문 서비스"
+      ],
+      "answer": 1,
+      "explanation": "AWS는 Amazon Web Services의 약자로, 아마존이 제공하는 클라우드 컴퓨팅 서비스입니다."
+    },
+    {
+      "question": "교안이 제시한 클라우드 컴퓨팅의 4대 키워드가 아닌 것은?",
+      "options": [
+        "On-demand",
+        "종량 요금제",
+        "Internet",
+        "무상 제공"
+      ],
+      "answer": 3,
+      "explanation": "교안 p.19의 4대 키워드는 Internet, IT 리소스, On-demand, 종량 요금제입니다. 무상 제공은 포함되지 않습니다."
+    },
+    {
+      "question": "클라우드 컴퓨팅의 반대 개념으로, 기존 전산실·데이터센터를 가리키는 용어는?",
+      "options": [
+        "프로비저닝(Provisioning)",
+        "멀티테넌시(Multi-tenancy)",
+        "온디맨드(On-demand)",
+        "온프레미스(On-premise)"
+      ],
+      "answer": 3,
+      "explanation": "온프레미스는 고객이 직접 보유·관리하는 기존 전산실 또는 데이터센터를 의미하며, 온사이트라고도 부릅니다."
+    },
+    {
+      "question": "클라우드에서 'On-demand'가 뜻하는 바는?",
+      "options": [
+        "장애 발생 시 자동으로 복구하는 것",
+        "미리 1년 이상 약정하고 구매하는 것",
+        "사용량과 무관하게 정액으로 과금하는 것",
+        "요구 시 즉시 배포해서 사용하는 것"
+      ],
+      "answer": 3,
+      "explanation": "On-demand는 '요구 시 즉시'라는 뜻으로, 필요할 때 바로 리소스를 배포해 사용하는 것을 말합니다."
+    },
+    {
+      "question": "강사가 온프레미스 대비 클라우드의 '가장 큰 장점'으로 반복해서 강조한 것은?",
+      "options": [
+        "완벽한 보안 — 고객이 보안을 신경 쓸 필요가 없음",
+        "무제한 무료 사용 — 프리티어로 모든 서비스를 무료로 이용",
+        "절대적인 저렴함 — 어떤 경우에도 온프레미스보다 비용이 낮음",
+        "유연성(Flexibility) — 크기를 짧은 시간에 늘리고 줄일 수 있음"
+      ],
+      "answer": 3,
+      "explanation": "클라우드의 최대 장점은 유연성입니다. 필요에 따라 자원을 늘리고 줄이는 크기 조정을 짧은 시간에 간편하게 할 수 있습니다."
+    },
+    {
+      "question": "온프레미스에서 서버 도입 시 수행하는 '용량 산정 계획'을 뜻하는 용어는?",
+      "options": [
+        "Load Balancing",
+        "Auto Scaling",
+        "Capacity Planning",
+        "Provisioning"
+      ],
+      "answer": 2,
+      "explanation": "Capacity Planning(용량 산정 계획)은 CPU·메모리·디스크를 얼마나 갖춰야 하는지 사전에 계산하는 작업입니다."
+    },
+    {
+      "question": "강사가 클라우드의 자원 사용 개념을 설명하며 '자동차 리스가 아니라 OO에 가깝다'고 했습니다. OO는?",
+      "options": [
+        "리스 승계",
+        "할부 구매",
+        "공유",
+        "임대차 계약"
+      ],
+      "answer": 2,
+      "explanation": "리스는 내가 안 쓰면 차가 주차장에서 놀지만, 클라우드는 공유 개념이므로 내가 안 쓰면 다른 고객이 사용해 전체 이용률이 올라가고 비용이 낮아집니다."
+    },
+    {
+      "question": "온프레미스와 클라우드의 비용 성격을 회계 용어로 짝지은 것으로 옳은 것은?",
+      "options": [
+        "온프레미스 = OPEX, 클라우드 = CAPEX",
+        "둘 다 OPEX로 처리한다",
+        "둘 다 CAPEX로 처리한다",
+        "온프레미스 = CAPEX(자본적 지출), 클라우드 = OPEX(운영 비용)"
+      ],
+      "answer": 3,
+      "explanation": "온프레미스는 자산을 구매하는 CAPEX, 클라우드는 쓴 만큼 지불하는 OPEX 성격입니다."
+    },
+    {
+      "question": "IaaS, PaaS, SaaS를 구분하는 기준은 무엇인가?",
+      "options": [
+        "서비스의 출시 연도가 언제인가",
+        "서비스의 월 이용 요금이 얼마인가",
+        "서비스가 어느 리전에서 제공되는가",
+        "해당 서비스가 어느 범위까지 기능을 제공하는가"
+      ],
+      "answer": 3,
+      "explanation": "IaaS는 인프라까지, PaaS는 플랫폼까지, SaaS는 소프트웨어까지 제공하며, 제공 범위가 구분 기준입니다."
+    },
+    {
+      "question": "'AWS는 IaaS다'라는 표현에 대한 강사의 설명으로 옳은 것은?",
+      "options": [
+        "맞는 표현이며 AWS의 모든 서비스는 IaaS다",
+        "AWS는 SaaS만 제공하므로 틀린 표현이다",
+        "AWS는 PaaS 전용 플랫폼이므로 틀린 표현이다",
+        "AWS는 서비스마다 제공 범위가 달라 하나로 규정할 수 없다"
+      ],
+      "answer": 3,
+      "explanation": "AWS는 서비스마다 인프라·플랫폼·소프트웨어 중 어디까지 제공하는지가 다르므로, 전체를 하나의 모델로 규정할 수 없습니다."
+    },
+    {
+      "question": "AWS 책임 공유 모델에서 'Security IN the Cloud'는 누구의 책임인가?",
+      "options": [
+        "AWS와 고객이 공동으로 절반씩",
+        "AWS 파트너사",
+        "AWS",
+        "고객"
+      ],
+      "answer": 3,
+      "explanation": "Security OF the Cloud(물리 인프라·하이퍼바이저)는 AWS 책임, Security IN the Cloud(OS 패치·보안그룹·IAM·데이터)는 고객 책임입니다."
+    },
+    {
+      "question": "EC2와 RDS 중 OS 패치를 고객이 직접 해야 하는 쪽은?",
+      "options": [
+        "EC2 — IaaS이므로 OS 계층부터 고객 책임",
+        "둘 다 고객이 직접 패치해야 한다",
+        "둘 다 AWS가 자동으로 패치해 준다",
+        "RDS — PaaS이므로 OS 계층부터 고객 책임"
+      ],
+      "answer": 0,
+      "explanation": "EC2는 IaaS라 OS 위는 고객 책임이고, RDS는 관리형(PaaS)이라 OS 패치를 AWS가 수행하며 고객은 SSH 접근도 할 수 없습니다."
+    },
+    {
+      "question": "AWS 글로벌 인프라의 계층 구조로 옳은 것은?",
+      "options": [
+        "데이터센터를 묶어 리전, 리전을 묶어 가용 영역",
+        "데이터센터를 묶어 가용 영역, 가용 영역을 묶어 리전",
+        "리전을 묶어 가용 영역, 가용 영역을 묶어 데이터센터",
+        "가용 영역을 묶어 데이터센터, 데이터센터를 묶어 리전"
+      ],
+      "answer": 1,
+      "explanation": "물리적 데이터센터들을 지역적으로 묶은 것이 가용 영역(AZ)이고, 가용 영역을 묶은 것이 리전(Region)입니다."
+    },
+    {
+      "question": "서울 리전의 리전 코드는?",
+      "options": [
+        "ap-southeast-2",
+        "ap-northeast-2",
+        "us-east-1",
+        "ap-northeast-1"
+      ],
+      "answer": 1,
+      "explanation": "서울 리전은 ap-northeast-2이며, ap-northeast-1은 도쿄 리전입니다."
+    },
+    {
+      "question": "서울 리전의 가용 영역 코드 표기로 옳은 것은?",
+      "options": [
+        "ap-northeast-a2",
+        "seoul-az-a",
+        "ap-northeast-2a",
+        "ap-northeast-2-az1"
+      ],
+      "answer": 2,
+      "explanation": "가용 영역 코드는 리전 코드 뒤에 a, b, c, d를 붙여 표기합니다."
+    },
+    {
+      "question": "서울 리전이 오픈한 연도와 강의 시점의 가용 영역 수는?",
+      "options": [
+        "2016년 오픈, 가용 영역 2개",
+        "2011년 오픈, 가용 영역 4개",
+        "2016년 오픈, 가용 영역 4개",
+        "2020년 오픈, 가용 영역 3개"
+      ],
+      "answer": 2,
+      "explanation": "서울 리전은 2016년에 가용 영역 2개로 오픈했고, 수요 증가에 따라 현재 4개로 확장되었습니다. 2011년 오픈은 도쿄 리전입니다."
+    },
+    {
+      "question": "리전 선택의 1순위 기준은 무엇인가?",
+      "options": [
+        "가용 서비스",
+        "지연시간(Latency)",
+        "법적인 문제",
+        "비용"
+      ],
+      "answer": 1,
+      "explanation": "교안 p.44는 지연시간·법적인 문제·가용 서비스·비용 네 가지를 제시하며, 강사는 지연시간을 1번 기준으로 강조했습니다."
+    },
+    {
+      "question": "리전 선택 시 지연시간의 기준점으로 삼아야 하는 것은?",
+      "options": [
+        "비즈니스 클라이언트가 위치한 곳",
+        "개발자 본인이 위치한 곳",
+        "AWS 본사가 있는 곳",
+        "본사 법인이 등록된 곳"
+      ],
+      "answer": 0,
+      "explanation": "서비스 속도는 고객이 체감하는 것이므로, 개발자의 위치가 아니라 비즈니스 클라이언트가 많은 지역을 기준으로 리전을 선택합니다."
+    },
+    {
+      "question": "동일한 서비스인데도 리전마다 비용이 다를 수 있는 이유는?",
+      "options": [
+        "오래된 리전일수록 할증 요금이 붙기 때문",
+        "가용 영역 개수에 비례해 요금이 책정되기 때문",
+        "리전마다 환율이 다르게 적용되기 때문",
+        "리전별로 땅값·전기세·임대료 같은 부대 비용이 다르기 때문"
+      ],
+      "answer": 3,
+      "explanation": "부대 비용(땅값, 전기세, 임대료 등)이 지역마다 다르기 때문에 동일 서비스도 리전에 따라 단가 차이가 납니다."
+    },
+    {
+      "question": "새로운 AWS 서비스가 출시될 때의 일반적인 방식은?",
+      "options": [
+        "서울 리전에 가장 먼저 출시된다",
+        "일부 리전에서 먼저 출시된 뒤 점차 확대된다",
+        "전 세계 모든 리전에 동시에 출시된다",
+        "반드시 1년 뒤에야 다른 리전으로 확대된다"
+      ],
+      "answer": 1,
+      "explanation": "신규 서비스는 일부 리전부터 가용해지고 이후 점차 확대되므로, 원하는 리전에 그 서비스가 있는지 사전 확인이 필요합니다."
+    },
+    {
+      "question": "다음 중 리전에 종속되지 않는 글로벌 서비스는?",
+      "options": [
+        "VPC",
+        "IAM",
+        "EC2",
+        "RDS"
+      ],
+      "answer": 1,
+      "explanation": "IAM과 Route 53은 글로벌 서비스로 리전과 무관하게 계정 전체에 적용됩니다. EC2·VPC·RDS는 리전에 종속됩니다."
+    },
+    {
+      "question": "교안 p.49가 제시한 AWS 장점 6가지에 포함되지 않는 것은?",
+      "options": [
+        "규모의 경제로 얻는 비용 절감",
+        "모든 보안 책임을 AWS가 대신 부담",
+        "초기 대규모 투자비용 불필요 : 종량 요금제",
+        "유연한 용량 계획"
+      ],
+      "answer": 1,
+      "explanation": "교안의 6가지는 초기 투자비용 불필요, 유지관리 비용·노력 절감, 규모의 경제, 전세계 원하는 곳에, 빠르게 서비스 배포, 유연한 용량 계획입니다."
+    },
+    {
+      "question": "강사가 설명한 AWS의 가격 전략으로 옳은 것은?",
+      "options": [
+        "신기술이 적용된 서비스는 항상 더 비싸게 책정한다",
+        "리전을 늘릴수록 단가를 올려 투자비를 회수한다",
+        "약정하지 않은 고객에게는 할증 요금을 부과한다",
+        "비용을 낮추면 고객이 늘고, 고객이 늘면 비용을 더 낮춘다"
+      ],
+      "answer": 3,
+      "explanation": "AWS는 동일 서비스의 비용을 시간이 갈수록 낮추는 박리다매식 가격 전략을 가지고 있습니다."
+    },
+    {
+      "question": "강사가 추가 학습용으로 특별히 추천한, 무료 강좌가 많은 AWS 온라인 학습 사이트는?",
+      "options": [
+        "AWS Well-Architected Tool",
+        "AWS Trusted Advisor",
+        "AWS Skill Builder",
+        "AWS Marketplace"
+      ],
+      "answer": 2,
+      "explanation": "Skill Builder(explore.skillbuilder.aws)는 AWS의 디지털 강좌 사이트로, 무료 강좌가 알차게 구성되어 있다고 강사가 추천했습니다."
+    },
+    {
+      "question": "AWS에서 '잘 설계된(Well-Architected) 클라우드'의 정의는?",
+      "options": [
+        "최신 세대의 인스턴스만 사용하는 것",
+        "모든 리전에 동일하게 복제되어 있는 것",
+        "모범 권장사례(best practice)에 맞게 구성되어 있는 것",
+        "비용이 가장 저렴하게 구성되어 있는 것"
+      ],
+      "answer": 2,
+      "explanation": "Well-Architected는 성능·운영·가용성·비용 등에서 모범 권장사례에 부합하는지를 뜻합니다."
+    },
+    {
+      "question": "강사가 제시한 클라우드 비용 방어의 대원칙은?",
+      "options": [
+        "만들면 돈이다",
+        "실습 계정은 과금되지 않는다",
+        "프리티어는 모두 무료다",
+        "중지하면 완전히 과금되지 않는다"
+      ],
+      "answer": 0,
+      "explanation": "프리티어나 평생 무료 항목이 있더라도 '만들면 돈이다'라는 전제로 행동하는 것이 가장 안전한 비용 방어법입니다."
+    },
+    {
+      "question": "실습에서 만든 리소스를 삭제할 때 권장되는 순서는?",
+      "options": [
+        "만든 순서 그대로 삭제한다",
+        "크기가 큰 리소스부터 삭제한다",
+        "이름의 알파벳 순서대로 삭제한다",
+        "만든 순서의 역순으로 삭제한다"
+      ],
+      "answer": 3,
+      "explanation": "리소스 간 종속성 때문에 A→B→C→D 순으로 만들었다면 D→C→B→A 순으로 지워야 합니다."
+    },
+    {
+      "question": "AWS 리소스에 접근하는 세 가지 도구로 옳게 묶인 것은?",
+      "options": [
+        "CLI, SDK, RDP",
+        "관리 콘솔, CLI, SDK",
+        "관리 콘솔, FTP, Telnet",
+        "관리 콘솔, SSH, SNMP"
+      ],
+      "answer": 1,
+      "explanation": "교안 p.81은 AWS 접근 도구로 관리 콘솔, CLI, SDK 세 가지를 제시합니다."
+    },
+    {
+      "question": "AWS CLI 명령의 기본 문법 구조로 옳은 것은?",
+      "options": [
+        "awscli --service <서비스> --run <명령>",
+        "<서비스 이름> aws <명령> [옵션]",
+        "aws <서비스 이름> <명령> [파라미터] [옵션]",
+        "aws <명령> <서비스 이름> [파라미터]"
+      ],
+      "answer": 2,
+      "explanation": "AWS CLI는 aws 다음에 서비스 이름, 명령, 파라미터, 옵션 순으로 작성합니다. 예: aws s3 ls"
+    },
+    {
+      "question": "강사가 설명한 CLI의 장점 두 가지로 옳은 것은?",
+      "options": [
+        "요금이 더 저렴함, 리전 선택이 불필요함",
+        "자동 백업 기능, 보안 그룹 자동 설정",
+        "그래픽 화면 제공, 학습 난이도가 낮음",
+        "반복 작업의 자동화, 콘솔이 지원하지 않는 일부 작업 수행"
+      ],
+      "answer": 3,
+      "explanation": "CLI는 스크립트로 만들어 반복 작업을 일관되게 자동화할 수 있고, 콘솔이 지원하지 않는 소수의 작업도 수행할 수 있습니다."
+    },
+    {
+      "question": "콘솔·CLI·SDK 세 가지 접근 도구의 공통점은?",
+      "options": [
+        "모두 액세스 키가 반드시 필요하다",
+        "모두 SSH 프로토콜을 사용한다",
+        "최종적으로 모두 AWS API를 호출한다",
+        "모두 웹 브라우저가 있어야 동작한다"
+      ],
+      "answer": 2,
+      "explanation": "세 도구 모두 결국 AWS API를 호출하므로, CloudTrail은 어떤 경로로 수행된 작업이든 동일하게 기록합니다."
+    },
+    {
+      "question": "'누가, 언제, 어떤 API를 호출했는가'를 기록하는 AWS 감사 서비스는?",
+      "options": [
+        "CloudTrail",
+        "CloudFront",
+        "CloudWatch 지표",
+        "CloudFormation"
+      ],
+      "answer": 0,
+      "explanation": "CloudTrail은 API 호출 감사 추적을 담당하며, 침해사고 대응에서 결정적인 자료가 됩니다."
+    },
+    {
+      "question": "EC2의 정식 명칭은?",
+      "options": [
+        "Elastic Compute Cloud",
+        "Elastic Cloud Computing",
+        "Elastic Container Cloud",
+        "Enterprise Compute Cluster"
+      ],
+      "answer": 0,
+      "explanation": "EC2는 Elastic Compute Cloud의 약자로, 가상 서버 역할을 제공하는 AWS의 대표 서비스입니다."
+    },
+    {
+      "question": "AWS 문서에서 '인스턴스(Instance)'라는 용어가 의미하는 것은?",
+      "options": [
+        "리전에 속한 가용 영역",
+        "보안 그룹 규칙 한 줄",
+        "AMI 이미지 파일",
+        "가상 서버 한 대"
+      ],
+      "answer": 3,
+      "explanation": "인스턴스는 가상 서버 한 대를 뜻하며, AWS 문서에서 인스턴스라고 하면 대개 EC2 인스턴스를 가리킵니다."
+    },
+    {
+      "question": "EC2가 지원하는 운영체제 3종에 포함되지 않는 것은?",
+      "options": [
+        "Linux",
+        "macOS",
+        "Windows",
+        "Unix"
+      ],
+      "answer": 3,
+      "explanation": "교안 p.106에 따르면 EC2 지원 OS는 Linux, Windows, macOS 세 가지이며 Unix는 지원하지 않습니다."
+    },
+    {
+      "question": "EC2 비용이 발생하는 기준으로 옳은 것은?",
+      "options": [
+        "인스턴스에 접속(SSH)한 시간에만",
+        "인스턴스를 생성한 시점부터 삭제할 때까지 전 기간",
+        "실행 중(Running) 상태의 시간에 비례",
+        "인스턴스가 처리한 요청 건수에 비례"
+      ],
+      "answer": 2,
+      "explanation": "EC2는 Running 상태의 시간에 비례해 과금되므로, 켜 두기만 해도 사용하지 않아도 비용이 발생합니다."
+    },
+    {
+      "question": "교안 p.108의 온프레미스 서버 vs EC2 비교에서, EC2의 '용량 산정' 항목에 해당하는 것은?",
+      "options": [
+        "사용 후 변경(모니터링 후 변경)",
+        "제조사별 스펙 시트",
+        "사전 계획",
+        "구매 + 배송기간"
+      ],
+      "answer": 0,
+      "explanation": "온프레미스는 사전 계획이 필요하지만, EC2는 먼저 배포하고 모니터링 결과에 따라 변경합니다."
+    },
+    {
+      "question": "EC2를 배포하기 위해 반드시 선행되어야 하는 것은?",
+      "options": [
+        "탄력적 IP가 미리 할당되어 있어야 한다",
+        "VPC(네트워크 환경)가 있어야 한다",
+        "User Data 스크립트가 작성되어 있어야 한다",
+        "키 페어가 반드시 등록되어 있어야 한다"
+      ],
+      "answer": 1,
+      "explanation": "VPC가 없으면 EC2를 배포할 수 없습니다. 이는 선택이 아니라 강제 사항입니다."
+    },
+    {
+      "question": "AMI의 정식 명칭과 역할로 옳은 것은?",
+      "options": [
+        "Amazon Machine Image — 루트 볼륨 템플릿",
+        "Amazon Memory Image — 메모리 상태 스냅샷",
+        "AWS Monitoring Interface — 모니터링 연동 인터페이스",
+        "Amazon Managed Instance — 관리형 인스턴스 유형"
+      ],
+      "answer": 0,
+      "explanation": "AMI는 Amazon Machine Image의 약자이며, 어떤 OS와 어떤 패키지로 루트 볼륨을 구성할지 정하는 템플릿입니다."
+    },
+    {
+      "question": "AMI가 결정하는 것으로 가장 정확한 설명은?",
+      "options": [
+        "CPU 개수와 메모리 용량",
+        "운영체제와 그 위에 설치된 추가 소프트웨어 패키지",
+        "인스턴스가 배치될 가용 영역",
+        "인바운드로 허용할 포트 목록"
+      ],
+      "answer": 1,
+      "explanation": "AMI는 OS뿐 아니라 Apache, PHP 같은 추가 패키지가 함께 설치된 상태까지 포함하는 템플릿입니다."
+    },
+    {
+      "question": "AWS가 제공하는 자체 리눅스 배포판 'Amazon Linux'는 어떤 계열인가?",
+      "options": [
+        "레드햇(Red Hat) 계열",
+        "데비안(Debian) 계열",
+        "슬랙웨어(Slackware) 계열",
+        "수세(SUSE) 계열"
+      ],
+      "answer": 0,
+      "explanation": "Amazon Linux는 레드햇 계열의 AWS 자체 배포판입니다."
+    },
+    {
+      "question": "AMI 선택 화면의 탭 중 'AWS 검증이 되지 않아 사용을 권장하지 않는다'고 강사가 경고한 것은?",
+      "options": [
+        "빠른 시작(Quick Start)",
+        "커뮤니티(Community) AMI",
+        "AWS Marketplace",
+        "나의 AMI(My AMIs)"
+      ],
+      "answer": 1,
+      "explanation": "커뮤니티 AMI는 AWS 검증을 거치지 않았으므로 출처가 확실하지 않으면 사용을 권장하지 않습니다."
+    },
+    {
+      "question": "설치·설정을 마친 EC2의 상태를 이미지로 저장해 동일한 서버를 반복 생성하는 것을 실무에서 무엇이라 부르는가?",
+      "options": [
+        "블루/그린 배포(Blue/Green Deployment)",
+        "라이브 마이그레이션(Live Migration)",
+        "골든 이미지(Golden Image)",
+        "스냅샷 체인(Snapshot Chain)"
+      ],
+      "answer": 2,
+      "explanation": "사용자 지정 AMI를 골든 이미지라고 하며, 서버마다 설정이 제각각이 되는 configuration drift를 막는 데 쓰입니다."
+    },
+    {
+      "question": "사용자 지정 AMI를 다른 리전에서 사용하려면 어떻게 해야 하는가?",
+      "options": [
+        "IAM 정책에 리전을 추가하면 자동 복제된다",
+        "별도 작업 없이 모든 리전에서 자동으로 보인다",
+        "AMI 복사(Copy AMI)를 수행해야 한다",
+        "해당 리전에서 인스턴스를 새로 만들어 다시 구성해야만 한다"
+      ],
+      "answer": 2,
+      "explanation": "AMI는 리전에 종속되므로 다른 리전에서 쓰려면 AMI 복사가 필요합니다."
+    },
+    {
+      "question": "인스턴스 유형 't3.micro'의 구조를 올바르게 분해한 것은?",
+      "options": [
+        "t = 패밀리, 3 = 세대, micro = 크기",
+        "t = 유형, 3 = 코어 수, micro = 리전",
+        "t = 세대, 3 = 크기, micro = 패밀리",
+        "t = 크기, 3 = 가용 영역, micro = 패밀리"
+      ],
+      "answer": 0,
+      "explanation": "인스턴스 유형은 패밀리 + 세대 + 크기 구조이며, 교안은 t2를 '버스트 가능한 범용 유형의 2번째 세대'로 정의합니다."
+    },
+    {
+      "question": "인스턴스 유형의 세대 숫자가 클수록 의미하는 것은?",
+      "options": [
+        "가용 영역을 더 많이 사용한다",
+        "메모리 용량이 항상 더 크다",
+        "저장 가능한 디스크 개수가 늘어난다",
+        "더 최신 기술의 CPU 칩셋을 가진 하드웨어 위에서 동작"
+      ],
+      "answer": 3,
+      "explanation": "AWS는 물리 장비를 계속 최신 기계로 교체하며, 새로운 CPU 칩셋이 적용되면 세대 숫자를 올립니다."
+    },
+    {
+      "question": "동일한 사양일 때 신세대(t3)와 구세대(t2)의 가격 관계로 옳은 것은?",
+      "options": [
+        "신기술이므로 신세대가 항상 더 비싸다",
+        "구세대는 단종되어 가격 비교가 불가능하다",
+        "신세대가 더 비싸지 않으며, 같거나 오히려 저렴할 수 있다",
+        "세대와 무관하게 가격은 항상 동일하다"
+      ],
+      "answer": 2,
+      "explanation": "AWS는 기존 기술을 대체하는 신규 서비스를 같거나 더 낮은 가격으로 제공하므로, 새로 만들 때는 최신 세대가 권장됩니다."
+    },
+    {
+      "question": "인스턴스 크기 순서가 작은 것부터 올바르게 나열된 것은?",
+      "options": [
+        "small < nano < micro < medium < large",
+        "nano < small < micro < large < medium",
+        "micro < nano < small < large < medium",
+        "nano < micro < small < medium < large"
+      ],
+      "answer": 3,
+      "explanation": "교안 p.116의 크기 순서는 nano, micro, small, medium, large, xlarge, 2xlarge, 4xlarge 순입니다."
+    },
+    {
+      "question": "t2.micro와 t3.micro의 vCPU 개수 비교로 옳은 것은?",
+      "options": [
+        "t2.micro는 1개, t3.micro는 2개",
+        "둘 다 1개로 동일하다",
+        "t2.micro는 2개, t3.micro는 1개",
+        "둘 다 2개로 동일하다"
+      ],
+      "answer": 0,
+      "explanation": "크기 이름이 같아도 세대·패밀리에 따라 사양이 다릅니다. t2.micro는 1vCPU/1GB, t3.micro는 2vCPU/1GB입니다."
+    },
+    {
+      "question": "T 패밀리만 제공하는 '버스팅(Bursting)' 기능을 가장 잘 설명한 것은?",
+      "options": [
+        "부하가 커지면 인스턴스 대수를 자동으로 늘리는 기능",
+        "메모리 상태를 저장해 두었다가 복원하는 기능",
+        "평상시 남는 CPU를 적립해 두었다가 피크 시 꺼내 쓰는 기능",
+        "인스턴스를 다른 가용 영역으로 자동 이동시키는 기능"
+      ],
+      "answer": 2,
+      "explanation": "버스팅은 기준 성능보다 적게 쓸 때 CPU 크레딧을 적립했다가, CPU가 피크를 칠 때 사용하는 기능입니다. 적립에는 한도가 있습니다."
+    },
+    {
+      "question": "어떤 인스턴스 패밀리를 써야 할지 모를 때 일반적으로 권장되는 선택은?",
+      "options": [
+        "범용(General Purpose) 패밀리, 특히 T 패밀리",
+        "메모리 최적화 R 패밀리",
+        "가속화 컴퓨팅 P 패밀리",
+        "컴퓨팅 최적화 C 패밀리"
+      ],
+      "answer": 0,
+      "explanation": "범용은 여러 용도에 두루 맞는다는 뜻이며, 버스팅 기능이 있는 T 패밀리를 많이 사용합니다."
+    },
+    {
+      "question": "강사가 인스턴스 유형 선택에서 '패밀리 이름보다 중요하다'고 강조한 것은?",
+      "options": [
+        "가장 최신 패밀리를 무조건 선택하는 것",
+        "리전별로 서로 다른 패밀리를 사용하는 것",
+        "애플리케이션 요구 사양과 목표 이용률에 맞춰 모니터링하고 조정하는 능력",
+        "패밀리별 알파벳 약어를 모두 암기하는 것"
+      ],
+      "answer": 2,
+      "explanation": "중요한 것은 요구 사양 파악 → 목표 이용률 설정 → 모니터링 → 조정의 루프를 돌릴 수 있는 능력입니다."
+    },
+    {
+      "question": "'AWS는 용량 산정이 필요 없다'는 말에 대한 강사의 정확한 설명은?",
+      "options": [
+        "온프레미스보다 더 정밀한 용량 산정이 필요하다는 뜻이다",
+        "용량 산정 자체는 필요하며, 다만 유연하게 변경할 수 있다는 뜻이다",
+        "용량 산정은 AWS가 자동으로 대신 해 준다는 뜻이다",
+        "용량 산정이 전혀 필요 없다는 뜻이 맞다"
+      ],
+      "answer": 1,
+      "explanation": "정밀 산정을 위한 별도 프로젝트가 불필요할 뿐, 대략 산정 후 모니터링으로 조정하는 과정은 여전히 필요합니다."
+    },
+    {
+      "question": "EC2 인스턴스를 시작했을 때 가장 먼저 거치는 상태는?",
+      "options": [
+        "중지됨(stopped)",
+        "대기 중(pending)",
+        "종료 중(shutting-down)",
+        "실행 중(running)"
+      ],
+      "answer": 1,
+      "explanation": "인스턴스는 먼저 pending 상태에서 하드웨어 선택과 OS 탑재를 거친 뒤 running 상태가 됩니다."
+    },
+    {
+      "question": "EC2 인스턴스를 '중지(Stop)'했을 때의 과금 상태로 옳은 것은?",
+      "options": [
+        "인스턴스와 EBS 요금이 모두 발생하지 않는다",
+        "중지 상태에서는 평소의 절반 요금이 부과된다",
+        "인스턴스 요금은 발생하고 EBS 요금만 면제된다",
+        "인스턴스 요금은 발생하지 않지만 EBS 볼륨 요금은 계속 발생한다"
+      ],
+      "answer": 3,
+      "explanation": "중지는 파워를 꺼 두는 개념이라 EC2 요금은 멈추지만, 디스크 영역이 살아 있으므로 EBS 비용은 계속 나갑니다."
+    },
+    {
+      "question": "실습을 마친 뒤 비용을 완전히 끊기 위해 수행해야 하는 작업은?",
+      "options": [
+        "인스턴스 재부팅(Reboot)",
+        "인스턴스 중지(Stop)",
+        "인스턴스 최대 절전(Hibernate)",
+        "인스턴스 종료(Terminate)"
+      ],
+      "answer": 3,
+      "explanation": "중지는 EBS 요금이 계속 나가므로, 더 이상 쓰지 않을 리소스는 종료(삭제)해야 합니다."
+    },
+    {
+      "question": "EC2를 '재부팅(Reboot)'한 경우와 '중지 후 시작'한 경우의 차이로 옳은 것은?",
+      "options": [
+        "두 경우 모두 퍼블릭 IP가 유지된다",
+        "재부팅은 퍼블릭 IP가 유지되지만, 중지 후 시작은 퍼블릭 IP가 바뀐다",
+        "재부팅은 퍼블릭 IP가 바뀌고, 중지 후 시작은 유지된다",
+        "두 경우 모두 퍼블릭 IP가 반드시 바뀐다"
+      ],
+      "answer": 1,
+      "explanation": "재부팅은 동일한 물리 호스트에서 OS만 다시 시작하므로 퍼블릭 IP가 유지되지만, 중지 후 시작하면 새 퍼블릭 IP가 할당됩니다."
+    },
+    {
+      "question": "EC2의 '최대 절전 모드(Hibernate)'에 대한 설명으로 옳은 것은?",
+      "options": [
+        "메모리 상태를 버리고 OS 부팅부터 다시 시작한다",
+        "모든 인스턴스 유형에서 사용할 수 있다",
+        "메모리 상태를 저장했다가 복원하며, 지원하는 인스턴스 유형이 따로 있다",
+        "T 패밀리에서만 사용할 수 있는 전용 기능이다"
+      ],
+      "answer": 2,
+      "explanation": "최대 절전 모드는 노트북 뚜껑을 닫았다 여는 것과 같은 개념이며, 지원 인스턴스 유형이 별도로 정해져 있고 T 패밀리는 지원하지 않습니다."
+    },
+    {
+      "question": "User Data에 대한 설명으로 옳은 것은?",
+      "options": [
+        "EC2 생성 시 딱 한 번 실행되는 스크립트",
+        "EC2에 부여하는 메타데이터 키-값 쌍",
+        "EC2의 CPU 사용률을 기록하는 로그 파일",
+        "EC2가 재부팅될 때마다 매번 실행되는 스크립트"
+      ],
+      "answer": 0,
+      "explanation": "User Data는 인스턴스 생성 시 일반적인 구성 작업을 자동 수행하는 스크립트로, 기본적으로 최초 1회만 실행됩니다."
+    },
+    {
+      "question": "교안 p.121의 User Data 예제에서 `chkconfig httpd on`이 수행하는 역할은?",
+      "options": [
+        "앞으로 리부팅할 때마다 httpd 프로세스를 자동 구동하도록 설정",
+        "httpd 패키지를 최신 버전으로 업데이트",
+        "httpd 프로세스를 지금 즉시 시작",
+        "httpd 설정 파일의 문법 오류를 검사"
+      ],
+      "answer": 0,
+      "explanation": "service httpd start는 지금 구동, chkconfig httpd on은 이후 재부팅 시마다 자동 구동되도록 등록하는 명령입니다."
+    },
+    {
+      "question": "Windows 인스턴스에서 User Data를 작성할 때 사용하는 스크립트 언어는?",
+      "options": [
+        "Bash 셸 스크립트",
+        "PowerShell 스크립트",
+        "Batch 파일만 지원",
+        "Python 스크립트"
+      ],
+      "answer": 1,
+      "explanation": "Linux·macOS는 셸 스크립트, Windows는 PowerShell 스크립트로 User Data를 작성합니다."
+    },
+    {
+      "question": "User Data가 가장 큰 효과를 내는 상황은?",
+      "options": [
+        "여러 EC2에 동일한 부트스트랩 구성을 적용해야 할 때",
+        "단 한 대의 EC2를 수동으로 설정할 때",
+        "EC2의 인스턴스 유형을 변경할 때",
+        "이미 실행 중인 EC2의 설정을 변경할 때"
+      ],
+      "answer": 0,
+      "explanation": "한 대뿐이면 SSH로 직접 하는 것과 결과가 같지만, 여러 대에 같은 작업을 해야 할 때 일일이 접속하지 않아도 되는 이점이 큽니다."
+    },
+    {
+      "question": "User Data에 DB 비밀번호나 API 키를 넣으면 안 되는 이유는?",
+      "options": [
+        "문자열 길이 제한 때문에 저장이 불가능하기 때문",
+        "인스턴스 메타데이터를 통해 평문으로 조회될 수 있기 때문",
+        "스크립트 실행 속도가 크게 느려지기 때문",
+        "AWS가 자동으로 삭제해 버리기 때문"
+      ],
+      "answer": 1,
+      "explanation": "User Data는 인스턴스 내부에서 평문으로 읽을 수 있으므로, 접근 권한을 가진 누구에게나 비밀이 노출됩니다."
+    },
+    {
+      "question": "SSH와 AWS의 관계에 대한 설명으로 옳은 것은?",
+      "options": [
+        "SSH는 AWS가 개발한 EC2 전용 프로토콜이다",
+        "SSH는 Windows 인스턴스 접속 전용 프로토콜이다",
+        "SSH는 AWS 콘솔에서만 사용할 수 있다",
+        "SSH는 AWS의 기술이 아니며, AWS가 이를 지원하는 것이다"
+      ],
+      "answer": 3,
+      "explanation": "SSH는 온프레미스에서도 쓰이는 표준 원격 접속 방식이며, AWS는 EC2 접속 수단으로 이를 지원할 뿐입니다."
+    },
+    {
+      "question": "SSH 키 페어에서 클라이언트와 서버가 각각 보관하는 키는?",
+      "options": [
+        "양쪽 모두 퍼블릭 키를 보관",
+        "양쪽 모두 프라이빗 키를 보관",
+        "클라이언트는 프라이빗 키, 서버는 퍼블릭 키",
+        "클라이언트는 퍼블릭 키, 서버는 프라이빗 키"
+      ],
+      "answer": 2,
+      "explanation": "SSH 클라이언트(내 PC)가 프라이빗 키를, EC2 서버가 퍼블릭 키를 갖고 있어야 인증이 성립합니다."
+    },
+    {
+      "question": "PuTTY를 사용할 때 다운로드해야 하는 프라이빗 키 파일 형식은?",
+      "options": [
+        ".ppk",
+        ".crt",
+        ".key",
+        ".pem"
+      ],
+      "answer": 0,
+      "explanation": "OpenSSH 계열(리눅스, Git Bash, Xshell)은 .pem, PuTTY는 .ppk 형식을 사용합니다."
+    },
+    {
+      "question": "EC2 키 페어의 프라이빗 키 파일을 분실했을 때의 결과는?",
+      "options": [
+        "동일한 이름으로 키 페어를 다시 만들면 복구된다",
+        "콘솔에서 언제든 다시 다운로드할 수 있다",
+        "AWS 지원팀에 요청하면 이메일로 재발급해 준다",
+        "AWS는 프라이빗 키를 보관하지 않으므로 재발급이 불가능하다"
+      ],
+      "answer": 3,
+      "explanation": "프라이빗 키는 생성 시 단 한 번만 다운로드할 수 있으며, 분실하면 해당 키로 만든 인스턴스에 SSH로 접속할 수 없습니다."
+    },
+    {
+      "question": "Amazon Linux 2023 AMI로 만든 EC2에 SSH 접속할 때 사용하는 기본 리눅스 사용자 이름은?",
+      "options": [
+        "ubuntu",
+        "root",
+        "ec2-user",
+        "admin"
+      ],
+      "answer": 2,
+      "explanation": "AMI마다 기본 사용자가 다르며, Amazon Linux는 ec2-user, Ubuntu는 ubuntu입니다. AWS 문서에 안내되어 있습니다."
+    },
+    {
+      "question": "다운로드한 키로 EC2에 SSH 접속하는 명령으로 올바른 것은?",
+      "options": [
+        "ssh -i MyKeyPair001.pem ec2-user@<퍼블릭 IP>",
+        "ssh --key MyKeyPair001.pem root@<프라이빗 IP>",
+        "ssh -p MyKeyPair001.pem ec2-user@<퍼블릭 IP>",
+        "ssh ec2-user@<퍼블릭 IP> -k MyKeyPair001.pem"
+      ],
+      "answer": 0,
+      "explanation": "-i 옵션으로 프라이빗 키 파일을 지정하고, 사용자이름@퍼블릭IP 형식으로 접속합니다."
+    },
+    {
+      "question": "EC2에 접속한 직후 상태를 확인하는 기본 3종 명령으로 옳게 묶인 것은?",
+      "options": [
+        "whoami, pwd, uname -a",
+        "ps, top, kill",
+        "ls, cd, mkdir",
+        "ifconfig, netstat, ping"
+      ],
+      "answer": 0,
+      "explanation": "whoami(나는 누구인가), pwd(여긴 어디인가), uname -a(얘는 뭔가)로 권한·위치·플랫폼을 한 번에 확인할 수 있습니다."
+    },
+    {
+      "question": "키 페어와 SSH 클라이언트 프로그램 없이 웹 브라우저에서 EC2에 접속할 수 있는 기능은?",
+      "options": [
+        "EC2 Instance Connect",
+        "AWS CloudShell Bridge",
+        "AWS Direct Connect",
+        "EC2 Remote Desktop"
+      ],
+      "answer": 0,
+      "explanation": "EC2 Instance Connect는 콘솔의 [연결] 버튼으로 웹 브라우저 기반 셸을 제공합니다."
+    },
+    {
+      "question": "교안 p.145가 소개한, 키 페어 없이 EC2에 접근할 수 있는 AWS 서비스는?",
+      "options": [
+        "AWS Systems Manager의 Session Manager",
+        "AWS Key Management Service",
+        "AWS Certificate Manager",
+        "AWS Secrets Manager"
+      ],
+      "answer": 0,
+      "explanation": "SSM Session Manager는 키 페어 없이 EC2에 접근할 수 있으며, EC2 Instance profile에 SSM 권한이 부여되어 있어야 합니다."
+    },
+    {
+      "question": "SSM Session Manager 사용을 위해 EC2 Instance profile에 부여하는 대표적인 AWS 관리형 정책은?",
+      "options": [
+        "AmazonS3ReadOnlyAccess",
+        "AmazonSSMManagedInstanceCore",
+        "AmazonEC2FullAccess",
+        "AWSCloudTrailReadOnlyAccess"
+      ],
+      "answer": 1,
+      "explanation": "교안 p.145는 AmazonSSMManagedInstanceCore를 예로 들고 있습니다."
+    },
+    {
+      "question": "보안 그룹(Security Group)에 대한 설명으로 옳은 것은?",
+      "options": [
+        "서브넷 레벨에서 동작하는 가상 방화벽",
+        "리전 간 트래픽을 암호화하는 게이트웨이",
+        "인스턴스 레벨에서 동작하는 가상 방화벽",
+        "VPC 전체에 적용되는 라우팅 규칙"
+      ],
+      "answer": 2,
+      "explanation": "보안 그룹은 EC2 한 대 한 대에 붙는 인스턴스 레벨 가상 방화벽입니다. 서브넷 레벨은 NACL입니다."
+    },
+    {
+      "question": "SSH 접속을 위해 보안 그룹에서 허용해야 하는 포트는?",
+      "options": [
+        "443번",
+        "22번",
+        "80번",
+        "23번"
+      ],
+      "answer": 1,
+      "explanation": "SSH의 서비스 포트는 22번입니다. 23번은 Telnet, 80/443은 HTTP/HTTPS입니다."
+    },
+    {
+      "question": "보안 그룹 규칙의 소스가 '0.0.0.0/0'이라는 것은 무엇을 의미하는가?",
+      "options": [
+        "같은 가용 영역에서만 접근을 허용한다",
+        "인터넷상의 누구든지 해당 포트로 접근을 허용한다",
+        "VPC 내부에서만 접근을 허용한다",
+        "어떤 접근도 허용하지 않는다"
+      ],
+      "answer": 1,
+      "explanation": "0.0.0.0/0은 모든 IP를 의미하므로, 전 세계 어디서든 해당 포트에 접근할 수 있게 됩니다."
+    },
+    {
+      "question": "EC2 생성 마법사가 자동 생성하는 보안 그룹과, 보안 그룹을 따로 직접 만들 때의 차이는?",
+      "options": [
+        "생성 마법사 쪽은 SSH 22번이 기본 체크되어 있지만, 직접 만들 때는 기본 허용이 아니다",
+        "두 경우 모두 SSH 22번이 자동 허용된다",
+        "직접 만들 때만 SSH 22번이 자동 허용된다",
+        "생성 마법사 쪽은 모든 포트가 차단되어 있다"
+      ],
+      "answer": 0,
+      "explanation": "생성 마법사는 'SSH를 많이 쓴다'는 이유로 22번을 기본 체크해 두지만, 보안 그룹을 별도로 만들면 기본 허용이 아닙니다. 원치 않으면 체크를 해제할 수 있습니다."
+    },
+    {
+      "question": "SSH 접속이 안 될 때 가장 먼저 확인해야 할 항목은?",
+      "options": [
+        "보안 그룹 인바운드 규칙에 22번 포트가 열려 있는지",
+        "AMI가 Amazon Linux인지",
+        "User Data 스크립트가 작성되어 있는지",
+        "인스턴스 유형이 t3.micro인지"
+      ],
+      "answer": 0,
+      "explanation": "키 페어를 올바르게 지정했는데도 접속이 안 되면 대개 보안 그룹에 22번이 허용되지 않은 경우입니다."
+    },
+    {
+      "question": "AWS 태그(Tag)의 형태로 옳은 것은?",
+      "options": [
+        "키-값 쌍 형태의 메타데이터 (예: Name=WebServer1)",
+        "단일 문자열 형태의 라벨 (예: WebServer1)",
+        "CIDR 표기 형태의 주소 (예: 10.0.0.0/16)",
+        "JSON 문서 형태의 정책 (예: {\"Effect\":\"Allow\"})"
+      ],
+      "answer": 0,
+      "explanation": "태그는 리소스 구성을 위한 메타데이터 키-값 쌍이며, 교안은 Name=WebServer1, Team=Prod1을 예로 듭니다."
+    },
+    {
+      "question": "교안 p.141이 제시한 Tagging의 장점에 해당하지 않는 것은?",
+      "options": [
+        "비용 관리 용이",
+        "리소스 사용량 자동 축소",
+        "태그별 권한 제어 가능",
+        "태그별 리소스 쿼리 가능"
+      ],
+      "answer": 1,
+      "explanation": "교안의 장점은 관리 편의(태그별 쿼리, 태그별 권한 제어, 리소스 그룹 지정)와 비용 관리 용이입니다."
+    },
+    {
+      "question": "EC2 생성 시 네트워크 항목이 비어 있을 때, 강사가 클릭하라고 안내한 링크는?",
+      "options": [
+        "새 서브넷 생성",
+        "새 인터넷 게이트웨이 생성",
+        "새 기본 VPC 생성",
+        "새 VPC 생성"
+      ],
+      "answer": 2,
+      "explanation": "'새 VPC 생성'은 마법사로 이동해 직접 구성해야 하지만, '새 기본 VPC 생성'은 버튼 한 번으로 완성된 기본 네트워크 세트를 만들어 줍니다."
+    },
+    {
+      "question": "EC2 인스턴스 안에서 ip addr 명령을 실행했을 때 퍼블릭 IP가 보이지 않는 이유는?",
+      "options": [
+        "명령어를 root 권한으로 실행하지 않았기 때문",
+        "퍼블릭 IP는 VPC 바깥에서 변환되며 OS 내부에는 프라이빗 IP만 설정되기 때문",
+        "퍼블릭 IP는 SSH 접속 시에만 임시로 생성되기 때문",
+        "퍼블릭 IP는 보안상 숨겨지도록 암호화되어 있기 때문"
+      ],
+      "answer": 1,
+      "explanation": "AWS가 NAT 방식으로 퍼블릭 IP를 프라이빗 IP로 변환하므로, 인스턴스 OS 안에서는 프라이빗 IP만 보이는 것이 정상입니다."
+    },
+    {
+      "question": "퍼블릭 IP 자동 할당에 대한 최근 AWS 정책 변경으로 옳은 것은?",
+      "options": [
+        "이전에는 별도 과금이 없었으나 현재는 별도로 과금된다",
+        "탄력적 IP만 과금되고 자동 할당 IP는 여전히 무료다",
+        "퍼블릭 IP 할당 기능 자체가 폐지되었다",
+        "이전에는 과금되었으나 현재는 무료가 되었다"
+      ],
+      "answer": 0,
+      "explanation": "IPv4 주소 고갈을 배경으로 퍼블릭 IPv4 사용에 요금이 부과되기 시작했습니다. 이는 프라이빗 서브넷 배치를 권장하는 보안 모범사례와도 방향이 일치합니다."
+    },
+    {
+      "question": "EC2를 별도 구매 옵션 없이 생성했을 때 적용되는 기본 요금제는?",
+      "options": [
+        "예약 인스턴스",
+        "스팟 인스턴스",
+        "Savings Plans",
+        "온디맨드 인스턴스"
+      ],
+      "answer": 3,
+      "explanation": "별도 옵션을 지정하지 않으면 온디맨드로, 러닝 시간에 비례해 과금됩니다."
+    },
+    {
+      "question": "예약(Reserved) 인스턴스 요금제의 성격과 약정 기간으로 옳은 것은?",
+      "options": [
+        "단기 약정 할인이며 1개월 또는 3개월을 선택한다",
+        "입찰 방식이며 약정 기간이 없다",
+        "사용량에 따라 자동으로 할인율이 결정된다",
+        "장기 약정 할인이며 1년 또는 3년을 선택한다"
+      ],
+      "answer": 3,
+      "explanation": "예약 인스턴스는 1년 또는 3년 약정으로 할인을 받는 요금제로, 장기간 상시 가동해야 하는 프로덕션 EC2에 적합합니다."
+    },
+    {
+      "question": "스팟(Spot) 인스턴스의 입찰 가격은 누가 결정하는가?",
+      "options": [
+        "리전별 정가표에 고정되어 있다",
+        "AWS가 유휴 리소스와 수요를 계산해 제시한다",
+        "고객 간 경쟁 입찰로 최고가가 결정된다",
+        "고객이 원하는 금액을 직접 제시한다"
+      ],
+      "answer": 1,
+      "explanation": "고객이 가격을 제시하는 것이 아니라, AWS가 유휴 EC2 리소스 현황과 수요를 계산해 가격을 제시하며 그 가격은 무조건 저렴합니다."
+    },
+    {
+      "question": "스팟 인스턴스 사용 중 입찰가가 올라가면 어떤 일이 발생하는가?",
+      "options": [
+        "자동으로 온디맨드 요금제로 전환된다",
+        "약 2분 후 해당 인스턴스가 종료(terminate)된다",
+        "인스턴스가 중지(stop) 상태로 전환된다",
+        "요금만 인상되고 인스턴스는 계속 유지된다"
+      ],
+      "answer": 1,
+      "explanation": "스팟은 입찰가가 상승하면 약 2분 후 종료되므로, 중단되어도 괜찮은 워크로드에만 사용해야 합니다."
+    },
+    {
+      "question": "스팟 인스턴스의 대표적인 활용 방식으로 강사가 제시한 것은?",
+      "options": [
+        "점프 서버를 스팟으로 구성",
+        "DB 서버 전체를 스팟으로 구성",
+        "단일 웹 서버를 스팟 하나로만 구성",
+        "클러스터의 일부 노드를 스팟으로 구성해 서비스 중단 없이 비용을 절감"
+      ],
+      "answer": 3,
+      "explanation": "클러스터(같은 워크로드를 갖는 서버 집합)의 일부만 스팟으로 두면, 스팟이 종료되어도 서비스는 중단되지 않고 속도만 다소 느려질 수 있습니다."
+    },
+    {
+      "question": "EC2 비용을 절감하는 방법으로 강사가 제시한 두 가지는?",
+      "options": [
+        "키 페어 삭제와 보안 그룹 축소",
+        "태그 제거와 User Data 삭제",
+        "적절한 인스턴스 유형(크기) 선택과 요금제(구매 옵션) 변경",
+        "리전 변경과 AMI 변경"
+      ],
+      "answer": 2,
+      "explanation": "모니터링을 통한 크기 최적화와, 온디맨드·예약·스팟 중 적절한 요금제 선택이 두 가지 경로입니다."
+    },
+    {
+      "question": "비용 절감을 위한 올바른 접근 순서는?",
+      "options": [
+        "먼저 3년 약정으로 구매한 뒤 크기를 조정",
+        "약정 구매만 하고 크기는 조정하지 않음",
+        "모니터링으로 크기를 최적화한 뒤 안정화되면 약정 구매",
+        "크기와 약정을 동시에 최대치로 설정"
+      ],
+      "answer": 2,
+      "explanation": "잘못된 크기를 장기 약정해 버리면 낭비를 약정 기간 내내 고정하게 됩니다."
+    },
+    {
+      "question": "확장 방식에서 Scale Out에 해당하는 것은?",
+      "options": [
+        "디스크 볼륨의 크기를 늘린다",
+        "한 대의 CPU와 메모리 사양을 키운다",
+        "같은 기능을 제공하는 서버의 대수를 늘린다",
+        "리전을 추가로 확보한다"
+      ],
+      "answer": 2,
+      "explanation": "Scale Up/Down은 한 대의 사양 변경, Scale Out/In은 대수 증감이며 Auto Scaling이 이를 담당합니다."
+    },
+    {
+      "question": "EC2 인스턴스 유형을 변경하려면 인스턴스가 어떤 상태여야 하는가?",
+      "options": [
+        "대기 중(pending) 상태",
+        "종료됨(terminated) 상태",
+        "중지(stopped) 상태",
+        "실행 중(running) 상태"
+      ],
+      "answer": 2,
+      "explanation": "인스턴스 유형 변경은 중지 상태에서만 가능하므로 짧은 다운타임이 발생합니다. 무중단 확장이 필요하면 Scale Out을 사용합니다."
+    }
+  ]
+}
