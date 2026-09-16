@@ -1,7 +1,7 @@
 {
   "title": "클라우드 보안 DAY1",
   "subtitle": "클라우드 개념 · AWS 글로벌 인프라 · EC2",
-  "subject": "Cloud Security",
+  "subject": "클라우드 보안",
   "description": "SK Shieldus Rookies: 클라우드 보안 1일차 수업. 클라우드 컴퓨팅의 정의와 온프레미스 비교, 서비스 모델(IaaS/PaaS/SaaS)과 책임 공유 모델, AWS 글로벌 인프라(리전·가용 영역), 계정과 접근 도구(콘솔/CLI/SDK), 그리고 EC2 전반(AMI, 인스턴스 유형, 수명 주기, User Data, SSH 연결, 보안 그룹, 요금제)을 다룹니다.",
   "questions": [
     {

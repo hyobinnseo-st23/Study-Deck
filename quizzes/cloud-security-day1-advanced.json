@@ -1,7 +1,7 @@
 {
   "title": "클라우드 보안 DAY1 심화",
   "subtitle": "시나리오 판단 · 설계 트레이드오프 · 운영 리스크",
-  "subject": "Cloud Security",
+  "subject": "클라우드 보안",
   "description": "SK Shieldus Rookies: 클라우드 보안 1일차 심화 문제. 단순 암기가 아니라 상황 판단, 설정 결과 예측, 트러블슈팅, 비용·보안 트레이드오프를 묻습니다. EC2 수명 주기와 과금, 인스턴스 유형과 버스팅, AMI·골든 이미지 운영, SSH·보안 그룹·SSM, 리전 선택 기준의 충돌을 다룹니다.",
   "questions": [
     {
