@@ -1,5 +1,5 @@
 {
-  "title": "클라우드 보안 3일차 심화",
+  "title": "클라우드 보안 DAY3 심화",
   "subtitle": "시나리오 판단 · 정책 평가 · 설계 · 트러블슈팅",
   "subject": "클라우드 보안",
   "description": "3일차 내용을 응용한 심화 문제 — Stateful/Stateless 결과 예측, IAM 정책 평가, 체이닝 보안 그룹 설계, 비용·운영 함정, 역할과 STS, CLI 필터, 서브넷 주소 계산",

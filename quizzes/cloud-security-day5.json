@@ -1,5 +1,5 @@
 {
-  "title": "클라우드 보안 5일차",
+  "title": "클라우드 보안 DAY5",
   "subtitle": "ELB·Auto Scaling · RDS · DynamoDB · Lambda",
   "subject": "클라우드 보안",
   "description": "권한 경계·S3 리뷰, ELB 라우팅과 Auto Scaling 정책, RDS(실습 14), DynamoDB(실습 15), Lambda(실습 16)와 Q&A 내용을 다룹니다.",
