@@ -1547,6 +1547,58 @@
     return res.json();
   }
 
+  function sourceFileName(file) {
+    const s = String(file || "").replace(/\\/g, "/");
+    const i = s.lastIndexOf("/");
+    return i === -1 ? s : s.slice(i + 1);
+  }
+  // 제목이 바뀌어도 같은 파일은 같은 퀴즈로 취급
+  function builtinId(file) { return hashId("builtin:" + sourceFileName(file)); }
+  function moveQuizIdentity(oldId, newId) {
+    if (!oldId || !newId || oldId === newId) return;
+    const lib = getLibrary();
+    if (lib[oldId]) {
+      if (!lib[newId]) lib[newId] = Object.assign({}, lib[oldId], { id: newId });
+      else if (lib[oldId].addedAt && (!lib[newId].addedAt || lib[oldId].addedAt < lib[newId].addedAt)) {
+        lib[newId].addedAt = lib[oldId].addedAt;
+      }
+      delete lib[oldId];
+      lsSet(LIB_KEY, lib);
+    }
+    const st = getStats();
+    if (st[oldId]) {
+      if (!st[newId]) st[newId] = st[oldId];
+      else {
+        const a = (st[newId].attempts || []).concat(st[oldId].attempts || []);
+        a.sort((x, y) => (x.date || 0) - (y.date || 0));
+        st[newId] = { attempts: a.slice(-100) };
+      }
+      delete st[oldId];
+      lsSet(STATS_KEY, st);
+    }
+    const r = getResume();
+    if (r[oldId]) {
+      if (!r[newId]) r[newId] = r[oldId];
+      delete r[oldId];
+      lsSet(RESUME_KEY, r);
+    }
+  }
+  function collectBuiltinAliases(id, file, title) {
+    const name = sourceFileName(file);
+    const titleId = hashId(title);
+    const aliases = [];
+    const lib = getLibrary();
+    Object.keys(lib).forEach(qid => {
+      if (qid === id) return;
+      const q = lib[qid];
+      if (!q || !q.builtin) return;
+      const sameFile = q.sourceFile && sourceFileName(q.sourceFile) === name;
+      const legacyTitle = !q.sourceFile && qid === titleId;
+      if (sameFile || legacyTitle) aliases.push(qid);
+    });
+    return aliases;
+  }
+
   // 더 이상 목록에 없는 기본 제공 퀴즈 제거 (사용자가 올린 퀴즈는 보존)
   function pruneBuiltins(keepIds) {
     const lib = getLibrary();
@@ -1579,6 +1631,7 @@
         const questions = Array.isArray(data) ? data : (data && data.questions);
         if (validate(questions)) return null;
         return {
+          file: file,
           title: (data && data.title) ? data.title : file.replace(/\.json$/i, ""),
           subtitle: (data && data.subtitle) ? String(data.subtitle).trim() : "",
           subject: subjectOverride || (data && data.subject ? String(data.subject).trim() : DEFAULT_SUBJECT),
@@ -1591,9 +1644,18 @@
     const valid = loaded.filter(Boolean);
     const keepIds = {};
     valid.forEach(p => {
-      const id = hashId(p.title);
+      const id = builtinId(p.file);
+      const titleId = hashId(p.title);
+      const lib = getLibrary();
+      const existing = lib[id] || lib[titleId] || Object.values(lib).find(q =>
+        q && q.builtin && q.sourceFile && sourceFileName(q.sourceFile) === sourceFileName(p.file)
+      ) || null;
+      collectBuiltinAliases(id, p.file, p.title).forEach(oldId => moveQuizIdentity(oldId, id));
+      if (existing && existing.id && existing.id !== id) moveQuizIdentity(existing.id, id);
+      const addedAt = (getLibrary()[id] && getLibrary()[id].addedAt)
+        || (existing && existing.addedAt)
+        || Date.now();
       keepIds[id] = true;
-      const existing = getLibrary()[id];
       saveQuiz({
         id: id,
         title: p.title,
@@ -1602,7 +1664,8 @@
         description: p.description,
         questions: p.questions,
         builtin: true,
-        addedAt: existing ? existing.addedAt : Date.now(),
+        sourceFile: sourceFileName(p.file),
+        addedAt: addedAt,
         updatedAt: Date.now()
       });
     });
