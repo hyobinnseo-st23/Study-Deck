@@ -2,6 +2,8 @@
     "_comment":  "이 파일은 update-manifest.ps1 (또는 GitHub Actions)가 quizzes/ 폴더를 스캔해 자동 생성합니다. 직접 수정하지 말고 스크립트를 다시 실행하세요.",
     "quizzes":  [
                     "malware_day1_quiz_advanced_day1.json",
-                    "malware_day1_quiz_day1.json"
+                    "malware_day1_quiz_advanced_day2.json",
+                    "malware_day1_quiz_day1.json",
+                    "malware_day1_quiz_day2.json"
                 ]
 }
