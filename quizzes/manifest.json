@@ -3,7 +3,9 @@
     "quizzes":  [
                     "malware_day1_quiz_advanced_day1.json",
                     "malware_day1_quiz_advanced_day2.json",
+                    "malware_day1_quiz_advanced_day3.json",
                     "malware_day1_quiz_day1.json",
-                    "malware_day1_quiz_day2.json"
+                    "malware_day1_quiz_day2.json",
+                    "malware_day1_quiz_day3.json"
                 ]
 }
