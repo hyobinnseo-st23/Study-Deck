@@ -1,0 +1,580 @@
+{
+  "title": "보안관제 로그 분석 DAY1",
+  "subtitle": "네트워크 보안 이론 · SNORT/IDS · 룰과 정규표현식",
+  "subject": "보안관제",
+  "description": "SK Shieldus Rookies 보안관제(네트워크 보안) 1일차. 보안의 역사, URI/파라미터 변조, 방화벽→IDS, 패턴매칭/이상징후, 오탐과 3단계 분석, VirtualBox/PuTTY 실습, SNORT 설정·룰·barnyard2·MySQL, 룰 옵션(flow·flags·dsize·threshold·content·pcre)과 정규표현식을 다룹니다.",
+  "questions": [
+    {
+      "question": "이 과정이 실제로 다루는 핵심 주제는?",
+      "options": [
+        "클라우드 인프라 보안",
+        "디지털 포렌식 수사",
+        "네트워크 보안",
+        "악성코드 정적 분석"
+      ],
+      "answer": 2,
+      "explanation": "과정명은 통합보안관제 로그 분석이지만 실제 주제는 네트워크 보안이다."
+    },
+    {
+      "question": "네트워크 보안에서 쓰는 두 가지 방법론은?",
+      "options": [
+        "대칭키 암호화와 복호화",
+        "접근 인증과 권한 인가",
+        "데이터 백업과 장애 복구",
+        "패턴매칭과 이상징후 분석"
+      ],
+      "answer": 3,
+      "explanation": "패턴매칭과 이상징후 분석이며, 둘 다 결국 데이터 분석 방법론이다."
+    },
+    {
+      "question": "빌트인 Administrator 계정의 특징으로 옳은 것은?",
+      "options": [
+        "외부 인터넷 접속이 차단됨",
+        "확인 창 없이 관리자 권한을 씀",
+        "관리자 작업마다 확인 창을 띄움",
+        "로그인 기록을 전혀 남기지 않음"
+      ],
+      "answer": 1,
+      "explanation": "일반 관리자 계정은 UAC 확인을 거치지만 빌트인 Administrator는 확인 없이 바로 실행된다."
+    },
+    {
+      "question": "보안 업무에서 사고 유무를 확인하는 가장 흔한 방법은?",
+      "options": [
+        "장비를 재부팅한다",
+        "전원을 내려 본다",
+        "백신을 돌려 본다",
+        "로그를 읽어 본다"
+      ],
+      "answer": 3,
+      "explanation": "대부분의 보안 업무는 로그를 읽어 보안 사고 여부를 확인하는 것이다."
+    },
+    {
+      "question": "컴퓨터에서 로그를 기록하는 주체는?",
+      "options": [
+        "네트워크 케이블",
+        "웹 브라우저",
+        "운영체제",
+        "전원 장치"
+      ],
+      "answer": 2,
+      "explanation": "로그는 운영체제가 기록하므로 OS를 알아야 로그를 이해할 수 있다."
+    },
+    {
+      "question": "IT 환경에서 사용 비중이 가장 높은 운영체제는?",
+      "options": [
+        "솔라리스",
+        "도스",
+        "맥OS",
+        "리눅스"
+      ],
+      "answer": 3,
+      "explanation": "리눅스가 가장 많이 쓰여서 익혀 두면 어느 분야에 가도 적응이 쉽다."
+    },
+    {
+      "question": "IDS와 IPS의 차이로 옳은 것은?",
+      "options": [
+        "둘 다 차단 기능만 수행한다",
+        "IDS는 차단, IPS는 탐지만 수행",
+        "둘 다 탐지 기능만 수행한다",
+        "IDS는 탐지, IPS는 탐지와 차단"
+      ],
+      "answer": 3,
+      "explanation": "IDS는 수상하면 경보만, IPS는 경보와 함께 차단까지 한다."
+    },
+    {
+      "question": "1940년대 컴퓨터 Bombe가 만들어진 목적은?",
+      "options": [
+        "포탄 탄도 계산",
+        "독일군 암호 해독",
+        "인구 조사 집계",
+        "일기 예보 산출"
+      ],
+      "answer": 1,
+      "explanation": "Bombe는 독일군 암호 해독용, ENIAC은 포탄 탄도 계산용이었다."
+    },
+    {
+      "question": "1970년대에 등장해 모든 운영체제의 조상이 된 것은?",
+      "options": [
+        "아르파넷(ARPANET)",
+        "유닉스(Unix)",
+        "안드로이드(Android)",
+        "윈도우(Windows)"
+      ],
+      "answer": 1,
+      "explanation": "유닉스가 범용 운영체제로 등장해 이후 모든 OS의 조상이 되었다."
+    },
+    {
+      "question": "세계 최초로 웜 바이러스를 퍼뜨린 인물은?",
+      "options": [
+        "클리포드 스톨",
+        "데니스 리치",
+        "케빈 미트닉",
+        "로버트 모리스"
+      ],
+      "answer": 3,
+      "explanation": "로버트 모리스가 세계 최초 웜으로 미국 네트워크를 마비시켰다(1988)."
+    },
+    {
+      "question": "URI를 URL과 변수로 나누는 기준이 되는 기호는?",
+      "options": [
+        "샵(#)",
+        "물음표(?)",
+        "콜론(:)",
+        "슬래시(/)"
+      ],
+      "answer": 1,
+      "explanation": "URI는 물음표 기준으로 왼쪽 URL(위치), 오른쪽 변수(파라미터)로 나뉜다."
+    },
+    {
+      "question": "KT·아이핀·코레일·T-모바일 사고의 공통된 수법은?",
+      "options": [
+        "무차별 대입 비밀번호 공격",
+        "분산 서비스 거부 공격",
+        "중간자 트래픽 가로채기",
+        "변수값 조작(파라미터 변조)"
+      ],
+      "answer": 3,
+      "explanation": "네 사건 모두 변수값을 조작해 남의 정보를 빼낸 파라미터 변조였다."
+    },
+    {
+      "question": "변수만 바꿔 남의 데이터에 접근하는 취약점의 이름은?",
+      "options": [
+        "XXE",
+        "CSRF",
+        "IDOR",
+        "SSRF"
+      ],
+      "answer": 2,
+      "explanation": "IDOR(안전하지 않은 직접 객체 참조)이며 OWASP Top 10의 취약한 접근 통제에 속한다."
+    },
+    {
+      "question": "Burp Suite 프록시의 기본 주소와 포트는?",
+      "options": [
+        "127.0.0.1 : 8080",
+        "10.0.0.1 : 3306",
+        "192.168.0.1 : 443",
+        "0.0.0.0 : 80"
+      ],
+      "answer": 0,
+      "explanation": "Burp 프록시 기본값은 자기 자신(127.0.0.1)의 8080 포트다."
+    },
+    {
+      "question": "국내에서 전국 인터넷이 마비된 2003년 사건은?",
+      "options": [
+        "모리스 웜",
+        "아이핀 사고",
+        "코레일 사고",
+        "1.25 대란"
+      ],
+      "answer": 3,
+      "explanation": "2003년 1.25 인터넷 대란(슬래머 웜) 이후 방화벽이 기본 보안 장비가 되었다."
+    },
+    {
+      "question": "네트워크에서 방어가 어려운 이유로 옳은 것은?",
+      "options": [
+        "적과 아군 식별이 어려움",
+        "전송 속도가 너무 느림",
+        "케이블이 쉽게 끊김",
+        "전력 소모가 너무 큼"
+      ],
+      "answer": 0,
+      "explanation": "정상과 공격이 겉모습이 같아 피아 식별이 어려워 방어가 힘들다."
+    },
+    {
+      "question": "방화벽이 허용·차단 판단의 기준으로 삼는 정보는?",
+      "options": [
+        "쿠키 값",
+        "파일 해시",
+        "IP와 Port",
+        "페이로드 문자열"
+      ],
+      "answer": 2,
+      "explanation": "방화벽은 봉투 겉면에 해당하는 IP와 Port를 보고 허용·차단을 결정한다."
+    },
+    {
+      "question": "페이로드(편지 내용)의 패턴까지 검사하는 장비는?",
+      "options": [
+        "라우터",
+        "스위치",
+        "방화벽",
+        "IDS"
+      ],
+      "answer": 3,
+      "explanation": "방화벽은 IP·Port만, IDS는 페이로드의 패턴까지 검사한다. 대표가 SNORT."
+    },
+    {
+      "question": "패턴매칭 기술의 원리가 유래한 개념은?",
+      "options": [
+        "도청",
+        "압축",
+        "백업",
+        "암호화"
+      ],
+      "answer": 0,
+      "explanation": "주고받는 패턴으로 관계를 파악하는 도청의 원리가 패턴매칭에 적용되었다."
+    },
+    {
+      "question": "침입탐지 모델에서 패턴매칭에 해당하는 방식은?",
+      "options": [
+        "블랙리스트",
+        "그레이리스트",
+        "화이트리스트",
+        "랜덤리스트"
+      ],
+      "answer": 0,
+      "explanation": "패턴매칭은 정의된 공격만 막는 블랙리스트, 이상징후는 정상만 허용하는 화이트리스트다."
+    },
+    {
+      "question": "패턴매칭 방식의 치명적인 단점은?",
+      "options": [
+        "모르는 공격은 탐지 못 함",
+        "설치 비용이 매우 큼",
+        "전력 소모가 매우 큼",
+        "정상 범위 정의가 어려움"
+      ],
+      "answer": 0,
+      "explanation": "알려진 공격은 쉽게 정의하지만 모르는 공격은 룰이 없어 탐지하지 못한다."
+    },
+    {
+      "question": "공격이 아닌데 공격이라고 탐지하는 것을 뜻하는 말은?",
+      "options": [
+        "미탐(False Negative)",
+        "정탐(True Positive)",
+        "오탐(False Positive)",
+        "무탐(True Negative)"
+      ],
+      "answer": 2,
+      "explanation": "오탐은 양치기 소년처럼 가짜 경보이며 IDS의 가장 큰 문제다."
+    },
+    {
+      "question": "오탐이 많이 발생하는 근본 원인으로 옳은 것은?",
+      "options": [
+        "보안 장비 전원이 약함",
+        "네트워크 케이블이 짧음",
+        "해커 트래픽만 골라 모을 수 없음",
+        "로그 파일이 전부 암호화되어 있음"
+      ],
+      "answer": 2,
+      "explanation": "누가 해커인지 모르니 전부 수집하게 되고, 문자열 조합이 무한해 우연히 일치한다."
+    },
+    {
+      "question": "벤더 기본 룰이 느슨하게 만들어지는 이유는?",
+      "options": [
+        "전력을 아끼기 위해서",
+        "어느 환경에서 쓸지 모르기 때문",
+        "속도를 높이기 위해서",
+        "저장 공간을 아끼기 위해서"
+      ],
+      "answer": 1,
+      "explanation": "어느 환경에서 쓸지 몰라 느슨하게 만들므로, 설치 후 환경에 맞게 커스터마이징해야 한다."
+    },
+    {
+      "question": "3단계 로그 분석에서 1단계가 보는 대상은?",
+      "options": [
+        "디스크 전체 이미지",
+        "양방향 트래픽 전체",
+        "IP와 Port의 관계",
+        "원인 패킷 페이로드"
+      ],
+      "answer": 2,
+      "explanation": "1단계는 IP·Port, 2단계는 원인 패킷, 3단계는 양방향 트래픽을 본다."
+    },
+    {
+      "question": "열어 둔 적 없는 목적지 3306 트래픽이 들어왔을 때 1차 판단은?",
+      "options": [
+        "항상 정탐",
+        "비정상",
+        "판단 불가",
+        "정상"
+      ],
+      "answer": 1,
+      "explanation": "열어 둔 적 없는 DB 포트(3306)로 접속 시도가 들어온 것이므로 비정상이다."
+    },
+    {
+      "question": "오탐으로 확인된 뒤에 반드시 해야 할 일은?",
+      "options": [
+        "네트워크를 전부 차단함",
+        "장비를 즉시 재부팅함",
+        "로그를 모두 삭제함",
+        "원인을 찾아 룰을 수정함"
+      ],
+      "answer": 3,
+      "explanation": "정오탐 구분이 끝이 아니라, 오탐 원인을 찾아 룰을 고쳐야 반복을 막는다."
+    },
+    {
+      "question": "SNORT 실습용 리눅스 VM을 만드는 프로그램은?",
+      "options": [
+        "Wireshark",
+        "Burp Suite",
+        "VirtualBox",
+        "HeidiSQL"
+      ],
+      "answer": 2,
+      "explanation": "VirtualBox에 snort.ova를 가져오기로 등록해 리눅스 VM을 만든다."
+    },
+    {
+      "question": "VM의 Host-Only 어댑터가 담당하는 연결은?",
+      "options": [
+        "바깥 인터넷 직접 연결",
+        "블루투스 장치 연결",
+        "무선 와이파이 연결",
+        "호스트와 VM 사이 내부망"
+      ],
+      "answer": 3,
+      "explanation": "NAT는 인터넷, Host-Only는 호스트와 VM 사이 내부망 연결이다."
+    },
+    {
+      "question": "VM의 특정 시점을 저장해 되돌리는 기능은?",
+      "options": [
+        "브리지",
+        "포워딩",
+        "스냅샷",
+        "클론"
+      ],
+      "answer": 2,
+      "explanation": "스냅샷은 시점 복원(세이브/로드) 기능으로 분석 후 원복에 쓴다."
+    },
+    {
+      "question": "윈도우와 리눅스 사이 파일 전송에 쓰는 도구는?",
+      "options": [
+        "pscp",
+        "putty",
+        "touch",
+        "whereis"
+      ],
+      "answer": 0,
+      "explanation": "putty.exe는 원격 접속, pscp.exe는 파일 전송 도구다."
+    },
+    {
+      "question": "SNORT 룰에서 sid 옵션이 지켜야 할 규칙은?",
+      "options": [
+        "날짜 형식으로 작성",
+        "절대 중복되면 안 됨",
+        "반드시 소문자 사용",
+        "항상 0으로 시작함"
+      ],
+      "answer": 1,
+      "explanation": "sid는 룰의 일련번호로 절대 중복되면 안 된다. 사용자 룰은 100만 이상을 쓴다."
+    },
+    {
+      "question": "ICMP 룰에서 itype 8이 의미하는 트래픽은?",
+      "options": [
+        "핑 응답",
+        "핑 요청",
+        "세션 종료",
+        "포트 스캔"
+      ],
+      "answer": 1,
+      "explanation": "itype 8은 Echo Request(핑 요청), 0은 Echo Reply(핑 응답)다."
+    },
+    {
+      "question": "SNORT와 MySQL 사이에서 로그를 DB로 넘기는 도구는?",
+      "options": [
+        "barnyard2",
+        "SQLyog",
+        "HeidiSQL",
+        "Wireshark"
+      ],
+      "answer": 0,
+      "explanation": "SNORT와 MySQL은 직접 연동되지 않아 barnyard2가 중계한다."
+    },
+    {
+      "question": "barnyard2 연동을 위해 룰 파일과 동기화해야 하는 파일은?",
+      "options": [
+        "barnyard.waldo",
+        "sid-msg.map",
+        "snort.conf",
+        "alert.log"
+      ],
+      "answer": 1,
+      "explanation": "sid-msg.map의 sid·이름이 룰 파일과 똑같이 동기화되어야 DB 저장이 정상 동작한다."
+    },
+    {
+      "question": "SNORT 실행 시 감시할 랜카드를 지정하는 옵션은?",
+      "options": [
+        "-i",
+        "-c",
+        "-A",
+        "-r"
+      ],
+      "answer": 0,
+      "explanation": "-i는 랜카드 실시간 감시, -c는 설정 파일, -r은 pcap 파일 읽기다."
+    },
+    {
+      "question": "SQL 기본 구조 세 가지로 옳은 것은?",
+      "options": [
+        "select · from · where",
+        "open · read · close",
+        "insert · update · delete",
+        "begin · commit · end"
+      ],
+      "answer": 0,
+      "explanation": "select(필드)·from(테이블)·where(조건)가 SQL의 기본이다."
+    },
+    {
+      "question": "SNORT 스키마에서 룰 이름(sig_name)이 들어 있는 테이블은?",
+      "options": [
+        "iphdr",
+        "data",
+        "signature",
+        "event"
+      ],
+      "answer": 2,
+      "explanation": "event에는 시간·번호만 있고, 룰 이름은 signature 테이블에 있다."
+    },
+    {
+      "question": "16진수 패킷 페이로드를 사람이 읽는 문자로 바꾸는 함수는?",
+      "options": [
+        "echo",
+        "touch",
+        "unhex",
+        "isset"
+      ],
+      "answer": 2,
+      "explanation": "MySQL의 unhex 함수로 16진수 페이로드를 문자로 디코딩한다."
+    },
+    {
+      "question": "flow 옵션이 방향을 구분하는 기준이 되는 플래그는?",
+      "options": [
+        "URG",
+        "FIN",
+        "RST",
+        "SYN"
+      ],
+      "answer": 3,
+      "explanation": "SYN은 항상 클라이언트가 먼저 보내므로 이를 기준으로 방향을 구분한다."
+    },
+    {
+      "question": "TCP 플래그 중 ACK의 10진수 값은?",
+      "options": [
+        "16",
+        "4",
+        "8",
+        "2"
+      ],
+      "answer": 0,
+      "explanation": "C128 E64 U32 A16 P8 R4 S2 F1이며 ACK는 16, PUSH는 8, SYN은 2다."
+    },
+    {
+      "question": "dsize 옵션이 검사하는 크기는?",
+      "options": [
+        "페이로드 크기만",
+        "MAC 주소 길이",
+        "IP 헤더 크기",
+        "전체 패킷 크기"
+      ],
+      "answer": 0,
+      "explanation": "dsize는 헤더를 제외한 페이로드 크기만 검사한다(예: 328-54=274)."
+    },
+    {
+      "question": "로그가 폭주할 때 발생량에 임계치를 거는 옵션은?",
+      "options": [
+        "nocase",
+        "offset",
+        "threshold",
+        "flags"
+      ],
+      "answer": 2,
+      "explanation": "threshold는 패킷 발생량에 임계치를 걸어 DDoS 같은 상황의 로그 폭주를 줄인다."
+    },
+    {
+      "question": "DB 연동 없이 탐지 로그를 실행 창에 바로 띄우는 옵션은?",
+      "options": [
+        "-K ascii",
+        "-A console",
+        "-A full",
+        "-A fast"
+      ],
+      "answer": 1,
+      "explanation": "-A console은 barnyard2 없이 탐지 로그를 SNORT 실행 창에 바로 표시한다."
+    },
+    {
+      "question": "content의 대소문자 구분을 해제하는 수정자는?",
+      "options": [
+        "nocase",
+        "within",
+        "offset",
+        "depth"
+      ],
+      "answer": 0,
+      "explanation": "nocase는 대소문자 구분을 해제한다. 공격 문자열 룰에 거의 필수다."
+    },
+    {
+      "question": "offset·depth가 가진 위치 개념은?",
+      "options": [
+        "무작위 위치",
+        "절대 위치",
+        "역방향 위치",
+        "상대 위치"
+      ],
+      "answer": 1,
+      "explanation": "offset·depth는 페이로드 첫 바이트 기준의 절대 위치, distance·within은 상대 위치다."
+    },
+    {
+      "question": "content 룰 26개를 한 줄로 대체하게 해 주는 옵션은?",
+      "options": [
+        "dsize",
+        "pcre",
+        "nocase",
+        "flow"
+      ],
+      "answer": 1,
+      "explanation": "pcre는 정규표현식을 써서 a.exe~z.exe 같은 26개 룰을 한 줄로 표현한다."
+    },
+    {
+      "question": "URI 구간만 검사하는 페이로드 옵션은?",
+      "options": [
+        "uricontent",
+        "pcre",
+        "content",
+        "dsize"
+      ],
+      "answer": 0,
+      "explanation": "content·pcre는 페이로드 전체를, uricontent는 URI 구간만 검사한다."
+    },
+    {
+      "question": "줄바꿈 문자 LF를 16진수로 나타내면?",
+      "options": [
+        "0D",
+        "09",
+        "20",
+        "0A"
+      ],
+      "answer": 3,
+      "explanation": "LF(개행)=0A, CR(복귀)=0D다. 윈도우는 CR LF, 리눅스는 LF만 쓴다."
+    },
+    {
+      "question": "정규표현식에서 나열한 문자 중 하나를 검사하는 구문은?",
+      "options": [
+        "앵커 문자 ^",
+        "수량자 기호 *",
+        "문자 클래스 [ ]",
+        "캡처 그룹 ( )"
+      ],
+      "answer": 2,
+      "explanation": "[abc]는 a·b·c 중 하나를 검사하며, 맨 앞 ^를 붙이면 반대로 검사한다."
+    },
+    {
+      "question": "정규표현식에서 줄의 시작 위치를 고정하는 앵커 문자는?",
+      "options": [
+        "$",
+        "^",
+        "*",
+        "."
+      ],
+      "answer": 1,
+      "explanation": "^는 줄의 시작, $는 줄의 끝을 고정한다. 기본은 첫 줄·마지막 줄에서만 동작한다."
+    },
+    {
+      "question": "상용 IDS·IPS 장비도 대부분 지원하는 룰 형식은?",
+      "options": [
+        "YAML 설정 포맷",
+        "JSON 스키마 규격",
+        "XML 문서 포맷",
+        "SNORT 룰 포맷"
+      ],
+      "answer": 3,
+      "explanation": "상용 장비들이 SNORT를 참고해 만들어져 SNORT 룰 포맷을 거의 그대로 지원한다."
+    }
+  ]
+}

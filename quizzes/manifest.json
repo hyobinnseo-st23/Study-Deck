@@ -12,6 +12,9 @@
                     "malware_day1_quiz_day3.json",
                     "malware_day1_quiz_day4.json",
                     "malware_day1_quiz_day5.json",
-                    "malware_day1_quiz_day6.json"
+                    "malware_day1_quiz_day6.json",
+                    "soc_day1.json",
+                    "soc_day1_advanced.json",
+                    "soc_day1_vim.json"
                 ]
 }
