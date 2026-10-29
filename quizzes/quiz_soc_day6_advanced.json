@@ -1,0 +1,250 @@
+{
+  "title": "보안관제 DAY6 심화",
+  "subtitle": "정규식 결과 예측 · 조건문 함정 · 집계 해석",
+  "subject": "보안관제",
+  "description": "SK Shieldus Rookies: 보안관제 6일차 심화 퀴즈. 최대/최소 모드와 OR 순서의 결과 예측, case 순서·replace 실패 반환·캡처 그룹 번호 함정, 교집합 집계와 fillnull 순서, eventstats·geostats 옵션, DDoS 지표 해석을 다룹니다.",
+  "questions": [
+    {
+      "question": "replace(x, \".*([^.]+\\.[^.]+)$\", \"\\1\")를 'www.naver.com'에 적용한 결과는?",
+      "options": [
+        "r.com",
+        "naver.com",
+        "www.naver.com",
+        "com"
+      ],
+      "answer": 0,
+      "explanation": "앞의 .*가 최대 모드라 최대한 먹고 후퇴하므로 [^.]+에는 'r' 한 글자만 남습니다. .*?로 바꾸면 naver.com이 됩니다."
+    },
+    {
+      "question": "replace(x, \".*?([^.]+\\.[^.]+)$\", \"\\1\")를 'api.twitter.com'에 적용한 결과는?",
+      "options": [
+        "api.twitter",
+        "twitter.com",
+        "r.com",
+        "api.twitter.com"
+      ],
+      "answer": 1,
+      "explanation": "최소 모드라 가능한 한 적게 먹되 $ 끝 고정 때문에 마지막 단어 두 개만 그룹에 남습니다."
+    },
+    {
+      "question": "case 순서가 havij → jsky → (?i)^mozilla\\/\\S+\\s → true() 일 때, 유저 에이전트가 'Mozilla/4.0' (뒤에 아무것도 없음)이면 agent2 값은?",
+      "options": [
+        "normal",
+        "Mozilla/4.0",
+        "Mozilla",
+        "null"
+      ],
+      "answer": 2,
+      "explanation": "버전 뒤 빈칸이 없어 normal 조건에 걸리지 않고, true()의 replace(agent, \"(\\w+).*\", \"\\1\")로 첫 단어 Mozilla만 남습니다."
+    },
+    {
+      "question": "가상의 유저 에이전트 'Mozilla/5.0 (compatible; Havij)'가 있다. case에서 normal 조건을 havij 조건보다 먼저 두면 agent2 값은?",
+      "options": [
+        "Havij",
+        "Mozilla",
+        "null",
+        "normal"
+      ],
+      "answer": 3,
+      "explanation": "case는 처음 참인 조건만 적용하므로, 일반 브라우저 구조 조건이 먼저 걸려 공격 툴이 normal에 묻힙니다. 그래서 알려진 툴을 먼저 둡니다."
+    },
+    {
+      "question": "eval list=mozilla (따옴표 없음) 다음에 `ut_parse(referer_domain, list)`가 실패한 이유는?",
+      "options": [
+        "매크로를 작은따옴표로 감싸서",
+        "mozilla를 필드 이름으로 읽어 list가 비어서",
+        "referer_domain이 IIS에 없어서",
+        "mozilla 리스트 파일이 없어서"
+      ],
+      "answer": 1,
+      "explanation": "eval에서 따옴표 없는 단어는 필드 이름이므로, 없는 필드 mozilla의 값(빈 값)이 들어갑니다."
+    },
+    {
+      "question": "VIM에서 'abcㅋ1.2.3.4ㅋdef' 줄에 :s/.*ㅋ// 를 실행한 결과는?",
+      "options": [
+        "1.2.3.4ㅋdef",
+        "abc",
+        "def",
+        "1.2.3.4"
+      ],
+      "answer": 2,
+      "explanation": ".*는 최대 모드라 두 번째 ㅋ까지 지웁니다. 첫 번째 ㅋ까지만 지우려면 .{-0,}ㅋ를 씁니다."
+    },
+    {
+      "question": "VIM에서 'abcㅋ1.2.3.4ㅋdef' 줄에 :s/^.{-0,}ㅋ// 를 실행한 결과는?",
+      "options": [
+        "def",
+        "1.2.3.4ㅋdef",
+        "abc",
+        "1.2.3.4"
+      ],
+      "answer": 1,
+      "explanation": ".{-0,}는 VIM의 최소 모드라 첫 번째 ㅋ에서 멈춥니다. 뒤의 ㅋ.*를 지우면 IP만 남습니다."
+    },
+    {
+      "question": "'Failed password for invalid user admin from …' 에 (for|for user|for invalid user) \\S+ 를 적용하면 \\S+ 자리에 잡히는 단어는?",
+      "options": [
+        "invalid",
+        "admin",
+        "user",
+        "from"
+      ],
+      "answer": 0,
+      "explanation": "OR은 왼쪽부터 시도하므로 짧은 for가 먼저 매치되고, 바로 다음 단어 invalid가 ID처럼 잡힙니다. 긴 것을 먼저 써야 합니다."
+    },
+    {
+      "question": "pam_ 모듈이 있는 secure 로그에 (\\S+\\s){8} 대신 {7}을 써서 replace(…, \"\\2\")를 하면 keyword에 들어가는 것은?",
+      "options": [
+        "원하던 두 단어(session opened)",
+        "pam_ 모듈 구간과 그 다음 단어",
+        "원본 _raw 전체",
+        "빈 값"
+      ],
+      "answer": 1,
+      "explanation": "{7}은 pam_ 모듈 구간 앞에서 멈추므로 그룹 2에 pam_…과 첫 단어가 들어갑니다. pam_ 로그는 한 단어 더 건너뛰는 {8}이 맞습니다."
+    },
+    {
+      "question": "if 없이 eval client_ip=replace(_raw, \".*?(\\d+\\.\\d+\\.\\d+\\.\\d+).*\", \"\\1\")만 쓰면, IP가 없는 로그의 client_ip 값은?",
+      "options": [
+        "원본 _raw 전체",
+        "null",
+        "0",
+        "빈 문자열"
+      ],
+      "answer": 0,
+      "explanation": "replace는 매치에 실패하면 원본을 그대로 돌려주므로 IP 아닌 값이 섞여 dc(client_ip)가 부풀어 오릅니다."
+    },
+    {
+      "question": "'… from 118.235.1.2 port 22' 에 replace(_raw, \".*(\\d+\\.\\d+\\.\\d+\\.\\d+).*\", \"\\1\")를 적용한 결과는?",
+      "options": [
+        "8.235.1.2",
+        "118.235.1.2",
+        "18.235.1.2",
+        "235.1.2"
+      ],
+      "answer": 0,
+      "explanation": "앞의 .*가 최대 모드라 \\d+가 1글자만 남을 때까지 먹습니다. .*?로 바꿔야 118.235.1.2가 나옵니다."
+    },
+    {
+      "question": "id 추출에서 replace(_raw, \"(?i).*(for invalid user|for user|for) (\\S+).*\", \"\\1\")처럼 \\1을 쓰면 결과는?",
+      "options": [
+        "ID",
+        "원본 _raw 전체",
+        "null",
+        "for invalid user 같은 양식 부분"
+      ],
+      "answer": 3,
+      "explanation": "첫 번째 괄호는 양식(OR) 그룹이고 ID는 두 번째 괄호이므로 \\2를 써야 합니다."
+    },
+    {
+      "question": "match에는 (?i)를 넣고 id의 replace에는 넣지 않았다. 로그가 'Failed password for Invalid User test'일 때 id 값은?",
+      "options": [
+        "test",
+        "Invalid",
+        "For",
+        "null"
+      ],
+      "answer": 1,
+      "explanation": "replace에 (?i)가 없으면 대문자 Invalid User 양식을 찾지 못하고 짧은 for만 매치되어, 다음 단어 Invalid가 ID로 잘못 들어갑니다. match와 replace 모두 (?i)를 넣어야 test가 나옵니다."
+    },
+    {
+      "question": "로그인한 계정과 IP를 함께 보려고 할 때 가장 알맞은 검색은?",
+      "options": [
+        "keyword=\"session opened\" | stats count by client_ip",
+        "keyword=\"Accepted password\" | stats count by id",
+        "keyword=\"Failed password\" | join pid [search keyword=\"session opened\"]",
+        "keyword=\"session opened\" | join pid [search keyword=\"Accepted password\"]"
+      ],
+      "answer": 3,
+      "explanation": "성공 확정(session opened)과 IP가 있는 Accepted password를 같은 PID로 이어 붙여야 누가 어디서 들어왔는지 한 줄로 나옵니다."
+    },
+    {
+      "question": "stats count by pam_module_type, vendor_action, auth_method 결과가 0건이었다. 그 이유는?",
+      "options": [
+        "vendor_action이 모든 로그에 없어서",
+        "fillnull을 stats 뒤에 써서",
+        "stats가 상위 10개만 세어서",
+        "pam_module_type과 auth_method가 한 로그에 함께 있지 않아서"
+      ],
+      "answer": 3,
+      "explanation": "by 필드가 여러 개면 모두 값이 있는 로그만 세는데, pam_module_type과 auth_method는 동시에 존재하지 않습니다."
+    },
+    {
+      "question": "vendor_action이 없을 때를 null()로 둔 keyword2를 stats count by keyword2 | addcoltotals 했더니 합계가 약 35만, 전체 로그는 약 36만이었다. 알맞은 해석은?",
+      "options": [
+        "약 1만 건이 중복으로 세어졌다",
+        "addcoltotals가 상위 10개만 더했다",
+        "약 1만 건이 대소문자 때문에 합쳐졌다",
+        "약 1만 건은 keyword2가 비어 집계에서 빠졌다"
+      ],
+      "answer": 3,
+      "explanation": "stats by는 값이 없는 로그를 세지 않으므로, 차이만큼이 세 필드가 다 없는 로그입니다. 그 자리를 replace로 채우자 합계가 전체와 같아졌습니다."
+    },
+    {
+      "question": "keyword2 eval 앞에 fillnull을 먼저 실행하면, 세 필드가 모두 없던 로그의 keyword2 값은?",
+      "options": [
+        "null",
+        "0 0",
+        "원본 _raw 전체",
+        "replace로 뽑은 두 단어"
+      ],
+      "answer": 1,
+      "explanation": "빈 값이 0으로 채워져 isnotnull(vendor_action)과 isnotnull(auth_method)가 모두 참이 되므로 vendor_action.\" \".auth_method = '0 0'이 됩니다. isnull 판단은 fillnull 전에 해야 합니다."
+    },
+    {
+      "question": "eval에서 dc(uri_path)/31 처럼 쓰려다 동작하지 않았다. 수업에서 쓴 해결 방법은?",
+      "options": [
+        "stats dc(uri_path) as info 로 별칭을 준 뒤 eval result=info/31",
+        "eval result=dc(uri_path)/31",
+        "timechart dc(uri_path)/31",
+        "stats dc(uri_path)/31"
+      ],
+      "answer": 0,
+      "explanation": "dc(uri_path)라는 이름은 eval에서 함수 호출처럼 읽히므로 as로 쉬운 이름을 붙여 계산합니다."
+    },
+    {
+      "question": "이벤트가 100개인 검색 결과에 | eventstats count 를 실행하면?",
+      "options": [
+        "count=100인 1개 행만 남는다",
+        "각 로그에 count=1이 붙는다",
+        "100개 로그가 count 필드 하나로 바뀐다",
+        "100개 로그가 그대로 있고 각각 count=100이 붙는다"
+      ],
+      "answer": 3,
+      "explanation": "eventstats는 원본 이벤트를 유지하면서 전체 집계 값을 로그마다 필드로 붙입니다. stats count라면 1개 행만 남습니다."
+    },
+    {
+      "question": "어느 날 count와 dc(c_ip)는 급증했지만 dc(uri_query)는 평소와 같았다. 가장 알맞은 해석은?",
+      "options": [
+        "소수 공격자의 변수 조작 공격",
+        "새로운 공격 도구의 SQL 인젝션",
+        "DDoS처럼 많은 IP가 같은 요청을 쏟아냈다",
+        "브루트포스 로그인 시도"
+      ],
+      "answer": 2,
+      "explanation": "웹 해킹은 소수 IP가 다양한 요청(dc(uri_query) 증가)을 보내고, DDoS는 접속 IP 수가 크게 늘어납니다."
+    },
+    {
+      "question": "eval info=Country.\"_\".City 로 만든 필드로 geostats count by info 를 했더니 도시가 일부만 보이고 OTHER가 생겼다. 알맞은 수정은?",
+      "options": [
+        "geostats limit=0 count by info",
+        "geom geo_countries featureIdField=info",
+        "geostats globallimit=20 count by info",
+        "iplocation info"
+      ],
+      "answer": 2,
+      "explanation": "geostats도 기본 상위 10개만 세므로 globallimit로 제한을 조절합니다. limit는 timechart·chart용입니다."
+    },
+    {
+      "question": "stats count by Country | geom geo_countries featureIdField=country (소문자 c)로 실행했을 때의 문제는?",
+      "options": [
+        "geom이 위도·경도를 요구한다",
+        "Country 필드와 이름이 달라 나라 정보가 연결되지 않는다",
+        "iplocation이 소문자 필드를 만든다",
+        "stats가 Country를 숫자로 바꾼다"
+      ],
+      "answer": 1,
+      "explanation": "iplocation이 만든 필드는 대문자 C의 Country이고, featureIdField에는 나라 필드 이름을 정확히 적어야 합니다."
+    }
+  ]
+}

@@ -1,0 +1,646 @@
+{
+  "title": "보안관제 DAY6",
+  "subtitle": "유저 에이전트 룩업 · URL Toolbox · secure 로그 분석 · 지도 시각화",
+  "subject": "보안관제",
+  "description": "SK Shieldus Rookies: 보안관제 6일차 퀴즈. user_agents 룩업 가속, case로 만든 agent2, RFI·리퍼러·URL Toolbox 매크로, secure 로그의 VIM·엑셀·스플렁크 추출(keyword·client_ip·id), join, secure 앱 필드 조합(fillnull·isnull·addcoltotals·lower), 패턴매칭과 이상징후, iplocation·geom·geostats·eventstats를 다룹니다.",
+  "questions": [
+    {
+      "question": "IIS 로그에서 유저 에이전트가 저장된 원본 필드 이름은?",
+      "options": [
+        "cs_User_Agent",
+        "http_user_agent",
+        "ua_family",
+        "agent2"
+      ],
+      "answer": 0,
+      "explanation": "IIS 원본 필드는 cs_User_Agent이고, http_user_agent는 룩업 조건에 맞추려고 eval로 새로 만든 필드입니다."
+    },
+    {
+      "question": "user_agents 룩업 정의에서 내 데이터와 비교하는 조건 필드 이름은?",
+      "options": [
+        "cs_User_Agent",
+        "ua_family",
+        "http_user_agent",
+        "useragent"
+      ],
+      "answer": 2,
+      "explanation": "조건 필드 http_user_agent와 이름·값이 일치해야 ua_로 시작하는 필드들이 붙습니다."
+    },
+    {
+      "question": "IIS 유저 에이전트를 룩업에 맞추려고 replace로 빈칸으로 바꾼 문자는?",
+      "options": [
+        "- (하이픈)",
+        "% (퍼센트)",
+        "+ (플러스)",
+        "_ (밑줄)"
+      ],
+      "answer": 2,
+      "explanation": "IIS는 빈칸 자리에 +를 기록하므로 eval http_user_agent=replace(cs_User_Agent, \"\\+\", \" \")로 맞춥니다."
+    },
+    {
+      "question": "lookup 명령에서 룩업 테이블의 필드 중 원하는 필드만 가져오게 하는 키워드는?",
+      "options": [
+        "AS",
+        "BY",
+        "WHERE",
+        "OUTPUT"
+      ],
+      "answer": 3,
+      "explanation": "lookup user_agents http_user_agent OUTPUT ua_family처럼 OUTPUT 뒤에 가져올 필드를 적습니다."
+    },
+    {
+      "question": "5월 21일 하루 약 751종이던 유저 에이전트를 ua_family로 묶었을 때 남은 종류 수는?",
+      "options": [
+        "약 49종",
+        "약 250종",
+        "약 81종",
+        "약 20종"
+      ],
+      "answer": 2,
+      "explanation": "OUTPUT ua_family로 웹 브라우저 특징만 가져오면 751종이 약 81종(약 1/10)으로 줄었습니다."
+    },
+    {
+      "question": "룩업 처리 시간을 줄이는 가장 효과적인 방법으로 수업에서 쓴 것은?",
+      "options": [
+        "stats로 먼저 묶어 개수를 줄인 뒤 lookup",
+        "lookup 뒤에 stats로 묶기",
+        "OUTPUT 없이 전체 필드 가져오기",
+        "검색 기간을 전체 시간으로 넓히기"
+      ],
+      "answer": 0,
+      "explanation": "stats count by http_user_agent로 약 750행으로 줄인 뒤 lookup하자 약 1분이 약 6.7초로 줄었습니다."
+    },
+    {
+      "question": "스플렁크 검색에서 어느 단계가 시간을 많이 썼는지 확인한 메뉴는?",
+      "options": [
+        "설정 → 룩업",
+        "앱 관리 → 파일에서 앱 설치",
+        "설정 → 필드 → 계산된 필드",
+        "작업 → 작업 검사"
+      ],
+      "answer": 3,
+      "explanation": "작업 → 작업 검사에서 단계별 실행 시간을 보면 lookup이 시간을 가장 많이 쓴 것을 확인할 수 있습니다."
+    },
+    {
+      "question": "stats count by http_user_agent, _time 이 행 수를 거의 줄이지 못한 이유는?",
+      "options": [
+        "_time 필드가 비어 있어서",
+        "_time이 초 단위로 나뉘어서",
+        "lookup이 먼저 실행되어서",
+        "stats가 상위 10개만 세어서"
+      ],
+      "answer": 1,
+      "explanation": "_time은 초 단위라 묶어도 행이 거의 그대로이므로, 먼저 bin _time으로 간격을 넓혀야 합니다."
+    },
+    {
+      "question": "stats나 chart로 시간대별 집계를 하기 전에 시간 간격을 넓히는 명령은?",
+      "options": [
+        "fillnull _time",
+        "eventstats _time",
+        "sort _time",
+        "bin _time"
+      ],
+      "answer": 3,
+      "explanation": "bin _time을 하면 기본 약 30분 간격으로 묶여 행이 크게 줄어듭니다."
+    },
+    {
+      "question": "timechart count by ua_family에서 Havij(약 9건)가 차트에 보이지 않았던 이유는?",
+      "options": [
+        "Havij 로그가 삭제되어서",
+        "bin _time을 쓰지 않아서",
+        "ua_family 필드가 대소문자를 구분해서",
+        "상위 10개만 보여 주고 나머지는 OTHER로 묶어서"
+      ],
+      "answer": 3,
+      "explanation": "timechart는 기본으로 상위 10개만 열로 그리므로, 양이 적은 Havij는 OTHER에 묻힙니다."
+    },
+    {
+      "question": "timechart에서 상위 10개 제한을 풀어 모든 값을 그리게 하는 옵션은?",
+      "options": [
+        "globallimit=0",
+        "span=0",
+        "useother=1",
+        "limit=0"
+      ],
+      "answer": 3,
+      "explanation": "limit=0으로 풀면 약 70개 열이 나오고 Havij가 튀는 시점을 찾을 수 있습니다. geostats는 globallimit를 씁니다."
+    },
+    {
+      "question": "유저 에이전트 앱이 Havij를 ua_family로 구분해 보여 준 이유는?",
+      "options": [
+        "regexes.yaml에 Havij 규칙을 추가해 두어서",
+        "Havij가 브라우저로 등록되어 있어서",
+        "lookup에 OUTPUT을 빼서",
+        "URL Toolbox가 설치되어서"
+      ],
+      "answer": 0,
+      "explanation": "앱의 bin\\uap-core\\regexes.yaml에 Havij 규칙을 추가했기 때문입니다. 보안용 앱이 아니므로 목적에 맞게 커스터마이징한 것입니다."
+    },
+    {
+      "question": "VIM이 남기는 '.파일.un~' 파일의 용도는?",
+      "options": [
+        "편집 전 백업 파일",
+        "스왑(임시) 파일",
+        "undo·redo 히스토리 저장",
+        "설정 파일"
+      ],
+      "answer": 2,
+      "explanation": "'파일~'은 백업 파일이고 '.파일.un~'은 실행 취소·다시 실행 기록입니다."
+    },
+    {
+      "question": "eval의 case 함수가 동작하는 방식으로 옳은 것은?",
+      "options": [
+        "위에서부터 처음 참인 조건의 액션만 적용",
+        "모든 참인 조건의 액션을 이어 붙임",
+        "마지막으로 참인 조건의 액션을 적용",
+        "조건이 하나라도 거짓이면 null 반환"
+      ],
+      "answer": 0,
+      "explanation": "case(조건, 액션, 조건, 액션, …)는 위에서부터 검사해 처음 참이 된 조건의 액션을 씁니다."
+    },
+    {
+      "question": "case 함수의 마지막 조건으로 true()를 넣는 이유는?",
+      "options": [
+        "case 함수를 끝내는 필수 문법이라서",
+        "대소문자를 무시하려고",
+        "결과를 null로 만들려고",
+        "앞 조건에 안 걸린 나머지를 모두 처리하려고"
+      ],
+      "answer": 3,
+      "explanation": "true()는 항상 참이므로 앞에서 걸리지 않은 값이 모두 이 액션으로 처리됩니다."
+    },
+    {
+      "question": "case로 agent2를 만든 결과 5월 21일 하루의 유저 에이전트 종류 수는?",
+      "options": [
+        "약 81종",
+        "약 49종",
+        "약 751종",
+        "약 4,900종"
+      ],
+      "answer": 1,
+      "explanation": "알려진 툴은 이름으로, 일반 브라우저는 normal로, 나머지는 첫 단어만 남겨 약 49종으로 줄었습니다."
+    },
+    {
+      "question": "agent2를 만든 다음 단계에서 normal을 빼고 검색하는 올바른 형태는?",
+      "options": [
+        "| NOT agent2=normal",
+        "| search NOT agent2=normal",
+        "| eval NOT agent2=normal",
+        "| fillnull agent2=normal"
+      ],
+      "answer": 1,
+      "explanation": "검색 명령은 1단계에서만 search를 생략할 수 있고, 2단계부터는 search를 선언해야 합니다."
+    },
+    {
+      "question": "libwww 계열 유저 에이전트가 보낸 요청의 변수에 외부 URL이 들어 있었다. 이 공격은?",
+      "options": [
+        "RFI (Remote File Inclusion)",
+        "SQL Injection",
+        "XSS",
+        "Brute Force"
+      ],
+      "answer": 0,
+      "explanation": "변수에 외부 웹셸 링크를 넣어 서버가 불러오게 하는 원격 파일 삽입(RFI) 공격입니다."
+    },
+    {
+      "question": "아파치 referer 필드에서 값이 없는 로그를 빼는 올바른 조건은?",
+      "options": [
+        "NOT referer=*",
+        "referer=null()",
+        "NOT referer=\"-\"",
+        "isnull(referer)"
+      ],
+      "answer": 2,
+      "explanation": "아파치는 값이 없을 때 '-'를 값으로 저장하므로 '-'를 직접 제외해야 합니다."
+    },
+    {
+      "question": "스플렁크가 referer_domain 필드를 자동으로 만들어 준 로그는?",
+      "options": [
+        "IIS 로그",
+        "secure 로그",
+        "snort DB 로그",
+        "아파치 로그"
+      ],
+      "answer": 3,
+      "explanation": "referer_domain(약 900종)은 아파치 로그에만 만들어졌습니다."
+    },
+    {
+      "question": "'api.twitter.com'에서 등록 도메인에 해당하는 부분은?",
+      "options": [
+        "api.twitter",
+        "twitter.com",
+        "api",
+        "com"
+      ],
+      "answer": 1,
+      "explanation": "등록 도메인은 twitter.com 하나이고, api.는 내부에서 만들어 쓰는 서브 도메인입니다."
+    },
+    {
+      "question": "스플렁크에서 매크로를 호출할 때 감싸는 기호는?",
+      "options": [
+        "작은따옴표(')",
+        "큰따옴표(\")",
+        "백틱(`)",
+        "대괄호([ ])"
+      ],
+      "answer": 2,
+      "explanation": "매크로는 물결 키 아래의 백틱으로 감쌉니다. 작은따옴표로는 동작하지 않습니다."
+    },
+    {
+      "question": "`ut_parse(referer_domain, list)`를 쓰기 전에 list를 지정하는 올바른 eval은?",
+      "options": [
+        "eval list=mozilla",
+        "eval list='mozilla'",
+        "eval list=`mozilla`",
+        "eval list=\"mozilla\""
+      ],
+      "answer": 3,
+      "explanation": "큰따옴표가 없으면 mozilla를 필드 이름으로 읽기 때문에 처음에는 실패했습니다."
+    },
+    {
+      "question": "ut_parse 결과 필드 중 등록 도메인(twitter.com 같은 값)이 담기는 필드는?",
+      "options": [
+        "ut_netloc",
+        "ut_subdomain",
+        "ut_domain",
+        "ut_scheme"
+      ],
+      "answer": 2,
+      "explanation": "ut_domain이 등록 도메인이고, ut_netloc은 스킴만 뺀 도메인 전체입니다."
+    },
+    {
+      "question": "URL Toolbox를 설치한 방법은?",
+      "options": [
+        "Splunkbase에서 검색해 설치",
+        "설정 → 룩업에서 추가",
+        "파일에서 앱 설치",
+        "검색창에서 install 명령 실행"
+      ],
+      "answer": 2,
+      "explanation": "Splunkbase에서 검색이 중지되어 파일에서 앱 설치로 넣었습니다."
+    },
+    {
+      "question": "정규식 [^.] 의 의미는?",
+      "options": [
+        "점(.)이 아닌 문자 하나",
+        "줄 시작 다음의 아무 문자",
+        "점(.) 문자 하나",
+        "아무 문자 0개 이상"
+      ],
+      "answer": 0,
+      "explanation": "대괄호 안의 ^는 반전이므로 [^.]는 점을 제외한 문자 하나입니다."
+    },
+    {
+      "question": "등록 도메인을 뽑는 정규식 [^.]+\\.[^.]+$ 에서 $ 의 역할은?",
+      "options": [
+        "문자열 끝에 고정",
+        "문자열 시작에 고정",
+        "최소 모드로 전환",
+        "그룹 번호 지정"
+      ],
+      "answer": 0,
+      "explanation": "$로 끝을 고정해야 마지막 단어 두 개(naver.com)가 잡힙니다."
+    },
+    {
+      "question": "secure 로그를 업로드할 때 지정한 소스 타입은?",
+      "options": [
+        "access_combined",
+        "linux_secure",
+        "iis",
+        "syslog"
+      ],
+      "answer": 1,
+      "explanation": "[운영 체제] linux_secure에 KV_MODE=none을 추가해 같은 이름으로 저장했습니다."
+    },
+    {
+      "question": "secure 로그를 업로드한 직후 스플렁크가 만들어 준 필드는?",
+      "options": [
+        "id와 client_ip",
+        "process와 pid",
+        "keyword와 process",
+        "user와 src"
+      ],
+      "answer": 1,
+      "explanation": "필드가 process·pid 두 개뿐이었고 PID는 랜덤 번호라 의미 있는 건 process뿐이었습니다."
+    },
+    {
+      "question": "secure 로그에서 timechart count by process 결과 가장 많았던 프로세스는?",
+      "options": [
+        "su",
+        "sudo",
+        "crond",
+        "sshd"
+      ],
+      "answer": 3,
+      "explanation": "원격 접속 프로세스 sshd가 대부분이었습니다."
+    },
+    {
+      "question": "엑셀에서 secure 로그를 불러올 때 시간을 한 필드로 두기 위해 고른 방식은?",
+      "options": [
+        "구분 기호 빈칸",
+        "너비가 일정함",
+        "구분 기호 쉼표",
+        "구분 기호 탭"
+      ],
+      "answer": 1,
+      "explanation": "빈칸으로 나누면 시간이 쪼개지므로, 프로세스 구간까지 모양이 같은 점을 이용해 너비 기준으로 나눴습니다."
+    },
+    {
+      "question": "엑셀에서 필터를 껐다 켜는 단축키는?",
+      "options": [
+        "Ctrl + Shift + F",
+        "Ctrl + Shift + L",
+        "Ctrl + L",
+        "Alt + F"
+      ],
+      "answer": 1,
+      "explanation": "필터 토글은 Ctrl + Shift + L입니다."
+    },
+    {
+      "question": "VIM 정규식 /\\v^(pam_\\S+\\s)?\\S+\\s\\S+ 에서 그룹 뒤 ? 의 의미는?",
+      "options": [
+        "그룹이 1개 이상",
+        "최소 모드",
+        "대소문자 무시",
+        "그룹이 0개 또는 1개"
+      ],
+      "answer": 3,
+      "explanation": "pam_ 모듈 구간이 있어도 없어도 매치되게 하려고 그룹 뒤에 ?를 붙였습니다."
+    },
+    {
+      "question": "IP가 없는 줄을 처리할 때 :v//d 대신 :v//s/.*// 를 쓴 이유는?",
+      "options": [
+        "줄 수를 유지해 엑셀 행이 어긋나지 않게",
+        "삭제 속도가 더 빨라서",
+        "IP 줄까지 함께 지우려고",
+        "undo 기록을 남기지 않으려고"
+      ],
+      "answer": 0,
+      "explanation": ":v//d는 줄째 지워 11만 줄이 10만 줄이 되므로, 내용만 비워 줄 수를 지킵니다."
+    },
+    {
+      "question": "VIM 정규식에서 최소 모드로 '아무 문자 0개 이상'을 쓰는 표기는?",
+      "options": [
+        ".*?",
+        ".{-0,}",
+        ".+?",
+        ".{0,-}"
+      ],
+      "answer": 1,
+      "explanation": "VIM은 ?로 최소 모드를 만들 수 없어 수량자 숫자 범위에 마이너스를 붙인 {-0,}를 씁니다."
+    },
+    {
+      "question": "VIM의 :sort u 명령이 하는 일은?",
+      "options": [
+        "역순 정렬",
+        "대문자 줄만 정렬",
+        "빈 줄만 삭제",
+        "정렬하면서 중복 줄 제거"
+      ],
+      "answer": 3,
+      "explanation": ":sort u로 10만 줄을 약 2만 6천 줄로, IP·포트를 지운 뒤 다시 약 170줄로 줄였습니다."
+    },
+    {
+      "question": "ID 양식 패턴에서 (for invalid user|for user|for) 순서로 쓴 이유는?",
+      "options": [
+        "알파벳 순서를 맞추려고",
+        "OR은 왼쪽부터 시도하므로 긴 것을 먼저",
+        "짧은 것부터 써야 빨라서",
+        "VIM이 순서를 자동 정렬해서"
+      ],
+      "answer": 1,
+      "explanation": "짧은 for가 먼저 오면 for invalid user에서도 for만 매치되어 엉뚱한 단어를 ID로 잡습니다."
+    },
+    {
+      "question": "실패한 로그인의 ID 목록이 a부터 z까지 순서대로 나타나는 것은 어떤 공격의 특징인가?",
+      "options": [
+        "RFI",
+        "DDoS",
+        "Brute Force(사전 대입)",
+        "SQL Injection"
+      ],
+      "answer": 2,
+      "explanation": "사전을 자동으로 대입하는 무차별 대입 공격의 특징입니다."
+    },
+    {
+      "question": "스플렁크 keyword 추출에서 pam_ 모듈이 없는 로그는 앞의 단어 몇 개를 건너뛰나?",
+      "options": [
+        "6개",
+        "8개",
+        "2개",
+        "7개"
+      ],
+      "answer": 3,
+      "explanation": "프로세스 구간까지 단어 7개라 (\\S+\\s){7}로 건너뛰고, pam_ 모듈이 있으면 {8}입니다."
+    },
+    {
+      "question": "secure 로그에서 로그인 성공을 확정하는 키워드는?",
+      "options": [
+        "Accepted password",
+        "session closed",
+        "session opened",
+        "Failed password"
+      ],
+      "answer": 2,
+      "explanation": "Accepted password는 패스워드 허용 단계이고, session opened가 찍혀야 로그인이 확정됩니다."
+    },
+    {
+      "question": "eval의 replace 함수가 정규식 매치에 실패하면 돌려주는 값은?",
+      "options": [
+        "null",
+        "빈 문자열",
+        "원본 값 그대로",
+        "0"
+      ],
+      "answer": 2,
+      "explanation": "그래서 client_ip는 if(match(…), replace(…), null())로 감싸 IP가 없는 줄을 비워 둡니다."
+    },
+    {
+      "question": "로그인 성공(keyword=\"session opened\")을 client_ip로 세었더니 NULL이 나온 이유는?",
+      "options": [
+        "session opened 줄에는 IP가 없어서",
+        "client_ip 계산된 필드가 삭제되어서",
+        "대소문자를 구분해서",
+        "join 결과가 0건이라서"
+      ],
+      "answer": 0,
+      "explanation": "IP는 같은 PID의 Accepted password 줄에 있어서 두 로그를 PID로 조인해야 합니다."
+    },
+    {
+      "question": "스플렁크 join에서 서브 검색을 감싸는 기호는?",
+      "options": [
+        "백틱 ` `",
+        "소괄호 ( )",
+        "중괄호 { }",
+        "대괄호 [ ]"
+      ],
+      "answer": 3,
+      "explanation": "| join pid [search … keyword=\"Accepted password\"]처럼 대괄호 안에서 search를 선언합니다."
+    },
+    {
+      "question": "두 달치 secure 로그에서 join pid 대신 join pid, _time 처럼 조건을 더한 이유는?",
+      "options": [
+        "pid 필드가 문자열이라서",
+        "PID가 재사용되어 다른 날 로그가 합쳐질 수 있어서",
+        "join이 상위 10개만 합쳐서",
+        "_time이 없으면 오류가 나서"
+      ],
+      "answer": 1,
+      "explanation": "PID는 일정 범위 안에서 다시 쓰이므로 시간까지 맞춰야 같은 접속끼리만 합쳐집니다."
+    },
+    {
+      "question": "stats count by A, B, C 처럼 by에 필드를 여러 개 주면 어떤 로그만 세나?",
+      "options": [
+        "하나라도 값이 있는 로그",
+        "세 필드에 모두 값이 있는 로그",
+        "모든 로그",
+        "세 필드가 모두 비어 있는 로그"
+      ],
+      "answer": 1,
+      "explanation": "by 필드가 여러 개면 교집합이라, 동시에 존재하지 않는 필드 조합은 결과가 나오지 않습니다."
+    },
+    {
+      "question": "fillnull을 옵션 없이 실행하면 빈 필드에 채워지는 값은?",
+      "options": [
+        "0",
+        "NULL",
+        "빈 문자열",
+        "-"
+      ],
+      "answer": 0,
+      "explanation": "기본값 0으로 채워 stats by 여러 필드를 합집합처럼 볼 수 있습니다."
+    },
+    {
+      "question": "addcoltotals 명령이 하는 일은?",
+      "options": [
+        "행별(가로) 합계 필드 추가",
+        "고유 개수 계산",
+        "빈 값을 0으로 채우기",
+        "숫자 필드별(세로) 합계 행 추가"
+      ],
+      "answer": 3,
+      "explanation": "col은 column(필드)이라 세로로 더하고, 가로(행별) 합계는 addtotals입니다."
+    },
+    {
+      "question": "'Failed password'와 'failed password'가 따로 세어지는 것을 막으려고 쓴 함수는?",
+      "options": [
+        "replace",
+        "len",
+        "lower",
+        "isnull"
+      ],
+      "answer": 2,
+      "explanation": "eval keyword2=lower(keyword2)로 소문자로 맞추자 11종이 10종으로 줄었습니다."
+    },
+    {
+      "question": "isnotnull(vendor_action)이 참이 되는 경우는?",
+      "options": [
+        "vendor_action 필드가 비어 있을 때",
+        "vendor_action 필드에 값이 있을 때",
+        "vendor_action 값이 0일 때만",
+        "vendor_action이 숫자일 때만"
+      ],
+      "answer": 1,
+      "explanation": "isnotnull은 값이 있으면 참, isnull은 값이 없으면 참입니다."
+    },
+    {
+      "question": "secure 앱이 만든 필드 중 Failed·Accepted 같은 동작이 담긴 필드는?",
+      "options": [
+        "auth_method",
+        "pam_module_type",
+        "vendor_action",
+        "src_ip"
+      ],
+      "answer": 2,
+      "explanation": "Failed는 vendor_action, password는 auth_method, session은 pam_module_type에 나뉘어 있었습니다."
+    },
+    {
+      "question": "패턴매칭(블랙리스트) 방식의 가장 큰 약점은?",
+      "options": [
+        "정상 범위를 정의하기 어렵다",
+        "패턴을 모르는 공격은 막기 어렵다",
+        "소량 공격을 놓친다",
+        "표 구조를 만들 수 없다"
+      ],
+      "answer": 1,
+      "explanation": "정의된 패턴이 있어야 탐지하므로 알려지지 않은 공격에 약합니다."
+    },
+    {
+      "question": "이상징후 분석에서 IIS의 Havij SQL 인젝션처럼 놓치기 쉬운 공격은?",
+      "options": [
+        "양이 적은 공격",
+        "처음 보는 공격",
+        "대량으로 반복되는 공격",
+        "여러 IP에서 오는 공격"
+      ],
+      "answer": 0,
+      "explanation": "숲(큰 숫자 변화)을 보는 방법이라 소량 공격은 큰 숫자에 묻힙니다."
+    },
+    {
+      "question": "iplocation c_ip 실행 후 위도가 담기는 필드 이름은?",
+      "options": [
+        "lon",
+        "Region",
+        "lat",
+        "latitude_ip"
+      ],
+      "answer": 2,
+      "explanation": "iplocation은 City, Country, Region, lat(위도), lon(경도)를 추가합니다."
+    },
+    {
+      "question": "나라별로 색칠하는 단계 구분도를 만들 때 stats count by Country 다음에 쓰는 명령은?",
+      "options": [
+        "geom geo_countries featureIdField=Country",
+        "geostats count by Country",
+        "iplocation Country",
+        "timechart count by Country"
+      ],
+      "answer": 0,
+      "explanation": "geom이 나라 국경 정보를 붙이고, 시각화에서 단계 구분도(코로플레스)를 고릅니다."
+    },
+    {
+      "question": "geostats에서 기본 상위 10개 제한을 바꾸는 옵션은?",
+      "options": [
+        "globallimit",
+        "limit",
+        "span",
+        "maxcount"
+      ],
+      "answer": 0,
+      "explanation": "geostats globallimit=20 count by info처럼 씁니다."
+    },
+    {
+      "question": "stats와 비교한 eventstats의 특징은?",
+      "options": [
+        "집계 결과 한 줄만 남긴다",
+        "stats보다 항상 빠르다",
+        "숫자 필드만 남긴다",
+        "원본 로그를 남기고 각 로그에 집계 값 필드를 붙인다"
+      ],
+      "answer": 3,
+      "explanation": "eventstats는 원래 필드 구조를 유지한 채 count 같은 집계 값을 로그마다 추가합니다."
+    },
+    {
+      "question": "DDoS 공격 여부를 볼 때 도움이 되는 지표로 수업에서 제시한 것은?",
+      "options": [
+        "timechart dc(uri_query)",
+        "timechart dc(c_ip)",
+        "stats count by cs_User_Agent",
+        "timechart count by keyword"
+      ],
+      "answer": 1,
+      "explanation": "DDoS는 공격자(접속 IP)가 많아지므로 접속 IP 고유 개수가 도움이 됩니다."
+    },
+    {
+      "question": "IIS 한 달 주소 고유 개수 6,840을 31로 나눈 계산은 어디에서 해야 하나?",
+      "options": [
+        "eval",
+        "stats",
+        "timechart",
+        "lookup"
+      ],
+      "answer": 0,
+      "explanation": "stats dc(uri_path) as info | eval result=info/31 처럼 숫자 연산은 eval에서 합니다(약 220)."
+    }
+  ]
+}
