@@ -1,0 +1,272 @@
+{
+  "title": "보안관제 DAY7 심화",
+  "subtitle": "옵션 함정 · 집계 단위 · 계산 · 연동 장애 진단",
+  "subject": "보안관제",
+  "description": "SK Shieldus Rookies: 보안관제 7일차 심화 퀴즈. labelonly·action 기본값 함정, 라벨 필드 오류, span과 행 수 계산, IQR·표준편차 기준선 계산, outlier의 위험, AI Toolkit 결과 해석, 포워더·배포 서버 연동 장애 진단을 다룹니다.",
+  "questions": [
+    {
+      "question": "anomalies field=uri_query | timechart avg(unexpectedness) 결과 5/23이 가장 높게 나왔다. 가장 알맞은 원인은?",
+      "options": [
+        "차트 오버레이가 꺼져 있어서",
+        "점수 붙은 약 6천 건만으로 평균을 내서",
+        "field 옵션을 생략해서 _raw를 봐서",
+        "maxvalues가 100으로 너무 작아서"
+      ],
+      "answer": 1,
+      "explanation": "기본 labelonly=false는 점수가 붙은 이벤트만 남기므로 일부로 평균을 내 왜곡됩니다. labelonly=true로 바꾸자 공격일이 나왔습니다."
+    },
+    {
+      "question": "analyzefields classfield=uri_query에서 param_len의 acc가 가장 높았다. 알맞은 해석은?",
+      "options": [
+        "응답 코드가 변수를 결정한다는 뜻이다",
+        "uri_query로 만든 필드라 당연한 결과다",
+        "변수 길이가 공격의 원인이라는 뜻이다",
+        "시간대가 변수에 영향을 준다는 뜻이다"
+      ],
+      "answer": 1,
+      "explanation": "파생 필드는 원래 필드와 관계가 높을 수밖에 없어 보안상 새 발견이 아닙니다."
+    },
+    {
+      "question": "90%가 참인 데이터에서 '무조건 참'이라고만 답하는 판정기의 acc와 balacc는?",
+      "options": [
+        "acc 0.9 · balacc 0.5",
+        "acc 0.9 · balacc 0.9",
+        "acc 0.5 · balacc 0.5",
+        "acc 0.5 · balacc 0.9"
+      ],
+      "answer": 0,
+      "explanation": "참은 100%, 거짓은 0% 맞혔으므로 balacc는 (1.0 + 0.0) / 2 = 0.5입니다."
+    },
+    {
+      "question": "한 달(31일) 데이터를 timechart span=2h로 집계하면 행 수는 대략 몇 개인가?",
+      "options": [
+        "약 62개",
+        "약 372개",
+        "약 31개",
+        "약 744개"
+      ],
+      "answer": 1,
+      "explanation": "하루 12행 × 31일 = 372행입니다. 1h면 약 744행, 12h면 약 62행입니다."
+    },
+    {
+      "question": "span=1h dc(uri_query) as info에 anomalousvalue action=annotate를 했더니 10곳을 탐지했는데 차트에는 두세 곳만 보였다. 이유는?",
+      "options": [
+        "탐지 구간 점수가 0이라 바닥에 붙어서",
+        "info 필드가 문자열이라서",
+        "span이 너무 넓어 구간이 합쳐져서",
+        "action=filter로 일부만 남아서"
+      ],
+      "answer": 0,
+      "explanation": "점수 0(가장 이상)과 점수 없음(정상)이 구별되지 않아 isnull로 0/1 라벨 필드를 만들었습니다."
+    },
+    {
+      "question": "eval anomaly=if(isnull(Anomaly_Score_Num(info)), 0, 1)이 실행되지 않은 이유는?",
+      "options": [
+        "if의 인자 순서가 뒤바뀌어서",
+        "isnull이 eval에서 지원되지 않아서",
+        "필드 이름이 함수 호출로 읽혀서",
+        "info가 숫자가 아니어서"
+      ],
+      "answer": 2,
+      "explanation": "괄호가 든 필드 이름은 'Anomaly_Score_Num(info)'처럼 작은따옴표로 감싸야 합니다."
+    },
+    {
+      "question": "eval anomaly=if(isnull('Anomaly_Score_Num(info)'), 1, 0)으로 쓰면 결과는?",
+      "options": [
+        "구문 오류가 난다",
+        "정상 구간이 1로 표시된다",
+        "탐지 구간이 1로 표시된다",
+        "모든 구간이 0이 된다"
+      ],
+      "answer": 1,
+      "explanation": "점수 필드가 없는(정상) 구간에서 isnull이 참이므로 1이 됩니다. 수업에서는 없으면 0, 있으면 1이었습니다."
+    },
+    {
+      "question": "anomalydetection에 avg(param_len) as info를 1h 간격으로 넣었더니 오탐이 늘었다. 가장 알맞은 설명은?",
+      "options": [
+        "method가 zscore로 바뀌어서",
+        "행 수가 적어 분석을 건너뛰어서",
+        "action=annotate를 빠뜨려서",
+        "구간당 이벤트가 적어 평균이 출렁여서"
+      ],
+      "answer": 3,
+      "explanation": "표본이 작으면 한두 건의 긴 변수에 평균이 크게 흔들립니다. 이 데이터에서는 3h가 적당했습니다."
+    },
+    {
+      "question": "log_event_prob 값이 A는 -4.6, B는 -9.2였다. 더 드문(이상한) 이벤트는?",
+      "options": [
+        "A 이벤트",
+        "판단할 수 없다",
+        "B 이벤트",
+        "두 이벤트가 같다"
+      ],
+      "answer": 2,
+      "explanation": "확률의 로그라 더 작을수록(더 음수일수록) 발생 확률이 낮습니다."
+    },
+    {
+      "question": "anomalydetection에서 uri_query를 어떻게 바꿨을 때 공격일에 가장 가까워졌나?",
+      "options": [
+        "변수 길이로 바꾼 숫자",
+        "숫자를 모두 지운 문자열",
+        "=http 여부로 true/false",
+        "원본 그대로의 문자열"
+      ],
+      "answer": 2,
+      "explanation": "문자열은 단순할수록 잘 분석했습니다. 원본은 거의 전부 이상, 숫자 제거는 오탐이 많았습니다."
+    },
+    {
+      "question": "cluster field=uri_query | stats values(uri_query) by cluster_label 결과 그룹마다 변수가 하나씩만 보였다. 알맞은 수정은?",
+      "options": [
+        "cluster에 labelonly=true 추가",
+        "cluster의 t 값을 1로 변경",
+        "stats에 count 함수 추가",
+        "cluster에 showcount=true 추가"
+      ],
+      "answer": 0,
+      "explanation": "기본은 그룹당 대표 이벤트만 남기므로 labelonly=true로 모든 이벤트를 남겨야 합니다."
+    },
+    {
+      "question": "kmeans k=9 param_len을 실행했는데 그룹이 5개만 만들어졌다. 알맞은 해석은?",
+      "options": [
+        "문자열 필드라 일부만 분석됐다",
+        "k 옵션이 무시되고 기본 2가 적용됐다",
+        "k는 최대 개수이고 데이터에 따라 덜 생긴다",
+        "t 옵션 기본값 때문에 그룹이 합쳐졌다"
+      ],
+      "answer": 2,
+      "explanation": "값이 몰려 있으면 일부 중심에 배정되는 값이 없어 k보다 적게 나올 수 있습니다."
+    },
+    {
+      "question": "outlier mark=true 뒤에 if(match(info, \"000\"), 1, 0)으로 라벨을 만들면 생기는 문제는?",
+      "options": [
+        "정상 값 1000도 1로 잡힌다",
+        "000210이 0으로 잡힌다",
+        "match가 숫자에서 오류가 난다",
+        "모든 값이 0이 된다"
+      ],
+      "answer": 0,
+      "explanation": "000이 값 중간·끝에 있어도 매치되므로 ^000으로 시작 위치를 고정해야 합니다."
+    },
+    {
+      "question": "보고용 차트를 매끈하게 만들려고 timechart dc(uri_query) 뒤에 outlier를 넣었다. 관제 관점의 위험은?",
+      "options": [
+        "공격 구간에 점수가 중복으로 붙는다",
+        "정상 구간이 이상으로 표시된다",
+        "공격 구간의 봉우리가 깎여 사라진다",
+        "차트가 그려지지 않는다"
+      ],
+      "answer": 2,
+      "explanation": "outlier는 이상값을 경계값으로 깎으므로 변화가 애매한 데이터에서는 이상징후를 지웁니다."
+    },
+    {
+      "question": "Q1=10, Q3=30일 때 일반적인 IQR 기준(1.5배)의 상한선은?",
+      "options": [
+        "45",
+        "75",
+        "30",
+        "60"
+      ],
+      "answer": 3,
+      "explanation": "IQR = 30 − 10 = 20, 상한 = Q3 + 1.5 × 20 = 60입니다."
+    },
+    {
+      "question": "Detect Numeric Outliers SPL에서 avg=100, stdev=20, 배수 2일 때 upperBound는?",
+      "options": [
+        "120",
+        "160",
+        "102",
+        "140"
+      ],
+      "answer": 3,
+      "explanation": "upperBound = avg + stdev × 2 = 100 + 40 = 140, lowerBound는 60입니다."
+    },
+    {
+      "question": "Detect Numeric Outliers에서 원본 param_len은 563개, timechart avg(param_len) as info는 4개를 찾았다. 결과를 바꾼 요인은?",
+      "options": [
+        "Experiment 이름",
+        "Field to analyze 순서",
+        "Threshold Method 종류",
+        "넣은 데이터의 집계 단위"
+      ],
+      "answer": 3,
+      "explanation": "원본에 MAD·IQR로 방식만 바꿔도 별 차이가 없었습니다. AI도 정리된 데이터를 더 잘 분석합니다."
+    },
+    {
+      "question": "Smart Outlier Detection에 하루 간격 dc(uri_query)를 넣었더니 '학습 데이터가 너무 적다'고 했다. 이유는?",
+      "options": [
+        "fit 명령이 설치되지 않아서",
+        "하루 간격은 지원되지 않아서",
+        "dc가 문자열을 만들어서",
+        "한 달이 31행뿐이라서"
+      ],
+      "answer": 3,
+      "explanation": "3시간 간격으로 행을 늘리자 정확하게 분석했습니다."
+    },
+    {
+      "question": "Detect Categorical Outliers의 SPL에서 isOutlier=1로 판정하는 기준은?",
+      "options": [
+        "log_event_prob가 음수인가",
+        "cluster_count가 작은가",
+        "probable_cause에 값이 있는가",
+        "unexpectedness가 1에 가까운가"
+      ],
+      "answer": 2,
+      "explanation": "if(probable_cause != \"\", \"1\", \"0\")로 원인 필드의 유무만 봅니다."
+    },
+    {
+      "question": "검색 앞부분에 table로 필드 두 개만 남긴 뒤 다른 필드로 집계했더니 결과가 비었다. 원인은?",
+      "options": [
+        "table 뒤로 다른 필드가 사라져서",
+        "table이 상위 10개만 남겨서",
+        "table이 숫자를 문자로 바꿔서",
+        "table이 시간 필드를 정렬해서"
+      ],
+      "answer": 0,
+      "explanation": "table은 결과 표시용이라 보통 검색 끝에 둡니다. 중간에서 필드를 줄일 때는 fields를 씁니다."
+    },
+    {
+      "question": "set deploy-poll이 정상인데 포워더 관리 화면에 리눅스 포워더가 나타나지 않았다. 수업에서 찾은 원인은?",
+      "options": [
+        "윈도우 방화벽의 인바운드 차단",
+        "포워더의 수신 포트 미설정",
+        "인덱스 secure_log 미생성",
+        "서버 클래스 미생성"
+      ],
+      "answer": 0,
+      "explanation": "인바운드 규칙으로 192.168.56.0/24 통신을 허용한 뒤 새로고침하자 나타났습니다."
+    },
+    {
+      "question": "포워더에 inputs.conf가 내려왔지만 인덱서에 데이터가 전혀 들어오지 않는다. 포워더에서 빠진 설정은?",
+      "options": [
+        "enable listen 9997 (포워더에서)",
+        "add forward-server 192.168.56.1:9997",
+        "set deploy-poll 192.168.56.1:8089",
+        "add monitor /var/log/secure -index secure_log"
+      ],
+      "answer": 1,
+      "explanation": "배포 서버는 무엇을 수집할지만 내려 주고, 어디로 보낼지는 포워더에서 직접 지정해야 합니다."
+    },
+    {
+      "question": "bin/splunk set deploy-poll 192.168.56.1:9997로 입력했다면 무엇이 잘못됐나?",
+      "options": [
+        "포트 없이 IP만 써야 한다",
+        "deploy-poll 대신 forward-server여야 한다",
+        "IP는 192.168.56.100이어야 한다",
+        "관리 포트 8089를 써야 한다"
+      ],
+      "answer": 3,
+      "explanation": "9997은 데이터 수신 포트이고, 배포 서버 등록은 관리 포트 8089로 합니다."
+    },
+    {
+      "question": "예측(Forecast) 기능을 보안 관제에 쓴다면 가장 알맞은 용도는?",
+      "options": [
+        "공격자 IP 예측하기",
+        "시간대별 정상 기준선 만들기",
+        "다음 공격 날짜 맞히기",
+        "공격 유형 분류하기"
+      ],
+      "answer": 1,
+      "explanation": "보안 사고는 주기가 없어 예측할 수 없지만, 정상 트래픽의 기대값을 만들어 벗어남을 볼 수는 있습니다."
+    }
+  ]
+}
