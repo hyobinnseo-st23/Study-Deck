@@ -1,7 +1,7 @@
 {
-  "title": "모의해킹 2일차 (심화)",
+  "title": "모의해킹 2일차 심화",
   "subtitle": "시나리오 판단·원리 추론·방어 설계",
-  "subject": "모의해킹(Penetration Testing)",
+  "subject": "모의해킹",
   "description": "SK Shieldus Rookies 모의해킹 2일차 심화 퀴즈. Case 판별 실험 설계, 이진 탐색·rownum 원리, TO_DATE 인자·NLS 설정 추론, WAF 우회 원리, 컨텍스트별 페이로드, 방어 설계 등 상황 판단형 문제입니다.",
   "questions": [
     {
