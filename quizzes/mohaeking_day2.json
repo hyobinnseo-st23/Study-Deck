@@ -1,5 +1,5 @@
 {
-  "title": "모의해킹 2일차",
+  "title": "모의해킹 DAY2",
   "subtitle": "로그인 Blind·Prepared Statement·JOIN·날짜 TO_DATE·WAF 우회",
   "subject": "모의해킹",
   "description": "SK Shieldus Rookies 모의해킹 2일차(EQST 강사). 로그인 Blind SQLi로 DB User명 추출, 서버 쿼리 유추(Case1/2), Prepared Statement와 적용 실패, JOIN·Cross Join 전체 ID 탈취, 숫자/문자 파라미터 판별, 날짜 TO_DATE로 DB명 추출, Castle WAF 우회를 다룹니다.",
